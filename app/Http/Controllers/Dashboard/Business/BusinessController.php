@@ -37,34 +37,12 @@ class BusinessController extends Controller
         return Inertia::render('admin/Business', $data);
     }
 
-    public function store(Request $request)
+    public function store()
     {
-        $data = $request->validate([
-            "name"              => ['required', 'string', 'max:255'],
-            "id_category"       => ['required'],
-            "description"       => ['required', 'string'],
-            "long_description"  => ['required', 'string'],
-            "phone"             => ['required', 'string'],
-            "use_whatsapp"      => ['required', 'boolean'],
-
-            "location"      => ['required'],
-            "address"       => ['required'],
-            "cords"         => ['required', 'array'],
-            "cords.lat"     => ['required', 'numeric', 'between:-90,90'],
-            "cords.long"    => ['required', 'numeric', 'between:-180,180'],
-        ]);
-
-        $data['cords'] = new Point(
-            latitude: $data['cords']['lat'],
-            longitude: $data['cords']['long']
-        );
-
-        // Asignar el usuario actual
-        $data['user_id'] = Auth::id();
-
+        $businessDTO = BusinessDTO::fromRequest(request());
 
         try { 
-            Businesses::create($data);
+            $this->businessService->create($businessDTO);
  
             return redirect()->back()->with('success', 'Se creó correctamente el negocio.');
 
@@ -79,7 +57,7 @@ class BusinessController extends Controller
 
         try
         {
-            $this->businessService->create($businessDTO, $idBusiness);
+            $this->businessService->update($businessDTO, $idBusiness);
             
             return redirect()->back()->with('success', 'Negocio actualizado correctamente.');
         }  

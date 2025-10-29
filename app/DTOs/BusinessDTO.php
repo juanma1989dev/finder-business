@@ -11,13 +11,6 @@ class Cord
         public readonly float $lat,
         public readonly float $long,
     ) {
-        // if ($lat < -90 || $lat > 90) {
-        //     throw new InvalidArgumentException("La latitud debe estar entre -90 y 90");
-        // }
-
-        // if ($long < -180 || $long > 180) {
-        //     throw new InvalidArgumentException("La longitud debe estar entre -180 y 180");
-        // }
     }
 }
 
@@ -35,7 +28,8 @@ class BusinessDTO
         
         public readonly string $location, 
         public readonly string $address, 
-        public readonly Cord $cord        
+        public readonly Cord $cord,     
+        public readonly int $user_id   
     )
     {
     }
@@ -66,7 +60,8 @@ class BusinessDTO
             $data['use_whatsapp'],
             $data['location'],
             $data['address'],
-            new Cord($data['cords']['lat'], $data['cords']['long'])
+            new Cord($data['cords']['lat'], $data['cords']['long']),
+            $request->user()->id
         );
     }
 }

@@ -13,7 +13,14 @@ class BusinessService
     {
     }
 
-    public function create(BusinessDTO $businessDTO, $idBusiness)
+    public function create(BusinessDTO $businessDTO)
+    {
+        return $this->businessRepository->create(
+            $businessDTO->toArray()
+        );
+    }
+
+    public function update(BusinessDTO $businessDTO, $idBusiness)
     {
         $business = $this->businessRepository->findById($idBusiness);
             
