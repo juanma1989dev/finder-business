@@ -25,14 +25,8 @@ class BusinessController extends Controller
 
     public function index()
     {
-        $businesses = Businesses::with(['category'])->where('user_id', Auth::id())->get();
-        
-        $data = [
-            'businesses' => $businesses,
-            'catalogs' => [
-                'categories' => BusinessCategory::all()
-            ]
-        ];
+        $userId = Auth::id();
+        $data = $this->businessService->getDataListBusinessByuser($userId);
 
         return Inertia::render('admin/Business', $data);
     }

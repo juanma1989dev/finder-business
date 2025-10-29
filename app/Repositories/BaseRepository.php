@@ -36,4 +36,15 @@ abstract class BaseRepository
     {
         return $this->model->with($relations)->get($columns);
     }
+
+    public function findBy(array $conditions, ?array $relations = [], array $columns = ['*'])
+    {
+        $query = $this->model->with($relations);
+
+        foreach ($conditions as $field => $value) {
+            $query->where($field, $value);
+        }
+
+        return $query->get($columns);
+    }
 }
