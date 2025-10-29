@@ -21,9 +21,10 @@ abstract class BaseRepository
     public function update($id, array $data)
     {
         $entity = $this->findById($id);
-        $entity->update($data);
-        
-        return $entity;  
+        $entity->fill($data);
+        $entity->save();
+
+        return $entity;
     }
 
     public function delete($id)

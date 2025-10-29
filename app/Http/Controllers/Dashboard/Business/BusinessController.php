@@ -63,9 +63,7 @@ class BusinessController extends Controller
 
     public function destroy($idBusiness) 
     {  
-        $business = Businesses::findOrFail($idBusiness); 
-
-        $business->delete();
+        $this->businessService->delete($idBusiness);
 
         return redirect()->back()->with('success', 'Se eliminó correctamente.');
     }

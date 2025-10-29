@@ -41,4 +41,10 @@ class BusinessService
             
         return $business->update($businessDTO->toArray());
     }
+
+    public function delete($idBusiness)
+    {
+        $business = $this->businessRepository->findById($idBusiness);
+        return $business->delete();
+    }
 }
