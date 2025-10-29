@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
-
+use App\DTOs\BusinessDTO;
 use App\Http\Controllers\Controller;
 use App\Models\BusinessCategory;
 use App\Models\Businesses;
+use App\Services\Dashboard\BusinessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,13 @@ use \Throwable;
 
 class BusinessController extends Controller
 {
+
+    public function __construct(
+        private readonly BusinessService $businessService
+    )
+    {
+    }
+
     public function index()
     {
         $businesses = Businesses::with(['category'])->where('user_id', Auth::id())->get();
@@ -65,36 +73,17 @@ class BusinessController extends Controller
         }
     }
 
-    public function update(Request $request, $idBusiness) 
+    public function update($idBusiness) 
     {
-        $data = $request->validate([
-            "name" => ['required'],
-            "id_category" => ['required'],
-            "description" => ['required'],
-            "long_description" => ['required'],
-            "phone" => ['required'],
-            "use_whatsapp" => ['required'],
-            
-            "location"      => ['required'],
-            "address"       => ['required'],
-            "cords"         => ['required', 'array'],
-            "cords.lat"     => ['required', 'numeric', 'between:-90,90'],
-            "cords.long"    => ['required', 'numeric', 'between:-180,180'],
-        ]);
-
-
-
+        $businessDTO = BusinessDTO::fromRequest(request());
 
         try
         {
-            $business = Businesses::findOrFail($idBusiness); 
+            $this->businessService->create($businessDTO, $idBusiness);
             
-            $business->update($data);
-            
-            return redirect()->back()
-            ->with('success', 'Negocio actualizado correctamente.');
+            return redirect()->back()->with('success', 'Negocio actualizado correctamente.');
         }  
-        catch(\Throwable) 
+        catch(Throwable) 
         {
             return back()->withErrors(['general' => 'Ocurrió un error al actualizar el negocio.']);
         }

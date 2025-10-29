@@ -19,6 +19,8 @@ final class BusinessController extends Controller
         $filters = $request->filters();
         $geoData = $request->geo();
 
+        // dd($geoData);
+
         $data = $this->searchService->getData($filters, $geoData);
 
         return inertia('Index', [

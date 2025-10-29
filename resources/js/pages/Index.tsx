@@ -42,6 +42,7 @@ export default function Index({ businesses, categories, filters }: Props) {
         enableHighAccuracy: true,
         timeout: 10000,
         enableIPFallback: true,
+        cacheMinutes: 30,
     });
 
     useEffect(() => {

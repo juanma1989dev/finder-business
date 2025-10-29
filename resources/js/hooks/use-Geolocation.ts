@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
-interface GeolocationState {
+export interface GeolocationState {
     latitude: number | null;
     longitude: number | null;
     accuracy: number | null;
@@ -9,14 +9,13 @@ interface GeolocationState {
     source: 'navigator' | 'ip' | 'cache' | null;
 }
 
-interface GeolocationOptions {
+export interface GeolocationOptions {
     enableHighAccuracy?: boolean;
     timeout?: number;
     maximumAge?: number;
     enableIPFallback?: boolean;
     ipApiUrl?: string;
-    cacheKey?: string;
-    cacheDuration?: number; // en milisegundos
+    cacheMinutes?: number;
 }
 
 interface CachedLocation {
@@ -24,6 +23,7 @@ interface CachedLocation {
     longitude: number;
     accuracy: number | null;
     timestamp: number;
+    expiresAt: number;
     source: 'navigator' | 'ip';
 }
 
@@ -34,10 +34,10 @@ export function useGeolocation(options: GeolocationOptions = {}) {
         maximumAge = 0,
         enableIPFallback = true,
         ipApiUrl = 'https://ipapi.co/json/',
-        cacheKey = 'user_geolocation',
-        cacheDuration = 30 * 60 * 1000, // 30 minutos por defecto
+        cacheMinutes = 30,
     } = options;
 
+    const cacheKey = 'geolocation_cache';
     const [state, setState] = useState<GeolocationState>({
         latitude: null,
         longitude: null,
@@ -47,56 +47,37 @@ export function useGeolocation(options: GeolocationOptions = {}) {
         source: null,
     });
 
-    // Función para obtener ubicación del caché
-    const getCachedLocation = (): CachedLocation | null => {
-        try {
-            const cached = sessionStorage.getItem(cacheKey);
-            if (!cached) return null;
+    const isMountedRef = useRef(true);
 
-            const data: CachedLocation = JSON.parse(cached);
-            const now = Date.now();
-
-            // Verificar si el caché expiró
-            if (now - data.timestamp > cacheDuration) {
-                sessionStorage.removeItem(cacheKey);
-                return null;
+    // Auto-limpiar cache expirado en cada render
+    useEffect(() => {
+        const cleanExpiredCache = () => {
+            try {
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    const data: CachedLocation = JSON.parse(cached);
+                    const now = Date.now();
+                    
+                    if (now >= data.expiresAt) {
+                        localStorage.removeItem(cacheKey);
+                        console.log('🗑️ Cache expirado y eliminado automáticamente');
+                    }
+                }
+            } catch (error) {
+                console.error('Error limpiando cache:', error);
+                localStorage.removeItem(cacheKey);
             }
+        };
 
-            return data;
-        } catch (error) {
-            console.error('Error al leer caché de ubicación:', error);
-            return null;
-        }
-    };
-
-    // Función para guardar ubicación en caché
-    const setCachedLocation = (
-        latitude: number,
-        longitude: number,
-        accuracy: number | null,
-        source: 'navigator' | 'ip',
-    ) => {
-        try {
-            const data: CachedLocation = {
-                latitude,
-                longitude,
-                accuracy,
-                timestamp: Date.now(),
-                source,
-            };
-            sessionStorage.setItem(cacheKey, JSON.stringify(data));
-        } catch (error) {
-            console.error('Error al guardar caché de ubicación:', error);
-        }
-    };
+        cleanExpiredCache();
+    }, []);
 
     useEffect(() => {
-        let isMounted = true;
-        let watchId: number | null = null;
+        isMountedRef.current = true;
 
-        // Función para obtener ubicación por IP (fallback)
         const getLocationByIP = async () => {
             try {
+                console.log('🌐 Obteniendo ubicación por IP...');
                 const response = await fetch(ipApiUrl);
 
                 if (!response.ok) {
@@ -105,7 +86,14 @@ export function useGeolocation(options: GeolocationOptions = {}) {
 
                 const data = await response.json();
 
-                if (isMounted && data.latitude && data.longitude) {
+                if (isMountedRef.current && data.latitude && data.longitude) {
+                    console.log('✅ Ubicación por IP obtenida:', {
+                        lat: data.latitude,
+                        lon: data.longitude,
+                        city: data.city,
+                        country: data.country_name
+                    });
+
                     const location = {
                         latitude: data.latitude,
                         longitude: data.longitude,
@@ -116,17 +104,24 @@ export function useGeolocation(options: GeolocationOptions = {}) {
                     };
 
                     setState(location);
-                    setCachedLocation(
-                        data.latitude,
-                        data.longitude,
-                        null,
-                        'ip',
-                    );
+                    
+                    // Guardar en cache
+                    const cacheData: CachedLocation = {
+                        latitude: data.latitude,
+                        longitude: data.longitude,
+                        accuracy: null,
+                        timestamp: Date.now(),
+                        expiresAt: Date.now() + (cacheMinutes * 60 * 1000),
+                        source: 'ip',
+                    };
+                    localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+                    console.log(`💾 Ubicación guardada en cache (expira en ${cacheMinutes} min)`);
                 } else {
                     throw new Error('Datos de IP incompletos');
                 }
             } catch (error) {
-                if (isMounted) {
+                console.error('❌ Error obteniendo ubicación por IP:', error);
+                if (isMountedRef.current) {
                     setState({
                         latitude: null,
                         longitude: null,
@@ -139,27 +134,50 @@ export function useGeolocation(options: GeolocationOptions = {}) {
             }
         };
 
-        // Función principal para obtener ubicación
         const getLocation = () => {
-            // 1. Intentar obtener del caché primero
-            const cached = getCachedLocation();
-            if (cached) {
-                setState({
-                    latitude: cached.latitude,
-                    longitude: cached.longitude,
-                    accuracy: cached.accuracy,
-                    error: null,
-                    loading: false,
-                    source: 'cache',
-                });
-                return;
-            }
+            // 1. Verificar cache válido en localStorage
+            try {
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    const data: CachedLocation = JSON.parse(cached);
+                    const now = Date.now();
 
-            // 2. Verificar si el navegador soporta geolocalización
+                    // Verificar si NO ha expirado
+                    if (now < data.expiresAt) {
+                        const ageInMinutes = Math.round((now - data.timestamp) / 60000);
+                        const expiresInMinutes = Math.round((data.expiresAt - now) / 60000);
+                        
+                        console.log('📦 Usando ubicación en cache:', {
+                            source: data.source,
+                            age: `${ageInMinutes} min`,
+                            expiresIn: `${expiresInMinutes} min`
+                        });
+                        
+                        setState({
+                            latitude: data.latitude,
+                            longitude: data.longitude,
+                            accuracy: data.accuracy,
+                            error: null,
+                            loading: false,
+                            source: 'cache',
+                        });
+                        return; // Cache válido, no solicitar ubicación
+                    } else {
+                        // Cache expirado, eliminarlo
+                        localStorage.removeItem(cacheKey);
+                        console.log('⏰ Cache expirado, solicitando nueva ubicación');
+                    }
+                }
+            } catch (error) {
+                console.error('Error leyendo cache:', error);
+                localStorage.removeItem(cacheKey);
+            }
+            
+            console.log('🔍 No hay cache válido, obteniendo nueva ubicación...');
+
+            // 2. Verificar soporte de geolocalización
             if (!navigator.geolocation) {
-                console.warn(
-                    'Geolocalización no soportada, intentando con IP...',
-                );
+                console.warn('⚠️ Geolocalización no soportada');
                 if (enableIPFallback) {
                     getLocationByIP();
                 } else {
@@ -177,7 +195,24 @@ export function useGeolocation(options: GeolocationOptions = {}) {
 
             // 3. Callback de éxito
             const onSuccess = (position: GeolocationPosition) => {
-                if (isMounted) {
+                if (isMountedRef.current) {
+                    console.log('✅ Ubicación del navegador obtenida:', {
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude,
+                        accuracy: Math.round(position.coords.accuracy) + 'm',
+                        altitude: position.coords.altitude,
+                        altitudeAccuracy: position.coords.altitudeAccuracy,
+                        heading: position.coords.heading,
+                        speed: position.coords.speed,
+                        timestamp: new Date(position.timestamp).toLocaleString(),
+                    });
+
+                    if (position.coords.accuracy > 10000) {
+                        console.warn('⚠️ ADVERTENCIA: Precisión muy baja (' + 
+                            Math.round(position.coords.accuracy/1000) + 'km). ' +
+                            'Probablemente usando Wi-Fi o IP en lugar de GPS real.');
+                    }
+
                     const location = {
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude,
@@ -188,24 +223,29 @@ export function useGeolocation(options: GeolocationOptions = {}) {
                     };
 
                     setState(location);
-                    setCachedLocation(
-                        position.coords.latitude,
-                        position.coords.longitude,
-                        position.coords.accuracy,
-                        'navigator',
-                    );
+                    
+                    // Guardar en cache con tiempo de expiración
+                    const cacheData: CachedLocation = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy,
+                        timestamp: Date.now(),
+                        expiresAt: Date.now() + (cacheMinutes * 60 * 1000),
+                        source: 'navigator',
+                    };
+                    localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+                    console.log(`💾 Ubicación guardada en cache (expira en ${cacheMinutes} min)`);
                 }
             };
 
             // 4. Callback de error
             const onError = (error: GeolocationPositionError) => {
-                console.error('Error de geolocalización:', error.message);
+                console.error('❌ Error de geolocalización:', error.message);
 
-                // Intentar fallback a IP si está habilitado
-                if (enableIPFallback && isMounted) {
-                    console.log('Intentando obtener ubicación por IP...');
+                if (enableIPFallback && isMountedRef.current) {
+                    console.log('🔄 Intentando fallback a IP...');
                     getLocationByIP();
-                } else if (isMounted) {
+                } else if (isMountedRef.current) {
                     let errorMessage = 'Error al obtener ubicación';
 
                     switch (error.code) {
@@ -239,15 +279,10 @@ export function useGeolocation(options: GeolocationOptions = {}) {
             });
         };
 
-        // Iniciar obtención de ubicación
         getLocation();
 
-        // Cleanup
         return () => {
-            isMounted = false;
-            if (watchId !== null) {
-                navigator.geolocation.clearWatch(watchId);
-            }
+            isMountedRef.current = false;
         };
     }, [
         enableHighAccuracy,
@@ -255,20 +290,21 @@ export function useGeolocation(options: GeolocationOptions = {}) {
         maximumAge,
         enableIPFallback,
         ipApiUrl,
-        cacheKey,
-        cacheDuration,
+        cacheMinutes,
     ]);
 
-    // Función para refrescar manualmente la ubicación
     const refresh = () => {
-        sessionStorage.removeItem(cacheKey);
-        setState((prev) => ({ ...prev, loading: true }));
-        window.location.reload();
+        console.log('🔄 Limpiando cache y obteniendo nueva ubicación...');
+        localStorage.removeItem(cacheKey);
+        setState((prev) => ({ ...prev, loading: true, error: null }));
+        setTimeout(() => {
+            window.location.reload();
+        }, 100);
     };
 
-    // Función para limpiar caché
     const clearCache = () => {
-        sessionStorage.removeItem(cacheKey);
+        localStorage.removeItem(cacheKey);
+        console.log('✅ Cache limpiado manualmente');
     };
 
     return {
