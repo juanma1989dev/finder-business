@@ -3,11 +3,12 @@
 namespace App\Services\Dashboard;
 
 use App\DTOs\BusinessDTO;
+use App\DTOs\CoverImageBusinessDTO;
 use App\Models\BusinessCategory;
 use App\Models\Businesses;
 use App\Repositories\BusinessCategoryRepository;
 use App\Repositories\BusinessRepository;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BusinessService
 {
@@ -47,4 +48,24 @@ class BusinessService
         $business = $this->businessRepository->findById($idBusiness);
         return $business->delete();
     }
+
+   public function updateCoverImage(string $idBusiness, CoverImageBusinessDTO $coverImage): bool
+    {
+        $business = $this->businessRepository->findById($idBusiness);
+
+        if ($business->cover_image) {
+            Storage::disk('public')->delete($business->cover_image);
+        }
+
+        $path = Storage::disk('public')->putFileAs(
+            "business_covers/{$idBusiness}", 
+            $coverImage->tmpPath, 
+            $coverImage->fileName
+        );
+
+        $business->update(['cover_image' => $path]);
+
+        return true;
+    }
+
 }
