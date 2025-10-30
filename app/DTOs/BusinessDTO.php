@@ -4,15 +4,16 @@ namespace App\DTOs;
 
 use App\DTOs\Traits\ArrayableDTO;
 use Illuminate\Http\Request;
+use LocationBusinessDTO;
 
-class Cord
-{
-    public function __construct(
-        public readonly ?float $lat,
-        public readonly ?float $long,
-    ) {
-    }
-}
+// class Cord
+// {
+//     public function __construct(
+//         public readonly ?float $lat,
+//         public readonly ?float $long,
+//     ) {
+//     }
+// }
 
 class BusinessDTO
 { 
@@ -27,10 +28,7 @@ class BusinessDTO
         public readonly bool $use_whatsapp, 
         public readonly ?int $user_id,
         public readonly ?string $tags,
-        
-        public readonly ?string $location, 
-        public readonly ?string $address, 
-        public readonly ?Cord $cord,     
+        public readonly ?LocationBusinessDTO $location
     )
     {
     }
@@ -44,14 +42,10 @@ class BusinessDTO
             "long_description" => ['required'],
             "phone" => ['required'],
             "use_whatsapp" => ['required'],
-            "tags" => ['nullable'],
-            
-            "location"      => ['nullable'],
-            "address"       => ['nullable'],
-            "cords"         => ['nullable', 'array'],
-            "cords.lat"     => ['nullable', 'numeric', 'between:-90,90'],
-            "cords.long"    => ['nullable', 'numeric', 'between:-180,180'],
+            "tags" => ['nullable']             
         ]);
+
+        $location = LocationBusinessDTO::fromRequest($request);
 
         return new self(
             $data['name'],
@@ -62,9 +56,7 @@ class BusinessDTO
             $data['use_whatsapp'],
             $request->user()->id,
             $data['tags'] ?? '', 
-            $data['location'] ?? null,
-            $data['address'],
-            new Cord($data['cords']['lat'] ?? null, $data['cords']['long'] ?? null),
+            $location
         );
     }
 }

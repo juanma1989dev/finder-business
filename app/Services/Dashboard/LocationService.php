@@ -2,8 +2,8 @@
 
 namespace App\Services\Dashboard;
 
+use App\DTOs\LocationBusinessDTO;
 use App\Repositories\BusinessRepository;
-use Illuminate\Http\Request;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class LocationService
@@ -23,21 +23,15 @@ class LocationService
         ];
     }
 
-    public function update(Request $request,  $id)
+    public function update(LocationBusinessDTO $location,  $id)
     {
-        $data = $request->validate([
-            'location'    => ['required'],
-            'address'     => ['required'],
-            'cords'       => ['required', 'array'],
-            'cords.lat'   => ['required', 'numeric', 'between:-90,90'],
-            'cords.long'  => ['required', 'numeric', 'between:-180,180'],
-        ]);
-
-        // Crear objeto Point
-        $data['cords'] = new Point(
-            latitude: $data['cords']['lat'],
-            longitude: $data['cords']['long']
+        $cords = new Point(
+            latitude: $location->cord->lat,
+            longitude: $location->cord->long
         );
+
+        $data = $location->toArray();
+        $data['cord'] = $cords;
 
         $this->businessRepository->update($id, $data);
     }
