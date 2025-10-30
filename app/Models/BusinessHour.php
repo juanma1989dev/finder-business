@@ -13,7 +13,7 @@ class BusinessHour extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'business_id',
+        'business_id',  
         'day',
         'open',
         'close',

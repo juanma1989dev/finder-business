@@ -22,7 +22,7 @@ class BusinessRepository extends BaseRepository
         return $business;
     }
 
-    public function syncPayments($id, array $payments = []) : Businesses
+    public function syncPayments(string $id, array $payments = []) : Businesses
     {
         $business = $this->findById($id);
         $business->payments()->sync($payments);
@@ -30,7 +30,7 @@ class BusinessRepository extends BaseRepository
         return $business;
     }
 
-    public function updateSchedules(int $id, array $schedules = []): Businesses
+    public function updateSchedules(string $id, array $schedules = []): Businesses
     {
         $business = $this->findById($id);
 
@@ -39,7 +39,7 @@ class BusinessRepository extends BaseRepository
 
             $hoursData = collect($schedules)->map(function ($dayData) use ($business) {
                 return [
-                    'id_business' => $business->id,
+                    'business_id' => $business->id,
                     'day' => $dayData['day'],
                     'is_open' => $dayData['isOpen'],
                     'open' => $dayData['isOpen'] ? $dayData['open'] : null,
@@ -57,7 +57,7 @@ class BusinessRepository extends BaseRepository
         return $business->fresh(['hours']);
     }
 
-    public function updateNetworks($id, $data): void
+    public function updateNetworks(string $id, $data): void
     {
         $business = $this->findById($id);
 

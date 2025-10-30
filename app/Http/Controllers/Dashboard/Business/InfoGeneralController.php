@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Dashboard\Business;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Business\InfoGeneralRequest; 
-use Inertia\Inertia;
 
 use App\Services\Dashboard\GeneralInfoService;
 
@@ -20,7 +19,7 @@ class InfoGeneralController extends Controller {
     {
         $data = $this->generalInfoService->getInfo($idBusiness);
 
-        return Inertia::render('admin/Business/InfoGeneral', $data);
+        return inertia('admin/Business/InfoGeneral', $data);
     }   
     
     public function update(InfoGeneralRequest $request, $idBusiness)
