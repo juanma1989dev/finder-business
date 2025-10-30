@@ -2,6 +2,7 @@
 
 namespace App\Services\Dashboard;
 
+use App\DTOs\InfoGeneralDTO;
 use App\Mappers\BusinessMapper;
 use App\Repositories\AmenitiesRepository;
 use App\Repositories\BusinessCategoryRepository;
@@ -36,30 +37,29 @@ class GeneralInfoService
         ];
     }
 
-    public function updateBusiness($idBusiness, $request)
+    public function updateBusiness($idBusiness, InfoGeneralDTO $info)
     {
-        return DB::transaction(function () use ($idBusiness, $request) {
-
-            $dataBusiness = $request->validated();
+        return DB::transaction(function () use ($idBusiness, $info) {
 
             $business = $this->businessRepository->update(
                 $idBusiness, 
-                $dataBusiness
+                $info->business->toArray(['user_id', 'location', 'address', 'cord'])
             );
 
             $this->businessRepository->syncServices(
                 $idBusiness, 
-                $request->amenities ?? []
+                $info->amenities ?? []
             );
 
             $this->businessRepository->syncPayments(
                 $idBusiness, 
-                $request->payments ?? []
+                $info->payments ?? []
             );
+            
 
             $this->businessRepository->updateSchedules(
                 $idBusiness, 
-                $request->schedules ?? []
+                $info->schedules 
             );
 
             return $business;

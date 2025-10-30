@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\DTOs\SchedulesDTO;
 use App\Models\Businesses;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -30,24 +31,20 @@ class BusinessRepository extends BaseRepository
         return $business;
     }
 
-    public function updateSchedules(string $id, array $schedules = []): Businesses
+    public function updateSchedules(string $id, SchedulesDTO $schedules): Businesses
     {
         $business = $this->findById($id);
 
         DB::transaction(function () use ($business, $schedules) {
             $business->hours()->delete();
 
-            $hoursData = collect($schedules)->map(function ($dayData) use ($business) {
-                return [
-                    'business_id' => $business->id,
-                    'day' => $dayData['day'],
-                    'is_open' => $dayData['isOpen'],
-                    'open' => $dayData['isOpen'] ? $dayData['open'] : null,
-                    'close' => $dayData['isOpen'] ? $dayData['close'] : null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            })->toArray();
+            $hoursData = [];
+            
+            foreach($schedules->data ?? [] as $schedule){
+                $newSchedule = $schedule->toArray();
+                $newSchedule['business_id'] = $business->id;
+                $hoursData[] = $newSchedule;
+            }
 
             if (!empty($hoursData)) {
                 $business->hours()->insert($hoursData);

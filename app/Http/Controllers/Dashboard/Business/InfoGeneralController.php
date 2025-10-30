@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
+use App\DTOs\InfoGeneralDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Business\InfoGeneralRequest; 
 
 use App\Services\Dashboard\GeneralInfoService;
+use Illuminate\Http\Request;
 
 class InfoGeneralController extends Controller {
 
@@ -22,9 +24,11 @@ class InfoGeneralController extends Controller {
         return inertia('admin/Business/InfoGeneral', $data);
     }   
     
-    public function update(InfoGeneralRequest $request, $idBusiness)
+    public function update(Request $request, $idBusiness)
     {
-        $this->generalInfoService->updateBusiness($idBusiness, $request);
+        $info = InfoGeneralDTO::fromRequest($request);
+
+        $this->generalInfoService->updateBusiness($idBusiness, $info);
 
         return redirect()->back()
             ->with('success', 'Negocio actualizado correctamente.');

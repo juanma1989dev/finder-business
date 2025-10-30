@@ -4,13 +4,19 @@ namespace App\DTOs\Traits;
 
 trait ArrayableDTO
 {
-    public function toArray(): array
+    public function toArray(array $exclude = []): array
     {
-        return array_map(function ($value) {
+        $data = array_map(function ($value) {
             if (is_object($value) && method_exists($value, 'toArray')) {
                 return $value->toArray();
             }
             return $value;
         }, get_object_vars($this));
+
+        foreach($exclude as $field){
+            unset($data[$field]);
+        }
+
+        return $data;
     }
 }
