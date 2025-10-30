@@ -25,7 +25,7 @@ class GalleryBusinessDTO
         $images = [];
 
         foreach ($validated['images'] ?? [] as $imagesData) {
-            $images[] = new ImageBusinessDTO(
+            $images[] = new ImageDTO(
                 filePath: $imagesData['file'] ?? null,
                 url: $imagesData['url'] ?? null,
                 isPrimary: $imagesData['is_primary'] ?? false

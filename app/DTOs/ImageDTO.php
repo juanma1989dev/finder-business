@@ -2,7 +2,7 @@
 
 namespace App\DTOs;
 
-class ImageBusinessDTO
+class ImageDTO
 {
     public function __construct(
         public readonly ?string $filePath,   // Ruta temporal del archivo

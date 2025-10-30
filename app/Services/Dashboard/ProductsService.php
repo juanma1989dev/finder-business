@@ -2,6 +2,7 @@
 
 namespace App\Services\Dashboard;
 
+use App\DTOs\ProductsDTO;
 use App\Mappers\ProductsAndServicesMapper;
 use App\Models\Businesses;
 use App\Repositories\BusinessRepository;
@@ -31,12 +32,14 @@ class ProductsService
     /**
      * Crea un nuevo producto o servicio asociado al negocio.
      */
-    public function create(string $idBusiness, array $data, $image = null): void
+    public function create(string $idBusiness, ProductsDTO $product): void
     {
+        $data = $product->toArray();
+
         $data['id'] = (string) Str::uuid();
 
-        if ($image) {
-            $data['image_url'] = $this->storeServiceImage($image, $idBusiness);
+        if ($product->image) {
+            $data['image_url'] = $this->storeServiceImage($product->image, $idBusiness);
         }
 
         $this->businessRepository->createProductOrService($idBusiness, $data);
@@ -45,12 +48,14 @@ class ProductsService
     /**
      * Actualiza un producto o servicio existente.
      */
-    public function update(string $idBusiness, string $idService, array $data, $image = null)
+    public function update(string $idBusiness, string $idService, ProductsDTO $product)
     {
+        $data = $product->toArray();
+
         $service = $this->findServiceOrFail($idBusiness, $idService);
 
-        if ($image) {
-            $data['image_url'] = $this->replaceImage($service, $image, $idBusiness);
+        if ($product->image) {
+            $data['image_url'] = $this->replaceImage($service, $product->image, $idBusiness);
         }
 
         $service->update($data);

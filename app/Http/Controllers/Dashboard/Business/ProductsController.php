@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
+use App\DTOs\ProductsDTO;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Business\ProductsRequest;
 use App\Services\Dashboard\ProductsService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Throwable;
 
 class ProductsController extends Controller 
@@ -21,16 +22,12 @@ class ProductsController extends Controller
         return inertia('admin/Business/Products', $data);
     }
 
-    public function store(ProductsRequest $request, string $idBusiness): RedirectResponse
+    public function store(Request $request, string $idBusiness): RedirectResponse
     {
         try {
-            $data = $request->validated();
+            $product = ProductsDTO::fromRequest($request);
 
-            $this->productsService->create(
-                $idBusiness, 
-                $data, 
-                $request->file('image')
-            );
+            $this->productsService->create($idBusiness, $product);
 
             return back()->with('success', 'Se agregó correctamente el servicio.');
         } catch (Throwable $e) {
@@ -38,17 +35,12 @@ class ProductsController extends Controller
         }
     }
 
-    public function update(ProductsRequest $request, string $idBusiness, string $id): RedirectResponse
+    public function update(Request $request, string $idBusiness, string $id): RedirectResponse
     {
         try {
-            $data = $request->validated();
+            $product = ProductsDTO::fromRequest($request);
             
-            $this->productsService->update(
-                $idBusiness, 
-                $id, 
-                $data, 
-                $request->file('image')
-            );
+            $this->productsService->update( $idBusiness, $id, $product );
 
             return back()->with('success', 'Servicio actualizado correctamente');
         } catch (Throwable $e) {
