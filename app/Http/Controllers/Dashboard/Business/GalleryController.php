@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
+use App\DTOs\GalleryBusinessDTO;
+use App\DTOs\GalleryImagesDTO;
 use App\Http\Controllers\Controller;
-use App\Models\Businesses;
 use App\Services\Dashboard\GalleryService;
-use Illuminate\Http\Request;
 
 class GalleryController extends Controller
 {
@@ -20,16 +20,11 @@ class GalleryController extends Controller
         return inertia('admin/Business/Gallery', $data);
     }
 
-    public function store(Request $request, string $businessId)
+    public function store(string $businessId)
     {
-        $validated = $request->validate([
-            'images' => 'nullable|array',
-            'images.*.file' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
-            'images.*.url' => 'nullable|string',
-            'images.*.is_primary' => 'nullable|boolean',
-        ]);
+        $gallery = GalleryBusinessDTO::fromArray( request() );
 
-        $this->galleryService->syncGallery($businessId, $validated['images'] ?? null);
+        $this->galleryService->syncGallery($businessId, $gallery);
 
         return redirect()
             ->back()

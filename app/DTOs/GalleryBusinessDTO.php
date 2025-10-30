@@ -4,16 +4,7 @@ namespace App\DTOs;
 
 use Illuminate\Http\Request;
 
-class GalleryImageDTO
-{
-    public function __construct(
-        public readonly ?string $filePath,   // Ruta temporal del archivo
-        public readonly ?string $url,        // URL externa si aplica
-        public readonly bool $isPrimary = false
-    ) {}
-}
-
-class GalleryImagesDTO
+class GalleryBusinessDTO
 {
     public array $images = [];
 
@@ -34,7 +25,7 @@ class GalleryImagesDTO
         $images = [];
 
         foreach ($validated['images'] ?? [] as $imagesData) {
-            $images[] = new GalleryImageDTO(
+            $images[] = new ImageBusinessDTO(
                 filePath: $imagesData['file'] ?? null,
                 url: $imagesData['url'] ?? null,
                 isPrimary: $imagesData['is_primary'] ?? false
@@ -42,5 +33,10 @@ class GalleryImagesDTO
         }
 
         return new self($images);
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->images);
     }
 }

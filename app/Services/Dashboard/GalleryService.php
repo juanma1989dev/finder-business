@@ -2,6 +2,9 @@
 
 namespace App\Services\Dashboard;
 
+use App\DTOs\GalleryBusinessDTO;
+use App\DTOs\GalleryImagesDTO;
+use App\DTOs\ImageBusinessDTO;
 use App\Mappers\BusinessMapper;
 use App\Repositories\BusinessRepository;
 
@@ -32,27 +35,27 @@ class GalleryService
     /**
      * Sincroniza la galería de imágenes de un negocio
      */
-    public function syncGallery($businessId, ?array $images): void
+    public function syncGallery($businessId, GalleryBusinessDTO $gallery): void
     {
-        DB::transaction(function () use ($businessId, $images) {
+        DB::transaction(function () use ($businessId, $gallery) {
 
             $business = $this->businessRepository->findById($businessId);
 
             $existingImages = $this->galleryRpository->getByBusiness($business);
             
-            // Si no hay imágenes, eliminar todas
-            if (empty($images)) {
+            # Si no hay imágenes, eliminar todas
+            if($gallery->isEmpty()) {
                 $this->deleteAllImages($existingImages);
                 return;
             }
 
-            // Procesar imágenes
-            $incomingPaths = $this->processImages($business, $images);
+            # Procesar imágenes
+            $incomingPaths = $this->processImages($business, $gallery);
 
-            // Eliminar imágenes que ya no están
+            # Eliminar imágenes que ya no están
             $this->deleteRemovedImages($business, $incomingPaths);
 
-            // Asegurar una sola imagen primaria
+            # Asegurar una sola imagen primaria
             $this->ensureSinglePrimaryImage($business);
         });
     }
@@ -61,22 +64,23 @@ class GalleryService
     /**
      * Procesa todas las imágenes (nuevas y existentes)
      */
-    private function processImages(Businesses $business, array $images): array
+    private function processImages(Businesses $business, GalleryBusinessDTO $gallery): array
     {
         $incomingPaths = [];
 
-        foreach ($images as $imageData) {
+        foreach ($gallery->images as $imageData) {
+
             $path = $this->processImage($imageData, $business->id);
 
             if (!$path) continue;
 
             $incomingPaths[] = $path;
 
-            // Usar repository en lugar de Eloquent directo
+            # Usar repository en lugar de Eloquent directo
             $this->galleryRpository->createOrUpdate(
                 $business->id,
                 $path,
-                $imageData['is_primary'] ?? false
+                $imageData->isPrimary ?? false
             );
         }
 
@@ -86,16 +90,16 @@ class GalleryService
     /**
      * Procesa una imagen individual (nueva o existente)
      */
-    private function processImage(array $imageData, string $businessId): ?string
+    private function processImage(ImageBusinessDTO $image, string $businessId): ?string
     {
-        // Imagen nueva subida
-        if (isset($imageData['file']) && $imageData['file'] instanceof UploadedFile) {
-            return $this->uploadImage($imageData['file'], $businessId);
+        # Imagen nueva subida
+        if (isset($image->filePath) && $image->filePath instanceof UploadedFile) {
+            return $this->uploadImage($image->filePath, $businessId);
         }
 
-        // Imagen existente con URL
-        if (!empty($imageData['url'])) {
-            return $this->cleanUrl($imageData['url']);
+        # Imagen existente con URL
+        if (!empty($image->url)) {
+            return $this->cleanUrl($image->url);
         }
 
         return null;
