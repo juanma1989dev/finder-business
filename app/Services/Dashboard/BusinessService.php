@@ -53,9 +53,7 @@ class BusinessService
     {
         $business = $this->businessRepository->findById($idBusiness);
 
-        if ($business->cover_image) {
-            Storage::disk('public')->delete($business->cover_image);
-        }
+        $oldCoverImage = $business->cover_image;
 
         $path = Storage::disk('public')->putFileAs(
             "business_covers/{$idBusiness}", 
@@ -64,6 +62,10 @@ class BusinessService
         );
 
         $business->update(['cover_image' => $path]);
+
+        if($oldCoverImage) {
+            Storage::disk('public')->delete($oldCoverImage);
+        }
 
         return true;
     }

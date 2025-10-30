@@ -3,6 +3,7 @@
 namespace App\DTOs;
 
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 
 class CoverImageBusinessDTO
 {
@@ -18,6 +19,10 @@ class CoverImageBusinessDTO
         ]);
 
         $file = $request->file('cover_image');
+
+        if (!$file || !$file->isValid()) {
+            throw new InvalidArgumentException('Archivo no válido.');
+        }
 
         return new self(
             $file->getPathname(),

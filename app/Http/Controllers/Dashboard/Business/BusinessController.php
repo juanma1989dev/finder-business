@@ -6,7 +6,6 @@ use App\DTOs\BusinessDTO;
 use App\DTOs\CoverImageBusinessDTO;
 use App\Http\Controllers\Controller;
 use App\Services\Dashboard\BusinessService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use \Throwable;
 
