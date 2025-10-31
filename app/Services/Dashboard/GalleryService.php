@@ -5,14 +5,15 @@ namespace App\Services\Dashboard;
 use App\DTOs\GalleryBusinessDTO;
 use App\DTOs\GalleryImagesDTO;
 use App\DTOs\ImageBusinessDTO;
+use App\DTOs\ImageDTO;
 use App\Mappers\BusinessMapper;
 use App\Repositories\BusinessRepository;
-
 use App\Models\Businesses;
 use App\Repositories\GalleryRpository;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 
 class GalleryService 
 {
@@ -93,8 +94,8 @@ class GalleryService
     private function processImage(ImageBusinessDTO $image, string $businessId): ?string
     {
         # Imagen nueva subida
-        if (isset($image->filePath) && $image->filePath instanceof UploadedFile) {
-            return $this->uploadImage($image->filePath, $businessId);
+        if (isset($image->data) &&  $image->data instanceof ImageDTO) {
+            return $this->uploadImage($image->data, $businessId);
         }
 
         # Imagen existente con URL
@@ -108,9 +109,16 @@ class GalleryService
     /**
      * Sube una imagen nueva al storage
      */
-    private function uploadImage(UploadedFile $file, string $businessId): string
+    private function uploadImage(ImageDTO $file, string $idBusiness): string
     {
-        return $file->store("business_images/{$businessId}/gallery", 'public');
+        $path = "business_gallery/{$idBusiness}";
+        $filename = Str::uuid() . '.' . $file->extension;
+ 
+        return Storage::disk('public')->putFileAs(
+            $path, 
+            $file->filePath, 
+            $filename
+        );
     }
 
     /**

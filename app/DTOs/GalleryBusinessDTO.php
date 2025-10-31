@@ -24,11 +24,20 @@ class GalleryBusinessDTO
 
         $images = [];
 
-        foreach ($validated['images'] ?? [] as $imagesData) {
-            $images[] = new ImageDTO(
-                filePath: $imagesData['file'] ?? null,
-                url: $imagesData['url'] ?? null,
-                isPrimary: $imagesData['is_primary'] ?? false
+        foreach ($validated['images'] ?? [] as $imageData) {
+
+            $file = $imageData['file'] ?? null;
+
+            $dataImage = $file ? new ImageDTO(
+                filePath: $file->getPathname(),
+                extension: $file->getClientOriginalExtension(),
+                mimeType:  $file->getMimeType()
+            ) : null;
+
+            $images[] = new ImageBusinessDTO(
+                data : $dataImage,
+                url: $imageData['url'] ?? null,
+                isPrimary: $imageData['is_primary'] ?? false
             ); 
         }
 

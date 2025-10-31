@@ -6,6 +6,7 @@ use App\DTOs\GalleryBusinessDTO;
 use App\DTOs\GalleryImagesDTO;
 use App\Http\Controllers\Controller;
 use App\Services\Dashboard\GalleryService;
+use Illuminate\Http\Request;
 
 class GalleryController extends Controller
 {
@@ -20,9 +21,9 @@ class GalleryController extends Controller
         return inertia('admin/Business/Gallery', $data);
     }
 
-    public function store(string $businessId)
+    public function store(Request $request, string $businessId)
     {
-        $gallery = GalleryBusinessDTO::fromArray( request() );
+        $gallery = GalleryBusinessDTO::fromArray( $request );
 
         $this->galleryService->syncGallery($businessId, $gallery);
 
