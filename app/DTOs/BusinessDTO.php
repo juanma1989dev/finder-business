@@ -4,16 +4,7 @@ namespace App\DTOs;
 
 use App\DTOs\Traits\ArrayableDTO;
 use Illuminate\Http\Request;
-use LocationBusinessDTO;
-
-// class Cord
-// {
-//     public function __construct(
-//         public readonly ?float $lat,
-//         public readonly ?float $long,
-//     ) {
-//     }
-// }
+ 
 
 class BusinessDTO
 { 

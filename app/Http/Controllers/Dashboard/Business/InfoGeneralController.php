@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Dashboard\Business;
 
 use App\DTOs\InfoGeneralDTO;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Business\InfoGeneralRequest; 
-
 use App\Services\Dashboard\GeneralInfoService;
 use Illuminate\Http\Request;
 

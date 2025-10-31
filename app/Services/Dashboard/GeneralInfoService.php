@@ -43,7 +43,7 @@ class GeneralInfoService
 
             $business = $this->businessRepository->update(
                 $idBusiness, 
-                $info->business->toArray(['user_id', 'location', 'address', 'cord'])
+                $info->business->toArray(['user_id', 'location'])
             );
 
             $this->businessRepository->syncServices(

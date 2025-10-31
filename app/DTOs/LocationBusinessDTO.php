@@ -27,21 +27,27 @@ class LocationBusinessDTO
     {        
     }
 
-    public static function fromRequest(Request $request): self
+   public static function fromRequest(Request $request): self
     {
-         $data = $request->validate([
-            'location'    => ['required'],
-            'address'     => ['required'],
-            'cords'       => ['required', 'array'],
-            'cords.lat'   => ['required', 'numeric', 'between:-90,90'],
-            'cords.long'  => ['required', 'numeric', 'between:-180,180'],
+        $data = $request->validate([
+            'location'    => ['nullable'],
+            'address'     => ['nullable'],
+            'cords'       => ['nullable', 'array'],
+            'cords.lat'   => ['nullable', 'numeric', 'between:-90,90'],
+            'cords.long'  => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
+        $cordsData = $data['cords'] ?? null;
+
+        $cords = isset($cordsData['lat'], $cordsData['long'])
+            ? new Cord($cordsData['lat'], $cordsData['long'])
+            : null;
 
         return new self(
-            $data['location'],
-            $data['address'],
-            new Cord($data['cords']['lat'], $data['cords']['long']),
+            $data['location'] ?? null,
+            $data['address'] ?? null,
+            $cords
         );
     }
+
 }

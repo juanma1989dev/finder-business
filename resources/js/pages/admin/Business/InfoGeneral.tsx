@@ -88,8 +88,8 @@ export default function EditBusiness({
                     toast.success(successMessage);
                 }
             },
-            onError: () => {
-                console.log('Error');
+            onError: (errors) => {
+                console.log('Error', errors);
             },
         });
     };
