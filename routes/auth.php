@@ -49,5 +49,11 @@ Route::middleware('guest')->group(function () {
 
 
 # Google
-Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
-Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
+// Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
+// Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
+
+
+// Rutas
+Route::get('/auth/google/login', [GoogleController::class, 'redirectToGoogleLogin'])->name('auth.google.login');
+Route::get('/auth/google/register', [GoogleController::class, 'redirectToGoogleRegister'])->name('auth.google.register');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('auth.google.callback');
