@@ -16,7 +16,7 @@ class ProductsDTO
         public readonly ?string $duration,
         public readonly string $category,
         public readonly bool $isActive,
-        public readonly ?string $image
+        public readonly object|string|null $image
     )
     {
     }
