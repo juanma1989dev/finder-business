@@ -2,6 +2,7 @@
 
 namespace App\Services\Dashboard;
 
+use App\DTOs\NetworksDTO;
 use App\Models\Businesses;
 use App\Repositories\BusinessRepository;
 use Illuminate\Http\Request;
@@ -23,16 +24,9 @@ class NetworksService
         ];
     }
 
-    public function update(Request $request, $id)
+    public function update(NetworksDTO $networks, $id)
     {
-        $data = $request->validate([
-            'web' => 'nullable|url',
-            'instagram' => 'nullable|url',
-            'youtube' => 'nullable|url',
-            'facebook' => 'nullable|url',
-            'tiktok' => 'nullable|url',
-            'twitter' => 'nullable|url',
-        ]);
+        $data = $networks->toArray();
 
         $this->businessRepository->updateNetworks($id, $data);
     }

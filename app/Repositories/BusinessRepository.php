@@ -54,7 +54,7 @@ class BusinessRepository extends BaseRepository
         return $business->fresh(['hours']);
     }
 
-    public function updateNetworks(string $id, $data): void
+    public function updateNetworks(string $id, array $data): void
     {
         $business = $this->findById($id);
 
