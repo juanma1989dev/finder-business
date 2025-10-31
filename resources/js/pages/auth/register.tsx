@@ -1,16 +1,20 @@
 import { Head, Link } from '@inertiajs/react';
 
-import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function Register() {
     return (
         <AuthLayout title="Crea una cuenta" description="">
-            <Head title="Register" />
+            <Head title="Registrarse" />
 
-            <Button className="bg-orange-600">
-                <a href="/auth/google"> Google </a>
-            </Button>
+            <div className="flex items-center justify-center gap-5">
+                <a
+                    href="/auth/google"
+                    className="rounded-md bg-orange-600 px-8 py-1 text-white hover:border-1 hover:border-orange-600 hover:bg-white hover:text-black hover:text-orange-600"
+                >
+                    Google
+                </a>
+            </div>
 
             <div className="flex items-center justify-center gap-5 text-center">
                 <Link href="/login" className="hover:underline">

@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { Home } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {
@@ -31,9 +32,10 @@ export default function AuthSimpleLayout({
                             <div className="flex flex-col items-center gap-4">
                                 <Link
                                     href="/"
-                                    className="flex flex-col items-center gap-2 font-medium"
+                                    className="mb-10 flex items-center gap-2 font-medium text-black hover:underline"
                                 >
-                                    <span className="sr-only">{title}</span>
+                                    <Home className="h-5 w-5" />
+                                    Inicio
                                 </Link>
 
                                 <div className="space-y-2 text-center">

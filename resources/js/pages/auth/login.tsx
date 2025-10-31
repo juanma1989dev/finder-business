@@ -10,10 +10,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     return (
         <AuthLayout title="Inicia sesión" description=" ">
             <Head title="Iniciar sessión" />
+
             <div className="flex items-center justify-center gap-5">
                 <a
                     href="/auth/google"
-                    className="rounded-md bg-orange-600 p-2 text-white hover:border-1 hover:border-orange-600 hover:bg-white hover:text-black"
+                    className="rounded-md bg-orange-600 px-8 py-1 text-white hover:border-1 hover:border-orange-600 hover:bg-white hover:text-black hover:text-orange-600"
                 >
                     Google
                 </a>
