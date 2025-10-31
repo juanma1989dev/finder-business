@@ -32,6 +32,7 @@ import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import {
     Edit,
     ExternalLink,
+    Home,
     Loader2,
     MoreVertical,
     Plus,
@@ -198,23 +199,35 @@ export default function Business({ businesses, catalogs }: Props) {
                 <div className="container mx-auto px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-md bg-gradient-to-r from-orange-700 to-amber-600 bg-clip-text font-bold text-transparent sm:text-2xl">
-                                Mis negocios
-                            </h1>
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-md bg-gradient-to-r from-orange-700 to-amber-600 bg-clip-text font-bold text-transparent sm:text-2xl">
+                                    Mis negocios
+                                </h1>
+                            </div>
                             <p className="mt-1 text-sm text-gray-800">
                                 Administr tus negocios desde aquí.
                             </p>
                         </div>
 
-                        {businesses.length < 10 && (
-                            <Button
-                                className="cursor-pointer bg-orange-600 text-white hover:bg-orange-700"
-                                onClick={openForCreate}
+                        <div className="flex gap-3">
+                            <Link
+                                className="flex cursor-pointer items-center gap-2 rounded-md bg-orange-600 px-3 text-white hover:bg-orange-700"
+                                href="/"
                             >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Agregar negocio
-                            </Button>
-                        )}
+                                <Home className="my-2 h-4 w-4" />
+                                Ir al buscador
+                            </Link>
+
+                            {businesses.length < 10 && (
+                                <Button
+                                    className="cursor-pointer bg-orange-600 text-white hover:bg-orange-700"
+                                    onClick={openForCreate}
+                                >
+                                    <Plus className="my-2 h-4 w-4" />
+                                    Agregar negocio
+                                </Button>
+                            )}
+                        </div>
 
                         <Dialog
                             open={open}
