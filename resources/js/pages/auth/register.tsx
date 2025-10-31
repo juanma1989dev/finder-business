@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
@@ -13,9 +13,9 @@ export default function Register() {
             </Button>
 
             <div className="flex items-center justify-center gap-5 text-center">
-                <a href="/login" className="hover:underline">
+                <Link href="/login" className="hover:underline">
                     Iniciar sesión
-                </a>
+                </Link>
             </div>
 
             {/* <Form
