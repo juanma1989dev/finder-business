@@ -27,7 +27,7 @@ export default function Favorites({ businesses }: Props) {
             ) : (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {businesses.map((negocio: any, index: number) => (
-                        <BusinessCard business={negocio} modeEdit={false} />
+                        <BusinessCard business={negocio} />
                     ))}
                 </div>
             )}

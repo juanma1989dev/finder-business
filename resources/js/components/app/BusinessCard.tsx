@@ -1,5 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { Edit, MapPinned } from 'lucide-react';
+import { MapPinned } from 'lucide-react';
+// import {
+//     Select,
+//     SelectContent,
+//     SelectItem,
+//     SelectTrigger,
+//     SelectValue,
+// } from '../ui/select';
 
 interface Props {
     business: any;
@@ -8,20 +15,40 @@ interface Props {
 
 export default function BusinessCard({ business, modeEdit }: Props) {
     return (
-        <div className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300">
-            <div className="relative h-48 overflow-hidden">
-                {modeEdit && (
-                    <Link
-                        href={`/dashboard/business/edit/${business.id}`}
-                        className="absolute top-3 right-3 cursor-pointer"
-                        title="Editar negocio"
-                    >
-                        <span className="inline-block rounded-full bg-orange-600 px-3 py-1 text-xs font-semibold hover:scale-105 hover:bg-orange-700">
-                            <Edit className="h-4 w-4 text-white" />
-                        </span>
-                    </Link>
-                )}
+        <div className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-red-800 bg-white shadow-sm transition-all duration-300">
+            <div className="absolute top-2 right-2 z-10">
+                {/* <Select onValueChange={(value) => console.log(value)}>
+                    <SelectTrigger className="text-gray/90 w-full rounded-lg border-none bg-white/80 px-3 py-1.5 transition duration-200 hover:bg-white/90">
+                        <SelectValue
+                            placeholder="Sin lista asignada"
+                            className="text-white/90"
+                        />
+                    </SelectTrigger>
 
+                    <SelectContent className="rounded-lg border border-white/10 bg-gray-800 text-white shadow-lg">
+                        <SelectItem
+                            value="opcion1"
+                            className="rounded-md px-2 py-1 transition-colors duration-150 hover:bg-white/10"
+                        >
+                            Opción 1
+                        </SelectItem>
+                        <SelectItem
+                            value="opcion2"
+                            className="rounded-md px-2 py-1 transition-colors duration-150 hover:bg-white/10"
+                        >
+                            Opción 2
+                        </SelectItem>
+                        <SelectItem
+                            value="opcion3"
+                            className="rounded-md px-2 py-1 transition-colors duration-150 hover:bg-white/10"
+                        >
+                            Opción 3
+                        </SelectItem>
+                    </SelectContent>
+                </Select> */}
+            </div>
+
+            <div className="relative h-48 overflow-hidden">
                 <Link href={`/business/detail/${business.id}`} className="">
                     <img
                         src={
@@ -33,10 +60,9 @@ export default function BusinessCard({ business, modeEdit }: Props) {
                         className="h-full w-full object-cover transition-transform duration-300"
                     />
                 </Link>
-                {/* <div className="absolute top-3 right-3 flex items-center space-x-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm">
-                                            <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                                            <span className="text-gray-700 text-xs font-semibold">{negocio.rating}</span>
-                                        </div> */}
+                {/* <div className="absolute top-3 right-3 flex items-center space-x-1 rounded-full bg-white/90 px-2 py-1 shadow-sm backdrop-blur-sm">
+                    <Star className="h-3 w-3 fill-current text-yellow-500" /> 5
+                </div> */}
                 <div className="absolute bottom-3 left-3">
                     <span className="inline-block rounded-full bg-orange-600 px-3 py-1 text-xs text-white shadow-sm">
                         {business?.category.name}
