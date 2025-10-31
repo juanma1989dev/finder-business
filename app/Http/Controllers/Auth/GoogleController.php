@@ -1,80 +1,68 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
+use App\Services\Auth\GoogleAuthService;
+use Illuminate\Http\RedirectResponse;
 use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Str;
 use Throwable;
 
 class GoogleController extends Controller
 {
-    public function redirectToGoogleLogin()
+    public function __construct(
+        private GoogleAuthService $googleAuthService
+    ) {}
+
+    /**
+     * Redirige al usuario a Google para login
+     */
+    public function redirectToGoogleLogin(): RedirectResponse
     {
-        Session::put('google_auth_action', 'login');
+        $this->googleAuthService->setAuthAction('login');
         return Socialite::driver('google')->redirect();
     }
 
-    public function redirectToGoogleRegister()
+    /**
+     * Redirige al usuario a Google para registro
+     */
+    public function redirectToGoogleRegister(): RedirectResponse
     {
-        Session::put('google_auth_action', 'register');
+        $this->googleAuthService->setAuthAction('register');
         return Socialite::driver('google')->redirect();
     }
 
-    public function handleGoogleCallback()
+    /**
+     * Maneja el callback de Google OAuth
+     */
+    public function handleGoogleCallback(): RedirectResponse
     {
         try {
             $googleUser = Socialite::driver('google')->user();
-            $action = Session::get('google_auth_action', 'login');
-            Session::forget('google_auth_action');  
+            $action = $this->googleAuthService->getAndForgetAuthAction();
             
-            $existingUser = User::where('email', $googleUser->getEmail())
-                ->orWhere('google_id', $googleUser->getId())
-                ->first();
+            $result = $this->googleAuthService->handleGoogleAuthentication($googleUser, $action);
 
-           
-            # Intentando REGISTRARSE pero ya existe
-            if ($action === 'register' && $existingUser) {
-                return redirect()->route('register')
-                    ->with('error', 'Ya existe una cuenta con este correo. Por favor inicia sesión.');
+            if (!$result['success']) {
+                return redirect()
+                    ->route($result['redirect'])
+                    ->with('error', $result['error']);
             }
 
-            # Intentando LOGIN pero no existe
-            if ($action === 'login' && !$existingUser) {
-                return redirect()->route('login')
-                    ->with('error', 'No existe una cuenta con este correo. Por favor regístrate primero.');
+            $redirect = redirect()->route($result['redirect']);
+            
+            if (isset($result['message'])) {
+                $redirect->with('success', $result['message']);
             }
 
-            # CASO 3: REGISTRO exitoso
-            if ($action === 'register' && !$existingUser) {
-                $user = User::create([
-                    'name'      => $googleUser->getName(),
-                    'email'     => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
-                    'password'  => bcrypt(Str::random(16)),
-                ]);
-                
-                Auth::login($user, true);
-                return redirect()->route('public.home')
-                    ->with('success', '¡Cuenta creada exitosamente!');
-            }
-
-            # CASO 4: LOGIN exitoso (actualizar google_id si no lo tenía)
-            if (!$existingUser->google_id) {
-                $existingUser->update(['google_id' => $googleUser->getId()]);
-            }
-
-            Auth::login($existingUser, true);
-            return redirect()->route('public.home');
+            return $redirect;
 
         } catch (Throwable $e) {
-            // Log::error('Google auth failed', ['error' => $e->getMessage()]);
-            Session::forget('google_auth_action');
-            return redirect()->route('login')
-                ->with('error', 'Error al autenticar con Google');
+            $this->googleAuthService->clearAuthAction();
+            
+            return redirect()
+                ->route('login')
+                ->with('error', 'Error al autenticar con Google. Por favor intenta nuevamente.');
         }
     }
 }
