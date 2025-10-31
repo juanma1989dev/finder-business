@@ -198,11 +198,11 @@ export default function Business({ businesses, catalogs }: Props) {
                 <div className="container mx-auto px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-2xl font-semibold">
+                            <h1 className="text-md bg-gradient-to-r from-orange-700 to-amber-600 bg-clip-text font-bold text-transparent sm:text-2xl">
                                 Mis negocios
                             </h1>
-                            <p className="mt-1 text-sm text-gray-600">
-                                Manejas todos tus negocios
+                            <p className="mt-1 text-sm text-gray-800">
+                                Administr tus negocios desde aquí.
                             </p>
                         </div>
 
