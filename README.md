@@ -1,5 +1,10 @@
 # Finder
 
+![Laravel](https://img.shields.io/badge/Laravel-12.x-red?logo=laravel)
+![React](https://img.shields.io/badge/React-19.x-blue?logo=react)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql)
+![Inertia.js](https://img.shields.io/badge/Inertia.js-0.10-purple)
+
 **Finder** es una aplicación web desarrollada con **Laravel** e **Inertia.js (React)**, diseñada para facilitar la búsqueda y gestión de negocios locales de manera rápida y eficiente.
 
 ## Tecnologías utilizadas
