@@ -2,6 +2,7 @@
 
 namespace App\Services\Dashboard;
 
+use App\DTOs\ImageDTO;
 use App\DTOs\ProductsDTO;
 use App\Mappers\ProductsAndServicesMapper;
 use App\Models\Businesses;
@@ -80,11 +81,16 @@ class ProductsService
     /**
      * Guarda una nueva imagen en el disco.
      */
-    public function storeServiceImage($file, string $idBusiness): string
+    public function storeServiceImage(ImageDTO $file, string $idBusiness): string
     {
         $path = "business_services/{$idBusiness}";
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        return $file->storeAs($path, $filename, 'public');
+        $filename = Str::uuid() . '.' . $file->extension;
+
+        return Storage::disk('public')->putFileAs(
+            $path, 
+            $file->filePath, 
+            $filename
+        );
     }
 
     /**

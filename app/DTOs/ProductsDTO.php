@@ -16,7 +16,7 @@ class ProductsDTO
         public readonly ?string $duration,
         public readonly string $category,
         public readonly bool $isActive,
-        public readonly object|string|null $image
+        public readonly ?ImageDTO $image
     )
     {
     }
@@ -33,6 +33,14 @@ class ProductsDTO
             "image"       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', 
         ]);
 
+        $imageFile = $request->file('image', null);
+
+        $image = $imageFile ? new ImageDTO(
+            filePath: $imageFile->getPathname(),
+            extension: $imageFile->getClientOriginalExtension(),
+            mimeType: $imageFile->getMimeType()
+        ) : null;
+
         return new self(
             $data['name'],
             $data['description'],
@@ -40,7 +48,7 @@ class ProductsDTO
             $data['duration'],
             $data['category'],
             $data['isActive'],
-            $request->file('image', null)
+            $image
         );
     }
 }
