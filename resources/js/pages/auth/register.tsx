@@ -13,9 +13,6 @@ export default function Register() {
             </Button>
 
             <div className="flex items-center justify-center gap-5 text-center">
-                <a href="/" className="hover:underline">
-                    Inicio
-                </a>
                 <a href="/login" className="hover:underline">
                     Iniciar sesión
                 </a>

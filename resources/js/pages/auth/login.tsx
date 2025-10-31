@@ -18,9 +18,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             </Button>
 
             <div className="flex items-center justify-center gap-5 text-center">
-                <a href="/" className="hover:underline">
-                    Inicio
-                </a>
                 <a href="/register" className="hover:underline">
                     Registrarse
                 </a>
