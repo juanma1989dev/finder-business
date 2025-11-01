@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Laravel;
 
 use App\Models\FavoriteBusiness;
-use App\Repositories\BaseRepository;
 
 class FavoriteBusinessRepository extends BaseRepository
 {

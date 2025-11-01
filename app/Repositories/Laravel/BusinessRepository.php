@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Laravel;
 
 use App\DTOs\SchedulesDTO;
 use App\Models\Businesses;
