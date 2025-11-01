@@ -3,25 +3,24 @@
 namespace App\Services\Dashboard;
 
 use App\DTOs\InfoGeneralDTO;
-use App\Mappers\BusinessMapper;
-use App\Repositories\AmenitiesRepository;
-use App\Repositories\BusinessCategoryRepository;
-use App\Repositories\BusinessRepository;
-use App\Repositories\PaymentsRepository;
+use App\Mappers\BusinessMapper; 
+use App\Repositories\Contracts\AmenitiesRepositoryInterface;
+use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Repositories\Contracts\PaymentsRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class GeneralInfoService
 {
     public function __construct(
-        private BusinessRepository $businessRepository, 
-        private AmenitiesRepository $amenitiesRepository,
-        private PaymentsRepository $paymentsRepository,
-        private BusinessCategoryRepository $businessCategoryRepository
+        private BusinessRepositoryInterface $businessRepository, 
+        private AmenitiesRepositoryInterface $amenitiesRepository,
+        private PaymentsRepositoryInterface $paymentsRepository,
+        private BusinessCategoryRepositoryInterface $businessCategoryRepository
     )
     {
     }
 
-    // // $daysOfWeek = DayOfWeek::toOptions();
     public function getInfo($idBusiness) 
     {
         $business   = $this->businessRepository->findById($idBusiness, ['hours', 'category', 'services', 'payments']) ;

@@ -3,13 +3,12 @@
 namespace App\Services\Dashboard;
 
 use App\DTOs\GalleryBusinessDTO;
-use App\DTOs\GalleryImagesDTO;
 use App\DTOs\ImageBusinessDTO;
 use App\DTOs\ImageDTO;
 use App\Mappers\BusinessMapper;
-use App\Repositories\BusinessRepository;
 use App\Models\Businesses;
-use App\Repositories\GalleryRpository;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Repositories\Contracts\GalleryRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -18,8 +17,8 @@ use Illuminate\Support\Str;
 class GalleryService 
 {
     public function __construct(
-        private BusinessRepository $businessRepository,
-        private GalleryRpository $galleryRpository
+        private BusinessRepositoryInterface $businessRepository,
+        private GalleryRepositoryInterface $galleryRpository
     )
     {
     }

@@ -3,8 +3,9 @@
 namespace App\Repositories\Laravel;
 
 use App\Models\FavoriteBusiness;
+use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
 
-class FavoriteBusinessRepository extends BaseRepository
+class FavoriteBusinessRepository extends BaseRepository implements FavoriteBusinessRepositoryInterface
 {
     public function __construct(
         FavoriteBusiness $model

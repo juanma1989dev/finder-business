@@ -5,14 +5,21 @@ namespace App\Services\Public;
 use App\Mappers\BusinessMapper;
 use App\Repositories\BusinessCategoryRepository;
 use App\Repositories\BusinessRepository;
+use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
 use App\Repositories\FavoriteBusinessRepository;
 
 final class SearchService
 {
     public function __construct(
-        private readonly BusinessRepository $businessRepository,
-        private readonly BusinessCategoryRepository $businessCategoryRepository, 
-        private readonly FavoriteBusinessRepository $favoriteBusinessRepository
+        // private readonly BusinessRepository $businessRepository,
+        // private readonly BusinessCategoryRepository $businessCategoryRepository, 
+        // private readonly FavoriteBusinessRepository $favoriteBusinessRepository
+
+        private readonly BusinessRepositoryInterface $businessRepository,
+        private readonly BusinessCategoryRepositoryInterface $businessCategoryRepository, 
+        private readonly FavoriteBusinessRepositoryInterface $favoriteBusinessRepository
     ) {}
 
     public function getData(array $filters, array $geo): array

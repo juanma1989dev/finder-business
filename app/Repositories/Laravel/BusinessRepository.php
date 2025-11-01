@@ -4,11 +4,12 @@ namespace App\Repositories\Laravel;
 
 use App\DTOs\SchedulesDTO;
 use App\Models\Businesses;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
-class BusinessRepository extends BaseRepository
+class BusinessRepository extends BaseRepository implements BusinessRepositoryInterface
 {
     public function __construct(Businesses $model)
     {

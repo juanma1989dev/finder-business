@@ -6,7 +6,7 @@ use App\DTOs\ImageDTO;
 use App\DTOs\ProductsDTO;
 use App\Mappers\ProductsAndServicesMapper;
 use App\Models\Businesses;
-use App\Repositories\BusinessRepository;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Exception;
@@ -14,7 +14,7 @@ use Exception;
 class ProductsService
 {
     public function __construct(
-        private readonly BusinessRepository $businessRepository
+        private readonly BusinessRepositoryInterface $businessRepository
     ) {}
 
     /**

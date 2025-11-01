@@ -4,9 +4,10 @@ namespace App\Repositories\Laravel;
 
 use App\Models\BusinessImage;
 use App\Models\Businesses;
+use App\Repositories\Contracts\GalleryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-class GalleryRpository
+class GalleryRepository implements GalleryRepositoryInterface
 {
     /**
      * Obtiene todas las imágenes de un negocio

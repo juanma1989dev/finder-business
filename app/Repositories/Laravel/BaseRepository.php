@@ -2,9 +2,10 @@
 
 namespace App\Repositories\Laravel;
 
+use App\Repositories\Contracts\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseRepository
+abstract class BaseRepository implements BaseRepositoryInterface
 {
     protected Model $model;
 

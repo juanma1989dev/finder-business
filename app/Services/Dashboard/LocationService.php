@@ -3,13 +3,13 @@
 namespace App\Services\Dashboard;
 
 use App\DTOs\LocationBusinessDTO;
-use App\Repositories\BusinessRepository;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class LocationService
 {
     public function __construct(
-        private BusinessRepository $businessRepository
+        private BusinessRepositoryInterface $businessRepository
     )
     {        
     }

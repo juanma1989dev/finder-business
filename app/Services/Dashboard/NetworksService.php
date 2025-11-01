@@ -3,14 +3,12 @@
 namespace App\Services\Dashboard;
 
 use App\DTOs\NetworksDTO;
-use App\Models\Businesses;
-use App\Repositories\BusinessRepository;
-use Illuminate\Http\Request;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
 
 class NetworksService
 {
     public function __construct(
-        private BusinessRepository $businessRepository
+        private BusinessRepositoryInterface $businessRepository
     )
     {
     }

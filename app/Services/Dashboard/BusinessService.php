@@ -4,17 +4,15 @@ namespace App\Services\Dashboard;
 
 use App\DTOs\BusinessDTO;
 use App\DTOs\CoverImageBusinessDTO;
-use App\Models\BusinessCategory;
-use App\Models\Businesses;
-use App\Repositories\BusinessCategoryRepository;
-use App\Repositories\BusinessRepository;
+use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 
 class BusinessService
 {
     public function __construct(
-        private readonly BusinessRepository $businessRepository,
-        private readonly BusinessCategoryRepository $businessCategoryRepository
+        private readonly BusinessRepositoryInterface $businessRepository,
+        private readonly BusinessCategoryRepositoryInterface $businessCategoryRepository
     )
     {
     }
