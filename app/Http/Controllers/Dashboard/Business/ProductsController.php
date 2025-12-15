@@ -24,9 +24,9 @@ class ProductsController extends Controller
 
     public function store(Request $request, string $idBusiness): RedirectResponse
     {
-        try {
-            $product = ProductsDTO::fromRequest($request);
+        $product = ProductsDTO::fromRequest($request);
 
+        try {
             $this->productsService->create($idBusiness, $product);
 
             return back()->with('success', 'Se agregó correctamente el servicio.');
@@ -37,9 +37,9 @@ class ProductsController extends Controller
 
     public function update(Request $request, string $idBusiness, string $id): RedirectResponse
     {
-        try {
-            $product = ProductsDTO::fromRequest($request);
-            
+        $product = ProductsDTO::fromRequest($request);
+
+        try {            
             $this->productsService->update( $idBusiness, $id, $product );
 
             return back()->with('success', 'Servicio actualizado correctamente');
