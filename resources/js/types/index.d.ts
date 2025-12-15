@@ -131,3 +131,15 @@ export interface Business {
         coordinates: [number, number];
     };
 }
+
+export interface CartItem {
+    id: string;
+    name: string;
+    price: number;
+    image_url: string;
+    quantity: number;
+
+    notes?: string;
+    // size: string;
+    // extras: string[];
+}
