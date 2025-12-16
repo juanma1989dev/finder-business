@@ -126,10 +126,10 @@ export default function ProductServiceModal({
                 <Tabs defaultValue="general" className="space-y-6">
                     <TabsList className="mb-1 border-b border-gray-200">
                         <TabsTrigger value="general">General</TabsTrigger>
-                        <TabsTrigger value="variations">
+                        {/* <TabsTrigger value="variations">
                             Variaciones
                         </TabsTrigger>
-                        <TabsTrigger value="extras">Extras</TabsTrigger>
+                        <TabsTrigger value="extras">Extras</TabsTrigger> */}
                     </TabsList>
 
                     {/* General */}
