@@ -43,7 +43,12 @@ class ProductsService
             $data['image_url'] = $this->storeServiceImage($product->image, $idBusiness);
         }
 
-        $this->businessRepository->createProductOrService($idBusiness, $data);
+        $productModel = $this->businessRepository->createProductOrService($idBusiness, $data);
+
+        # Guardar variaciones
+        foreach ($product->variations as $variation) {
+            $this->businessRepository->createProductVariation($productModel->id, $variation);
+        }
     }
 
     /**
@@ -59,7 +64,15 @@ class ProductsService
             $data['image_url'] = $this->replaceImage($service, $product->image, $idBusiness);
         }
 
-        $service->update($data);
+        $service->update($data); //// migrar al repo
+
+        # Eliminar variaciones existentes
+        $service->variations()->delete(); //// migrar al repo
+
+        # Insertar nuevas variaciones
+        foreach ($product->variations as $variation) {
+            $this->businessRepository->createProductVariation($service->id, $variation);
+        }
 
         return $service->fresh();
     }

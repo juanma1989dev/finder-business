@@ -27,13 +27,19 @@ class ServicesAndProductsByBusiness extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    // public function business()
-    // {
-    //     return $this->belongsTo(Businesses::class);
-    // }
-
     public function business()
     {
         return $this->belongsTo(Businesses::class, 'business_id', 'id');
     }
+
+    public function extras()
+    {
+        return $this->hasMany(BusinessProductExtra::class, 'product_id', 'id');
+    }
+
+    public function variations()
+    {
+        return $this->hasMany(BusinessProductVariation::class, 'product_id', 'id');
+    }
+
 }

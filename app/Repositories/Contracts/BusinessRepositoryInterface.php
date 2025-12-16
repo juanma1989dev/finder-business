@@ -19,4 +19,6 @@ interface BusinessRepositoryInterface extends BaseRepositoryInterface
     public function search(array $filters);
 
     public function getFavoritesByUser(int $userId);
+
+    public function createProductVariation(string $productId, array $variation);
 }

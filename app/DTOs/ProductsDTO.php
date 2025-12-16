@@ -16,7 +16,9 @@ class ProductsDTO
         public readonly ?string $duration,
         public readonly string $category,
         public readonly bool $isActive,
-        public readonly ?ImageDTO $image
+        public readonly ?ImageDTO $image,
+        public readonly array $extas,
+        public readonly array $variations
     )
     {
     }
@@ -31,6 +33,13 @@ class ProductsDTO
             'category'    => 'required|string',
             'isActive'    => 'required|boolean',
             "image"       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', 
+            
+            'extras'      => 'sometimes|array',
+            'extras.*.name' => 'required_with:extras|string|max:255',
+            'extras.*.price' => 'required_with:extras|numeric|gt:0',
+
+            'variations'  => 'sometimes|array',
+            'variations.*.name' => 'required_with:variations|string|max:255',
         ]);
 
         $imageFile = $request->file('image', null);
@@ -48,7 +57,9 @@ class ProductsDTO
             $data['duration'],
             $data['category'],
             $data['isActive'],
-            $image
+            $image,
+            $data['extras'] ?? [],
+            $data['variations'] ?? []
         );
     }
 }
