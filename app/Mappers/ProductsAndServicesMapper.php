@@ -21,7 +21,9 @@ class ProductsAndServicesMapper
                 "duration" =>  $product->duration,
                 "category" =>  $product->category,
                 "isActive" =>  boolval($product->isActive),
-                "image_url" => $image_url 
+                "image_url" => $image_url,
+                "extras" => BusinessProductExtrasMapper::toArray($product->extras),
+                "variations" => BusinessProductVariationsMapper::toArray($product->variations)
             ];
         })->toArray();
     }
