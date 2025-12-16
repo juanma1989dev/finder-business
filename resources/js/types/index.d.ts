@@ -52,6 +52,20 @@ export interface User {
 
 /**************************/
 
+export interface ProductExtras {
+    id?: string;
+    business_product_id?: string;
+    name: string;
+    price: number;
+}
+
+export interface ProductVariations {
+    id?: string;
+    business_product_id?: string;
+    name: string;
+    // options: string[]; // e.g., ["Small", "Medium", "Large"]
+}
+
 export interface ServicesAndProducts {
     id?: string;
     business_id: string;
@@ -62,6 +76,8 @@ export interface ServicesAndProducts {
     category: string;
     isActive: boolean;
     image_url: string;
+    extras?: ProductExtras[];
+    variations?: ProductVariations[];
 }
 
 interface SocialLinks {
