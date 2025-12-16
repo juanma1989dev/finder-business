@@ -1,3 +1,4 @@
+import { GoogleButtonRegister } from '@/components/app/GoogleButtonRegsiter';
 import AuthLayout from '@/layouts/auth-layout';
 import { SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -29,47 +30,14 @@ export default function Register() {
 
             <div className="space-y-6">
                 {/* Botón Google */}
-                <button
-                    type="button"
+                <GoogleButtonRegister
+                    label="Crear cuenta con Google"
+                    disabled={!acceptPrivacy}
                     onClick={() => {
-                        if (!acceptPrivacy) {
-                            return alert(
-                                'Debes aceptar el Aviso de Privacidad para continuar',
-                            );
-                        }
+                        if (!acceptPrivacy) return;
                         window.location.href = '/auth/google/register';
                     }}
-                    className={`flex w-full items-center justify-center gap-3 rounded-lg border bg-white px-4 py-2 text-sm font-medium shadow-sm transition ${
-                        acceptPrivacy
-                            ? 'text-gray-700 hover:bg-gray-50'
-                            : 'opacity-50'
-                    }`}
-                >
-                    {/* Google icon */}
-                    <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 533.5 544.3"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            fill="#4285F4"
-                            d="M533.5 278.4c0-17.4-1.6-34.1-4.7-50.4H272v95.3h146.9c-6.3 34-25 62.7-53.3 82v67h86.2c50.4-46.4 81.7-114.8 81.7-193.9z"
-                        />
-                        <path
-                            fill="#34A853"
-                            d="M272 544.3c72.6 0 133.5-24.1 178-65.5l-86.2-67c-24 16.1-54.6 25.7-91.8 25.7-70.6 0-130.5-47.6-151.8-111.5h-89.5v69.9c44.4 88.1 135.4 148.4 241.3 148.4z"
-                        />
-                        <path
-                            fill="#FBBC05"
-                            d="M120.2 325.9c-10.6-31.8-10.6-66.1 0-97.9V158H30.7c-39.6 79.2-39.6 172.1 0 251.3l89.5-69.9z"
-                        />
-                        <path
-                            fill="#EA4335"
-                            d="M272 107.7c39.5-.6 77.5 14 106.4 40.8l79.3-79.3C409.5 24.6 345.2-1.2 272 0 166.1 0 75.1 60.3 30.7 148.4l89.5 69.9C141.5 155.3 201.4 107.7 272 107.7z"
-                        />
-                    </svg>
-                    Crear cuenta con Google
-                </button>
+                />
 
                 {/* Aviso */}
                 <button
@@ -81,9 +49,12 @@ export default function Register() {
                 </button>
             </div>
 
-            <p className="mt-6 text-center text-sm text-gray-500">
+            <p className="mt-6 mt-15 text-center text-sm text-gray-500">
                 ¿Ya tienes cuenta?{' '}
-                <Link href="/login" className="hover:underline">
+                <Link
+                    href="/login"
+                    className="font-medium text-orange-600 hover:underline"
+                >
                     Inicia sesión
                 </Link>
             </p>

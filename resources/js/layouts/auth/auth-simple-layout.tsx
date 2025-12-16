@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Home, ShieldCheck } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 
@@ -12,6 +12,10 @@ export default function AuthLayout({
     title,
     description,
 }: PropsWithChildren<AuthLayoutProps>) {
+    const p = usePage();
+
+    console.log(p);
+
     return (
         <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-100 via-white to-gray-100">
             {/* Background decoration */}
@@ -26,7 +30,7 @@ export default function AuthLayout({
                         <img
                             src="/logo.webp"
                             alt="Logo"
-                            className="mb-10 h-60"
+                            className="mb-10 h-60 w-full object-cover"
                         />
 
                         <h2 className="mb-3 text-2xl leading-tight font-semibold">
@@ -60,17 +64,15 @@ export default function AuthLayout({
                                 {title}
                             </h1>
                             {description && (
-                                <p className="text-sm text-gray-500">
-                                    {description}
-                                </p>
+                                <p className="text-gray-500">{description}</p>
                             )}
                         </div>
 
                         {children}
 
                         <p className="mt-10 text-center text-xs text-gray-400">
-                            © {new Date().getFullYear()} Tu Plataforma. Todos
-                            los derechos reservados.
+                            © {new Date().getFullYear()} Tu {}. Todos los
+                            derechos reservados.
                         </p>
                     </div>
                 </div>

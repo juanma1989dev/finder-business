@@ -96,7 +96,7 @@ class GoogleAuthService
                 'success' => false,
                 'user' => null,
                 'error' => 'Ya existe una cuenta con este correo. Por favor inicia sesión.',
-                'redirect' => 'register'
+                'redirect' => 'login'
             ];
         }
 
