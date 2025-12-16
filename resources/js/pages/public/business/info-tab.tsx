@@ -1,68 +1,15 @@
 import { formatTime, IconDynamic } from '@/lib/utils';
 import { Business } from '@/types';
-import {
-    Badge,
-    Globe,
-    MapPinned,
-    MessageCircle,
-    PhoneCall,
-    Star,
-} from 'lucide-react';
+import { Badge, Globe, Star } from 'lucide-react';
 
 interface Props {
     business: Business;
 }
 
-const santizePhoneNumber = (phone: string | null): string => {
-    if (!phone) return '';
-
-    const newPhone = '52' + phone.trim();
-
-    return newPhone;
-};
-
 export const InfoBusinessTab = ({ business }: Props) => {
     return (
         <div className="flex flex-col gap-3 md:flex-row">
             <div className="w-full md:w-4/6">
-                <div className="my-3 flex flex-col items-center justify-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
-                    <div>
-                        <a
-                            className="block flex w-full cursor-pointer items-center justify-center rounded-xl bg-sky-500 px-2 py-1 font-medium text-white shadow-lg transition-all duration-200 hover:bg-sky-600"
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(business.address)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <MapPinned className="mr-2 inline h-4 w-4" />
-                            <span className="text-sm">Cómo llegar</span>
-                        </a>
-                    </div>
-
-                    <div>
-                        {business.use_whatsapp ? (
-                            <a
-                                className="block flex w-full cursor-pointer items-center justify-center rounded-xl bg-green-500 px-2 py-1 font-medium text-white shadow-lg transition-all duration-200 hover:bg-green-600"
-                                href={`https://wa.me/${santizePhoneNumber(business.phone)}?text=${encodeURIComponent('Hola me podría dar más información de ...')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <MessageCircle className="mr-2 inline h-4 w-4" />
-
-                                <span className="text-sm">WhatsApp</span>
-                            </a>
-                        ) : (
-                            // Solo mostrar el número sin acción de WhatsApp
-                            <a
-                                href={`tel:${santizePhoneNumber(business.phone)}`}
-                                className="flex w-full items-center justify-center rounded-lg bg-green-600 px-2 py-1 font-medium text-white shadow-lg transition duration-300 ease-in-out hover:bg-green-700"
-                            >
-                                <PhoneCall className="mr-2 inline h-4 w-4" />
-                                <span className="text-sm">¡Llama Ahora!</span>
-                            </a>
-                        )}
-                    </div>
-                </div>
-
                 {/* Descripcion */}
                 <p className="max-w-2xl leading-relaxed text-gray-600">
                     {business.long_description}

@@ -148,14 +148,25 @@ export interface Business {
     };
 }
 
-export interface CartItem {
-    id: string;
+export interface CartExtra {
+    id: string | number;
     name: string;
     price: number;
-    image_url: string;
-    quantity: number;
+}
 
+export interface CartVariation {
+    id: string | number;
+    name: string;
+    price: number;
+}
+
+export interface CartItem {
+    key: string;
+    id: string | number;
+    name: string;
+    price: number;
+    quantity: number;
+    extras: CartExtra[];
+    variations: CartVariation[];
     notes?: string;
-    // size: string;
-    // extras: string[];
 }
