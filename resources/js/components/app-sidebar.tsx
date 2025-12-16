@@ -85,7 +85,7 @@ export function AppSidebar() {
                   icon: MapPin,
               },
               {
-                  title: 'Servicios',
+                  title: 'Productos',
                   href: `/dashboard/business/${business.id}/services`,
                   icon: ShoppingBag,
               },
