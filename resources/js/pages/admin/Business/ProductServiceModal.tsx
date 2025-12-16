@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { ServicesAndProducts } from '@/types';
+import { ProductExtras, ProductVariations, ServicesAndProducts } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle, Plus, Save, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
@@ -24,8 +24,8 @@ const initialData = {
     isActive: true,
     image: undefined as File | undefined,
     image_url: '',
-    extras: [] as { name: string; price: number }[],
-    variations: [] as { name: string }[],
+    extras: [] as ProductExtras[],
+    variations: [] as ProductVariations[],
 };
 
 interface Props {
@@ -58,8 +58,8 @@ export default function ProductServiceModal({
                 isActive: service.isActive ?? true,
                 image: undefined,
                 image_url: service.image_url ?? '',
-                extras: [],
-                variations: [],
+                extras: service.extras ?? [],
+                variations: service.variations ?? [],
             });
         } else {
             form.reset();

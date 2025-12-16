@@ -4,6 +4,7 @@ namespace App\Repositories\Laravel;
 
 use App\DTOs\SchedulesDTO;
 use App\Models\Businesses;
+use App\Models\BusinessProductExtra;
 use App\Models\BusinessProductVariation;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
@@ -125,6 +126,15 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         return  BusinessProductVariation::create([
             'product_id' => $productId,
             'name' => $variation['name'],
+        ]);
+    }
+
+    public function createProductExtra(string $productId, array $variation)
+    {
+        return  BusinessProductExtra::create([
+            'product_id' => $productId,
+            'name' => $variation['name'],
+            'price' => $variation['price'],
         ]);
     }
 }

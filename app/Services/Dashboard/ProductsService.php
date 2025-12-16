@@ -49,6 +49,11 @@ class ProductsService
         foreach ($product->variations as $variation) {
             $this->businessRepository->createProductVariation($productModel->id, $variation);
         }
+
+        # Guardar Extras
+        foreach ($product->extas as $extra) {
+            $this->businessRepository->createProductExtra($productModel->id, $extra);
+        }
     }
 
     /**
@@ -72,6 +77,14 @@ class ProductsService
         # Insertar nuevas variaciones
         foreach ($product->variations as $variation) {
             $this->businessRepository->createProductVariation($service->id, $variation);
+        }
+
+        # Eliminar extras existentes
+        $service->extras()->delete(); //// migrar al repo
+
+        # Guardar Extras
+        foreach ($product->extas as $extra) {
+            $this->businessRepository->createProductExtra($service->id, $extra);
         }
 
         return $service->fresh();
