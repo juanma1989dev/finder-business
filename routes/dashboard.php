@@ -11,7 +11,7 @@ use App\Http\Controllers\Dashboard\IndexController;
 use Illuminate\Support\Facades\Route; 
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Route::get('dashboard', [IndexController::class, 'index'])->name('dashboard'); // PEDING
+    Route::get('dashboard', [IndexController::class, 'index'])->name('dashboard');  
 
     // Route::get('/dashboard/profile/business', [BusinessController::class, 'index'])->name('dashboard.business');
     // Route::get('/dashboard/business/create', [BusinessController::class, 'create'])->name('dashboard.business.create');
