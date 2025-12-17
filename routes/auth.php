@@ -51,3 +51,12 @@ Route::middleware('guest')->group(function () {
 Route::get('/auth/google/login', [GoogleController::class, 'redirectToGoogleLogin'])->name('auth.google.login');
 Route::get('/auth/google/register', [GoogleController::class, 'redirectToGoogleRegister'])->name('auth.google.register');
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
+Route::post('/session/privacy-accept', function () {
+    session([
+        'accept_privacy' => true,
+        'privacy_version' => config('privacy.version'),
+    ]);
+
+    return redirect()->back();
+})->name('privacy.accept');
