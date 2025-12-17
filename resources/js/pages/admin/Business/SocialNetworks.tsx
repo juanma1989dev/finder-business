@@ -8,8 +8,9 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { makeBreadCrumb } from '@/helpers';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Business, SocialLinks } from '@/types';
+import { Business, SocialLinks } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import {
     Facebook,
@@ -22,19 +23,16 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard - Nuevo negocio',
-        // href: dashboard().url,
-        href: '',
-    },
-];
-
 interface Props {
     business: Business;
 }
 
 export default function SocialNetworks({ business }: Props) {
+    const breadcrumbs = makeBreadCrumb({
+        text: `${business.name ?? ''} - Información general`,
+        url: '/',
+    });
+
     const initialSocialLinks: SocialLinks = {
         web: '',
         facebook: '',

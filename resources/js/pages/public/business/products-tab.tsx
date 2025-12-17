@@ -51,67 +51,84 @@ export const ProductsBussinessTab = ({ business }: Props) => {
         <div className="container mx-auto px-1 py-2">
             <section className="mb-8">
                 {business.products?.length ? (
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                        {business.products.map(
-                            (product: ServicesAndProducts) => {
-                                const quantity = getQuantity(product.id!);
-
-                                return (
-                                    <div
-                                        key={product.id}
-                                        className="relative flex h-full flex-col gap-3 rounded-xl bg-white p-3 shadow-sm md:flex-row"
-                                    >
-                                        {/* IMAGEN */}
-                                        <div className="relative mb-2 h-32 w-full overflow-hidden rounded-lg bg-gray-100 md:mb-0 md:ml-3 md:h-24 md:w-24">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {business.products.map((product) => {
+                            const quantity = getQuantity(product.id!);
+                            return (
+                                <div
+                                    key={product.id}
+                                    className="flex h-full flex-col justify-between rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition hover:shadow-md"
+                                >
+                                    {/* IMAGEN */}
+                                    <div className="mb-3 flex h-32 w-full items-center justify-center overflow-hidden rounded-lg bg-gray-100">
+                                        {product.image_url ? (
                                             <img
                                                 src={product.image_url}
                                                 alt={product.name}
-                                                className="h-full w-full object-cover"
+                                                className="h-full w-full object-cover transition-transform hover:scale-105"
                                             />
+                                        ) : (
+                                            <span className="text-sm text-gray-300">
+                                                Sin imagen
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* CONTENIDO */}
+                                    <div className="flex flex-1 flex-col justify-between">
+                                        <div>
+                                            <h3 className="line-clamp-2 text-sm font-semibold text-gray-900">
+                                                {product.name}
+                                            </h3>
+                                            <p className="mt-1 line-clamp-2 text-xs text-gray-500">
+                                                {product.description || '—'}
+                                            </p>
                                         </div>
 
-                                        {/* INFO */}
-                                        <div className="flex flex-1 flex-col">
-                                            <div>
-                                                <h3 className="text-sm font-semibold text-gray-900">
-                                                    {product.name}
-                                                </h3>
-
-                                                <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">
-                                                    {product.description}
-                                                </p>
-
-                                                <span className="mt-2 block text-base font-bold text-gray-900">
+                                        {/* PRECIO + BOTÓN */}
+                                        {user && (
+                                            <div className="mt-3 flex flex-col gap-2">
+                                                <span className="text-base font-bold text-gray-900">
                                                     ${product.price}
                                                 </span>
+                                                <button
+                                                    onClick={() =>
+                                                        setSelectedProduct(
+                                                            product,
+                                                        )
+                                                    }
+                                                    className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700 active:scale-[0.98]"
+                                                >
+                                                    {quantity === 0
+                                                        ? '+ Agregar'
+                                                        : `Agregar otro (${quantity})`}
+                                                </button>
                                             </div>
-
-                                            {/* ACCIÓN */}
-                                            {user && false && (
-                                                <div className="mt-auto w-full pt-4">
-                                                    <button
-                                                        onClick={() =>
-                                                            setSelectedProduct(
-                                                                product,
-                                                            )
-                                                        }
-                                                        className="w-full rounded-lg bg-green-600 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 active:scale-[0.98]"
-                                                    >
-                                                        {quantity === 0
-                                                            ? '+ Agregar'
-                                                            : `Agregar otro (${quantity})`}
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
+                                        )}
                                     </div>
-                                );
-                            },
-                        )}
+                                </div>
+                            );
+                        })}
                     </div>
                 ) : (
-                    <div className="flex items-center justify-center rounded-lg bg-gray-50/80 p-6 text-gray-600">
-                        No hay productos disponibles por el momento.
+                    <div className="flex flex-col items-center justify-center rounded-lg bg-gray-50 p-6 text-center text-gray-500">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="mb-3 h-12 w-12 text-gray-300"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 3h18v18H3V3z"
+                            />
+                        </svg>
+                        <span>
+                            No hay productos disponibles por el momento.
+                        </span>
                     </div>
                 )}
             </section>

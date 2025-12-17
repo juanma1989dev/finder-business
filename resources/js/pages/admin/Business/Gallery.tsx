@@ -6,27 +6,25 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { makeBreadCrumb } from '@/helpers';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { BreadcrumbItem, GalleryImage } from '@/types';
+import { GalleryImage } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { ImageIcon, Loader2, Save, Trash2, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard - Nuevo negocio',
-        // href: dashboard().url,
-        href: '',
-    },
-];
 
 interface Props {
     business: any;
 }
 
 export default function Gallery({ business }: Props) {
+    const breadcrumbs = makeBreadCrumb({
+        text: `${business.name ?? ''} - Información general`,
+        url: '/',
+    });
+
     const [images, setImages] = useState<GalleryImage[]>(() =>
         business.images.map((img: GalleryImage, index: number) => ({
             ...img,

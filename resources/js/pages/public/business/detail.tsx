@@ -11,11 +11,11 @@ import {
     MessageCircle,
     PhoneCall,
     Share2,
-    ShoppingCart,
-    Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { CartFloatButton } from './CartFloatButton';
+import { CartDrawer } from './drawer-cart';
 import { InfoBusinessTab } from './info-tab';
 import { ProductsBussinessTab } from './products-tab';
 
@@ -94,86 +94,101 @@ export default function BusinessDetail({ business, favorite }: Props) {
                         className="h-full w-full object-cover"
                     />
 
-                    <div className="absolute top-4 right-4 flex gap-2">
+                    <div className="absolute top-4 right-4 flex flex-col gap-2 sm:flex-row sm:gap-2">
                         {user && (
                             <button
                                 onClick={toggleFavorite}
-                                className={`rounded-full p-3 ${
+                                className={`flex h-10 w-10 items-center justify-center rounded-full p-3 transition-all duration-200 ${
                                     stateFavorite
                                         ? 'bg-orange-600 text-white'
-                                        : 'bg-white'
+                                        : 'bg-white text-gray-600'
                                 }`}
                             >
                                 <Heart
-                                    className={
-                                        stateFavorite ? 'fill-current' : ''
-                                    }
+                                    className={`h-6 w-6 transition-colors duration-200 ${
+                                        stateFavorite
+                                            ? 'fill-current text-white'
+                                            : ''
+                                    }`}
                                 />
                             </button>
                         )}
 
                         <button
                             onClick={copyUlrDetailBusiness}
-                            className="rounded-full bg-white p-3"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-white p-3 shadow-md transition-all duration-200 hover:bg-gray-100"
                         >
-                            <Share2 />
+                            <Share2 className="h-6 w-6 text-gray-600" />
                         </button>
                     </div>
                 </div>
 
-                <div className="p-6">
-                    <h1 className="item-center mb-4 flex gap-4 text-2xl font-bold">
+                <div className="p-4 sm:p-6">
+                    <h1 className="mb-4 flex flex-col gap-4 text-2xl font-bold sm:flex-row sm:items-center">
                         <span>
                             {business.name}
-                            <span className="mx-2 text-sm text-gray-500">
+                            <span className="mx-0 text-sm text-gray-500 sm:mx-2">
                                 ({business.category?.name})
                             </span>
                         </span>
 
-                        {/* WhatsApp o Cel */}
-                        {business.use_whatsapp ? (
+                        {/* Botones */}
+                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                            {business.use_whatsapp ? (
+                                <a
+                                    className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:bg-green-600 sm:flex-none"
+                                    href={`https://wa.me/${santizePhoneNumber(
+                                        business.phone,
+                                    )}?text=${encodeURIComponent(
+                                        'Hola me podría dar más información de ...',
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <MessageCircle className="mr-2 h-4 w-4" />
+                                    <span className="text-sm sm:text-base">
+                                        WhatsApp
+                                    </span>
+                                </a>
+                            ) : (
+                                <a
+                                    href={`tel:${santizePhoneNumber(business.phone)}`}
+                                    className="flex flex-1 items-center justify-center rounded-lg bg-green-600 px-3 py-2 font-medium text-white shadow-lg transition duration-300 ease-in-out hover:bg-green-700 sm:flex-none"
+                                >
+                                    <PhoneCall className="mr-2 h-4 w-4" />
+                                    <span className="text-sm sm:text-base">
+                                        ¡Llama Ahora!
+                                    </span>
+                                </a>
+                            )}
+
                             <a
-                                className="block flex cursor-pointer items-center justify-center rounded-xl bg-green-500 px-2 py-1 font-medium text-white shadow-lg transition-all duration-200 hover:bg-green-600"
-                                href={`https://wa.me/${santizePhoneNumber(business.phone)}?text=${encodeURIComponent('Hola me podría dar más información de ...')}`}
+                                className="flex flex-1 items-center justify-center rounded-xl bg-sky-500 px-3 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:bg-sky-600 sm:flex-none"
+                                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                                    business.address,
+                                )}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <MessageCircle className="mr-2 inline h-4 w-4" />
-
-                                <span className="text-sm">WhatsApp</span>
+                                <MapPinned className="mr-2 h-4 w-4" />
+                                <span className="text-sm sm:text-base">
+                                    Cómo llegar
+                                </span>
                             </a>
-                        ) : (
-                            <a
-                                href={`tel:${santizePhoneNumber(business.phone)}`}
-                                className="flex items-center justify-center rounded-lg bg-green-600 px-2 py-1 font-medium text-white shadow-lg transition duration-300 ease-in-out hover:bg-green-700"
-                            >
-                                <PhoneCall className="mr-2 inline h-4 w-4" />
-                                <span className="text-sm">¡Llama Ahora!</span>
-                            </a>
-                        )}
-                        {/* Indicaciones */}
-                        <a
-                            className="block flex cursor-pointer items-center justify-center rounded-xl bg-sky-500 px-2 py-1 font-medium text-white shadow-lg transition-all duration-200 hover:bg-sky-600"
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(business.address)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <MapPinned className="mr-2 inline h-4 w-4" />
-                            <span className="text-sm">Cómo llegar</span>
-                        </a>
+                        </div>
                     </h1>
 
                     <Tabs defaultValue="products">
-                        <TabsList className="mb-4">
+                        <TabsList className="mb-4 flex flex-row gap-2">
                             <TabsTrigger
                                 value="main"
-                                className="cursor-pointer"
+                                className="w-full cursor-pointer py-2 text-center sm:w-auto"
                             >
                                 General
                             </TabsTrigger>
                             <TabsTrigger
                                 value="products"
-                                className="cursor-pointer"
+                                className="w-full cursor-pointer py-2 text-center sm:w-auto"
                             >
                                 Productos
                             </TabsTrigger>
@@ -189,131 +204,18 @@ export default function BusinessDetail({ business, favorite }: Props) {
                     </Tabs>
                 </div>
 
-                {/* BOTÓN CARRITO */}
-                {user && totalItems > 0 && (
-                    <button
+                {user && (
+                    <CartFloatButton
+                        totalItems={totalItems}
                         onClick={() => setIsCartOpen(true)}
-                        className="fixed right-6 bottom-6 flex items-center gap-3 rounded-full bg-green-600 px-5 py-4 text-white shadow-xl"
-                    >
-                        <ShoppingCart />
-                        <span>{totalItems}</span>
-                    </button>
+                    />
                 )}
 
-                {/* DRAWER */}
-                {isCartOpen && (
-                    <>
-                        <div
-                            onClick={() => setIsCartOpen(false)}
-                            className="fixed inset-0 bg-black/60"
-                        />
-
-                        <div className="fixed top-0 right-0 h-full w-full max-w-sm bg-white shadow-xl">
-                            <div className="flex justify-between border-b p-4">
-                                <h2 className="font-semibold">Tu pedido</h2>
-                                <button onClick={() => setIsCartOpen(false)}>
-                                    ✕
-                                </button>
-                            </div>
-
-                            <div className="space-y-4 overflow-y-auto p-4">
-                                {items.map((item) => (
-                                    <div
-                                        key={item.key}
-                                        className="flex items-start justify-between rounded-lg border p-3"
-                                    >
-                                        {/* IZQUIERDA → INFO */}
-                                        <div className="flex-1">
-                                            <p className="mb-1 font-semibold">
-                                                {item.name} {' - '}
-                                                {item.variations?.length >
-                                                    0 && (
-                                                    <span className="text-sm text-gray-500">
-                                                        {item.variations
-                                                            .map(
-                                                                (v: any) =>
-                                                                    v.name,
-                                                            )
-                                                            .join(', ')}
-                                                    </span>
-                                                )}
-                                            </p>
-
-                                            {/* EXTRAS */}
-                                            <span className="mt-4 mb-2 text-sm text-gray-700">
-                                                Extras
-                                            </span>
-                                            {item.extras.length > 0 && (
-                                                <ul className="text-sm text-gray-500">
-                                                    {item.extras.map(
-                                                        (e: any) => (
-                                                            <li key={e.id}>
-                                                                + {e.name} ($
-                                                                {e.price})
-                                                            </li>
-                                                        ),
-                                                    )}
-                                                </ul>
-                                            )}
-                                        </div>
-
-                                        {/* DERECHA → ACCIONES */}
-                                        <div className="ml-4 flex h-full min-h-[80px] flex-col items-end justify-between">
-                                            {/* ELIMINAR ARRIBA */}
-                                            <button
-                                                onClick={() =>
-                                                    removeItem(item.key)
-                                                }
-                                                className="text-red-500 hover:text-red-600"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-
-                                            {/* CONTADOR ABAJO */}
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() =>
-                                                        decrement(item.key)
-                                                    }
-                                                    className="flex h-7 w-7 items-center justify-center rounded border hover:bg-gray-100"
-                                                >
-                                                    −
-                                                </button>
-
-                                                <span className="w-5 text-center text-sm font-medium">
-                                                    {item.quantity}
-                                                </span>
-
-                                                <button
-                                                    onClick={() =>
-                                                        increment(item.key)
-                                                    }
-                                                    className="flex h-7 w-7 items-center justify-center rounded border hover:bg-gray-100"
-                                                >
-                                                    +
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {items.length > 0 && (
-                                <div className="border-t p-4">
-                                    <button
-                                        onClick={() =>
-                                            router.visit(
-                                                '/shopping-cart/details',
-                                            )
-                                        }
-                                        className="w-full rounded-xl bg-green-600 py-3 text-white"
-                                    >
-                                        Total: ${totalPrice.toFixed(2)}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </>
+                {user && (
+                    <CartDrawer
+                        isOpen={isCartOpen}
+                        onClose={() => setIsCartOpen(false)}
+                    />
                 )}
             </div>
         </MainLayout>

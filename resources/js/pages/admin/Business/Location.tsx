@@ -9,8 +9,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { locations } from '@/data/locations';
+import { makeBreadCrumb } from '@/helpers';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Business } from '@/types';
+import { Business } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import 'leaflet/dist/leaflet.css';
 import { Save } from 'lucide-react';
@@ -61,13 +62,6 @@ import { toast } from 'react-toastify';
 // }
 /***************************** */
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard - Nuevo negocio - Información general',
-        href: '/dashboard',
-    },
-];
-
 interface Props {
     business: Business;
 }
@@ -82,6 +76,10 @@ interface FormLocationProps {
 }
 
 export default function Location({ business }: Props) {
+    const breadcrumbs = makeBreadCrumb({
+        text: `${business.name ?? ''} - Información general`,
+        url: '/',
+    });
     const defaultCords = locations.NOCHIXTLAN;
 
     const [mapReady, setMapReady] = useState(false);

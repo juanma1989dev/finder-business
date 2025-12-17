@@ -14,6 +14,7 @@ import { DollarSign, Edit, Package, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { makeBreadCrumb } from '@/helpers';
 import { Business, FlashData, ServicesAndProducts } from '@/types';
 import ProductServiceModal from './ProductServiceModal';
 
@@ -23,6 +24,11 @@ interface Props {
 }
 
 export default function Products({ business, productsAndServices }: Props) {
+    const breadcrumbs = makeBreadCrumb({
+        text: `${business.name ?? ''} - Información general`,
+        url: '/',
+    });
+
     const [services, setServices] = useState(productsAndServices);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingService, setEditingService] =
@@ -82,7 +88,7 @@ export default function Products({ business, productsAndServices }: Props) {
     };
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Servicios y Productos" />
 
             <Card className="m-2">

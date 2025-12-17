@@ -5,27 +5,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { makeBreadCrumb } from '@/helpers';
 import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
+// import { dashboard } from '@/routes';
 import {
     Amenites,
     BusinessCategories,
     Payments,
     Schedules,
     ServicesAndProducts,
-    type BreadcrumbItem,
 } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { BookText, Clock, LoaderCircle, Save, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard - Nuevo negocio - Información general',
-        href: dashboard().url,
-    },
-];
 
 interface Props {
     business: any;
@@ -44,6 +37,11 @@ export default function EditBusiness({
     payments,
     amenities,
 }: Props) {
+    const breadcrumbs = makeBreadCrumb({
+        text: `${business.name ?? ''} - Información general`,
+        url: '/',
+    });
+
     const { data, setData, transform, put, processing, errors } = useForm<{
         name: string;
         phone: string;
