@@ -6,7 +6,7 @@ export default function () {
     const { user } = auth;
 
     return (
-        <header className="sticky top-0 z-50 m-0 w-full border-b border-gray-100 bg-white/80 p-0 px-5 shadow-sm backdrop-blur-sm">
+        <header className="top-0 z-20 m-0 w-full border-b border-gray-100 bg-white/80 p-0 px-5 shadow-sm backdrop-blur-sm">
             <div className="mx-auto flex items-center justify-between px-1 py-0">
                 {/* Logo */}
                 <div className="flex items-center space-x-2">
