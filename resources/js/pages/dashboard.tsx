@@ -1,227 +1,284 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
-import { Bike, CheckCircle, Package, Star } from 'lucide-react';
+import { Bike, Check, CheckCircle, Clock, Power, Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
-export default function Dashboard() {
+export default function OrderManagement() {
+    const [isBusinessOpen, setIsBusinessOpen] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [activeTab, setActiveTab] = useState('Todos'); // 'Todos', 'Pendiente', 'Preparando'
+
+    const [pedidos, setPedidos] = useState([
+        {
+            id: '#1024',
+            cliente: 'Juan Pérez',
+            total: 31.26,
+            status: 'Pendiente',
+            items: '2x Hamburguesa, 1x Soda',
+            tiempo: 5,
+            tipo: 'Delivery',
+        },
+        {
+            id: '#1025',
+            cliente: 'Maria G.',
+            total: 15.5,
+            status: 'Preparando',
+            items: '1x Pizza Grande',
+            tiempo: 12,
+            tipo: 'Pick-up',
+        },
+        {
+            id: '#1026',
+            cliente: 'Carlos R.',
+            total: 42.0,
+            status: 'Pendiente',
+            items: '3x Tacos Pastor',
+            tiempo: 2,
+            tipo: 'Delivery',
+        },
+    ]);
+
+    // Lógica de Filtrado (Funcionalidad Nueva A)
+    const pedidosFiltrados = useMemo(() => {
+        return pedidos.filter((p) => {
+            const matchesSearch =
+                p.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.id.includes(searchTerm);
+            const matchesTab = activeTab === 'Todos' || p.status === activeTab;
+            return matchesSearch && matchesTab;
+        });
+    }, [pedidos, searchTerm, activeTab]);
+
+    const avanzarEstado = (id: string) => {
+        setPedidos(
+            pedidos.map((p) => {
+                if (p.id === id) {
+                    if (p.status === 'Pendiente')
+                        return { ...p, status: 'Preparando' };
+                    if (p.status === 'Preparando')
+                        return { ...p, status: 'Enviado' };
+                }
+                return p;
+            }),
+        );
+    };
+
     return (
         <AppLayout
-            breadcrumbs={[
-                { title: 'Seguimiento de pedidos', href: '/dashboard' },
-            ]}
+            breadcrumbs={[{ title: 'Panel de Control', href: '/admin' }]}
         >
-            <Head title="Seguimiento de Pedidos" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl bg-gray-50/50 p-4">
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 bg-white p-6 shadow-sm md:min-h-min">
-                    {/* Header */}
-                    <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            Seguimiento de tu pedidos
+            <Head title="Gestión de Pedidos" />
+
+            <div className="flex min-h-screen flex-col gap-4 bg-[#f8fafc] p-4 lg:p-6">
+                {/* HEADER SUPERIOR */}
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900">
+                            Gestión de Pedidos
                         </h1>
-                        <p className="text-gray-500">
-                            Revisa los productos y finaliza tu compra
+                        <p className="text-sm font-medium text-slate-500">
+                            Control en tiempo real de tu cocina
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                        {/* Columna Izquierda: Información del Pedido */}
-                        <div className="space-y-6 lg:col-span-2">
-                            {/* Stepper / Estado del Pedido */}
-                            <div className="rounded-xl border bg-white p-6">
-                                <div className="relative flex items-center justify-between">
-                                    <div className="absolute top-1/2 left-0 z-0 h-1 w-full -translate-y-1/2 bg-orange-100"></div>
-                                    <div className="absolute top-1/2 left-0 z-0 h-1 w-2/3 -translate-y-1/2 bg-orange-500"></div>
+                    <div className="flex items-center gap-3">
+                        {/* Funcionalidad C: Acceso rápido a inventario */}
+                        {/* <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">
+                            <Utensils className="h-4 w-4" />
+                            <span>Menú</span>
+                        </button> */}
 
-                                    {[
-                                        {
-                                            label: 'Pedido Recibido',
-                                            icon: (
-                                                <CheckCircle className="h-5 w-5" />
-                                            ),
-                                            active: true,
-                                        },
-                                        {
-                                            label: 'En Preparación',
-                                            icon: (
-                                                <Package className="h-5 w-5" />
-                                            ),
-                                            active: true,
-                                        },
-                                        {
-                                            label: 'En Caminossss',
-                                            icon: <Bike className="h-5 w-5" />,
-                                            active: true,
-                                        },
-                                    ].map((step, i) => (
-                                        <div
-                                            key={i}
-                                            className="relative z-10 flex flex-col items-center gap-2"
-                                        >
-                                            <div
-                                                className={`rounded-full p-2 ${step.active ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'}`}
-                                            >
-                                                {step.icon}
-                                            </div>
-                                            <span className="text-xs font-medium text-gray-600">
-                                                {step.label}
-                                            </span>
-                                        </div>
-                                    ))}
+                        <button
+                            onClick={() => setIsBusinessOpen(!isBusinessOpen)}
+                            className={`flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold shadow-sm transition-all ${
+                                isBusinessOpen
+                                    ? 'border border-emerald-200 bg-emerald-50 text-emerald-700'
+                                    : 'border border-rose-200 bg-rose-50 text-rose-700'
+                            }`}
+                        >
+                            <Power className="h-4 w-4" />
+                            {isBusinessOpen
+                                ? 'NEGOCIO ABIERTO'
+                                : 'NEGOCIO CERRADO'}
+                        </button>
+                    </div>
+                </div>
+
+                {/* BARRA DE FILTROS Y BÚSQUEDA */}
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm md:flex-row">
+                    <div className="relative w-full md:w-64">
+                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Buscar pedido o cliente..."
+                            className="w-full rounded-xl border-none bg-slate-100 py-2 pr-4 pl-10 text-sm focus:ring-2 focus:ring-indigo-500"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex w-full gap-1 md:w-auto">
+                        {['Todos', 'Pendiente', 'Preparando'].map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`flex-1 rounded-lg px-4 py-1.5 text-xs font-bold uppercase transition-all md:flex-none ${
+                                    activeTab === tab
+                                        ? 'bg-slate-900 text-white shadow-md'
+                                        : 'text-slate-500 hover:bg-slate-50'
+                                }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* GRID PRINCIPAL */}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+                    <div className="lg:col-span-3">
+                        {pedidosFiltrados.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 bg-white p-20 text-center">
+                                <div className="rounded-full bg-slate-50 p-4">
+                                    <CheckCircle className="h-8 w-8 text-slate-300" />
                                 </div>
-                            </div>
-
-                            {/* Detalles de Productos */}
-                            <div className="space-y-4">
-                                <h2 className="text-lg font-semibold">
-                                    Detalles seleccionados
-                                </h2>
-
-                                {/* Item 1 */}
-                                <div className="flex items-center gap-4 rounded-xl border bg-white p-4 shadow-sm">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=100&h=100&auto=format&fit=crop"
-                                        alt="Hamburguesa"
-                                        className="h-20 w-20 rounded-lg object-cover"
-                                    />
-                                    <div className="flex-1">
-                                        <h3 className="font-bold">
-                                            Hamburguesa clásica
-                                        </h3>
-                                        <p className="text-sm text-gray-500">
-                                            $12.00
-                                        </p>
-                                        <p className="text-xs text-gray-400">
-                                            Refresco de cola
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button className="flex h-8 w-8 items-center justify-center rounded-full border">
-                                            -
-                                        </button>
-                                        <span className="font-medium">2</span>
-                                        <button className="flex h-8 w-8 items-center justify-center rounded-full border">
-                                            +
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Botones de Acción Rápida */}
-                                <div className="flex gap-4">
-                                    <button className="flex-1 rounded-xl bg-orange-500 py-3 font-bold text-white transition-colors hover:bg-orange-600">
-                                        Pedir de nuevo
-                                    </button>
-                                    <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-300 py-3 font-medium text-gray-600 transition-colors hover:bg-gray-50">
-                                        <Star className="h-4 w-4 text-orange-400" />{' '}
-                                        Calificar pedido
-                                    </button>
-                                </div>
-
-                                {/* Item Historial */}
-                                <div className="flex items-center gap-4 rounded-xl border bg-gray-50 p-4 opacity-70">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?q=80&w=100&h=100&auto=format&fit=crop"
-                                        alt="Pizza"
-                                        className="h-16 w-16 rounded-lg object-cover"
-                                    />
-                                    <div className="flex-1 text-sm">
-                                        <h3 className="font-bold">
-                                            Pedido #9876 - Entregado
-                                        </h3>
-                                        <p className="text-gray-500">
-                                            05/09/2024
-                                        </p>
-                                        <div className="mt-1 flex text-orange-400">
-                                            <Star className="h-3 w-3 fill-current" />
-                                            <Star className="h-3 w-3 fill-current" />
-                                            <Star className="h-3 w-3 fill-current" />
-                                        </div>
-                                    </div>
-                                    <span className="font-bold">$18.50</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Columna Derecha: Resumen y Mapa */}
-                        <div className="space-y-6">
-                            {/* Card Estado Actual */}
-                            <div className="rounded-xl border bg-white p-5 shadow-sm">
-                                <div className="mb-4 flex items-start justify-between">
-                                    <div>
-                                        <p className="text-sm font-semibold tracking-wider text-gray-500 uppercase">
-                                            Estado actual
-                                        </p>
-                                        <p className="text-lg font-bold text-orange-600">
-                                            ¡Tu pedido va camino!
-                                        </p>
-                                        <p className="text-sm text-gray-400">
-                                            Llegará en ~15-20 min.
-                                        </p>
-                                    </div>
-                                    <Star className="h-5 w-5 text-gray-300" />
-                                </div>
-                                <div className="text-2xl font-black text-gray-800">
-                                    $31.26
-                                </div>
-                            </div>
-
-                            {/* Resumen de costos */}
-                            <div className="space-y-3 rounded-xl border bg-white p-5 shadow-sm">
-                                <h3 className="border-bottom pb-2 font-bold">
-                                    Resumen del pedido
+                                <h3 className="mt-4 font-bold text-slate-900">
+                                    No hay pedidos aquí
                                 </h3>
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Subtotal:</span>
-                                    <span>$23.50</span>
-                                </div>
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Costo de envío:</span>
-                                    <span>$4.00</span>
-                                </div>
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>IVA (16%):</span>
-                                    <span>$3.76</span>
-                                </div>
-                                <div className="flex justify-between border-t pt-2 text-lg font-bold text-gray-900">
-                                    <span>Total:</span>
-                                    <span>$31.26</span>
-                                </div>
-                                <p className="text-xs font-medium text-green-600">
-                                    Efectivo al recibir
+                                <p className="text-sm text-slate-500">
+                                    Todo está al día por el momento.
                                 </p>
                             </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                {pedidosFiltrados.map((pedido) => (
+                                    <OrderCard
+                                        key={pedido.id}
+                                        pedido={pedido}
+                                        avanzarEstado={avanzarEstado}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
-                            {/* Mapa y Dirección */}
-                            {/* <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-                                <div className="relative h-40 bg-blue-50">
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <MapPin className="h-8 w-8 animate-bounce text-orange-500" />
-                                        <div className="absolute h-1 w-3/4 rotate-45 bg-blue-200"></div>
-                                    </div>
-                                    <div className="absolute bottom-2 left-2 rounded bg-white px-2 py-1 text-[10px] font-bold shadow">
-                                        Ubicación en tiempo real
-                                    </div>
+                    {/* LADO DERECHO: MÉTRICAS E HISTORIAL */}
+                    <div className="space-y-4">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                            <h3 className="mb-4 text-xs font-black tracking-widest text-slate-400 uppercase">
+                                Resumen de Hoy
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-slate-600">
+                                        Total Ventas
+                                    </span>
+                                    <span className="text-lg font-black text-slate-900">
+                                        $1,850.00
+                                    </span>
                                 </div>
-                                <div className="space-y-4 p-4">
-                                    <div>
-                                        <p className="text-xs font-bold tracking-tighter text-gray-400 uppercase">
-                                            Dirección de entrega
-                                        </p>
-                                        <p className="text-sm font-medium">
-                                            Casa - Santo Domingo Yanhuitlán
-                                        </p>
-                                    </div>
-                                    <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 py-3 font-bold text-white transition-colors hover:bg-black">
-                                        Confirmar y Pagar
-                                    </button>
-                                    <button className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                        <MessageSquare className="h-4 w-4" />{' '}
-                                        Contactar al repartidor
-                                    </button>
+                                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                                    <div className="h-full w-2/3 bg-indigo-500"></div>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </AppLayout>
+    );
+}
+
+// Subcomponente para Limpieza de Código
+function OrderCard({
+    pedido,
+    avanzarEstado,
+}: {
+    pedido: any;
+    avanzarEstado: (id: string) => void;
+}) {
+    // Mejora UI: Alerta visual si el pedido lleva más de 10 min
+    const isLate = pedido.tiempo > 10 && pedido.status === 'Pendiente';
+
+    return (
+        <div
+            className={`group flex flex-col rounded-2xl border bg-white transition-all hover:shadow-lg ${isLate ? 'border-rose-200 ring-2 ring-rose-50' : 'border-slate-200'}`}
+        >
+            <div className="p-4">
+                <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                        <div
+                            className={`rounded-lg p-2 ${pedido.status === 'Pendiente' ? 'bg-orange-100' : 'bg-blue-100'}`}
+                        >
+                            {pedido.tipo === 'Delivery' ? (
+                                <Bike className="h-4 w-4 text-orange-600" />
+                            ) : (
+                                <Clock className="h-4 w-4 text-blue-600" />
+                            )}
+                        </div>
+                        <div>
+                            <span className="block text-[10px] font-black text-slate-400">
+                                {pedido.id}
+                            </span>
+                            <h3 className="font-bold text-slate-900">
+                                {pedido.cliente}
+                            </h3>
+                        </div>
+                    </div>
+                    <span
+                        className={`rounded-full px-3 py-1 text-[10px] font-black uppercase ${
+                            pedido.status === 'Pendiente'
+                                ? 'bg-orange-50 text-orange-600'
+                                : 'bg-blue-50 text-blue-600'
+                        }`}
+                    >
+                        {pedido.status}
+                    </span>
+                </div>
+
+                <div className="mt-4 rounded-xl bg-slate-50 p-3">
+                    <p className="mb-1 text-xs font-bold tracking-tighter text-slate-500 uppercase">
+                        Items
+                    </p>
+                    <p className="text-sm font-medium text-slate-700">
+                        {pedido.items}
+                    </p>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+                        <Clock
+                            className={`h-3.5 w-3.5 ${isLate ? 'text-rose-500' : ''}`}
+                        />
+                        <span className={isLate ? 'text-rose-600' : ''}>
+                            {pedido.tiempo} min
+                        </span>
+                    </div>
+                    <span className="text-lg font-black text-slate-900">
+                        ${pedido.total}
+                    </span>
+                </div>
+            </div>
+
+            <div className="mt-auto flex gap-2 border-t border-slate-100 p-2">
+                <button
+                    onClick={() => avanzarEstado(pedido.id)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-700 py-2.5 text-xs font-bold text-white transition-all hover:bg-red-800 active:scale-95"
+                >
+                    <Check className="h-3.5 w-3.5" />
+                    {pedido.status === 'Pendiente' ? 'Recahzar' : 'Cancelar'}
+                </button>
+
+                <button
+                    onClick={() => avanzarEstado(pedido.id)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-700 py-2.5 text-xs font-bold text-white transition-all hover:bg-green-800 active:scale-95"
+                >
+                    <Check className="h-3.5 w-3.5" />
+                    {pedido.status === 'Pendiente' ? 'Aceptar' : 'Listo'}
+                </button>
+                {/* <button className="rounded-xl bg-slate-100 px-3 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-500">
+                    <X className="h-4 w-4" />
+                </button> */}
+            </div>
+        </div>
     );
 }

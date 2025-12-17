@@ -13,6 +13,7 @@ const buildKey = (item: Omit<CartItem, 'key'>) =>
 interface CartState {
     items: CartItem[];
     addItem: (item: Omit<CartItem, 'key'>) => void;
+    updateQuantity: (key: string, quantity: number) => void; // <-- Nueva
     increment: (key: string) => void;
     decrement: (key: string) => void;
     updateNotes: (key: string, notes: string) => void;
@@ -20,7 +21,6 @@ interface CartState {
     clearCart: () => void;
     getTotalPrice: () => number;
 }
-
 const SHOPPING_CART_KEY = 'cart-storage';
 
 export const useCartStore = create<CartState>()(
@@ -29,7 +29,7 @@ export const useCartStore = create<CartState>()(
             items: [],
 
             /**
-             * Agregar producto (o sumar si existe la misma configuración)
+             * AGREGAR PRODUCTO
              */
             addItem: (item) =>
                 set((state) => {
@@ -47,10 +47,7 @@ export const useCartStore = create<CartState>()(
                         return {
                             items: state.items.map((i) =>
                                 i.key === key
-                                    ? {
-                                          ...i,
-                                          quantity: i.quantity + 1,
-                                      }
+                                    ? { ...i, quantity: i.quantity + 1 }
                                     : i,
                             ),
                         };
@@ -59,69 +56,43 @@ export const useCartStore = create<CartState>()(
                     return {
                         items: [
                             ...state.items,
-                            {
-                                ...normalized,
-                                key,
-                                quantity: 1,
-                            },
+                            { ...normalized, key, quantity: 1 },
                         ],
                     };
                 }),
 
             /**
-             * Incrementar cantidad de un item
+             * ACTUALIZAR CANTIDAD (Motor central)
              */
-            increment: (key) =>
-                set((state) => {
-                    if (!state.items.some((i) => i.key === key)) {
-                        console.warn(
-                            '[cart.increment] key no encontrada:',
-                            key,
-                        );
-                        return state;
-                    }
-
-                    return {
-                        items: state.items.map((i) =>
+            updateQuantity: (key, quantity) =>
+                set((state) => ({
+                    items: state.items
+                        .map((i) =>
                             i.key === key
-                                ? {
-                                      ...i,
-                                      quantity: i.quantity + 1,
-                                  }
+                                ? { ...i, quantity: Math.max(0, quantity) }
                                 : i,
-                        ),
-                    };
-                }),
+                        )
+                        .filter((i) => i.quantity > 0),
+                })),
 
             /**
-             * Decrementar cantidad (elimina si llega a 0)
+             * INCREMENTAR
              */
-            decrement: (key) =>
-                set((state) => {
-                    if (!state.items.some((i) => i.key === key)) {
-                        console.warn(
-                            '[cart.decrement] key no encontrada:',
-                            key,
-                        );
-                        return state;
-                    }
-
-                    return {
-                        items: state.items
-                            .map((i) =>
-                                i.key === key
-                                    ? {
-                                          ...i,
-                                          quantity: i.quantity - 1,
-                                      }
-                                    : i,
-                            )
-                            .filter((i) => i.quantity > 0),
-                    };
-                }),
+            increment: (key) => {
+                const item = get().items.find((i) => i.key === key);
+                if (item) get().updateQuantity(key, item.quantity + 1);
+            },
 
             /**
-             * Actualizar notas
+             * DECREMENTAR
+             */
+            decrement: (key) => {
+                const item = get().items.find((i) => i.key === key);
+                if (item) get().updateQuantity(key, item.quantity - 1);
+            },
+
+            /**
+             * NOTAS
              */
             updateNotes: (key, notes) =>
                 set((state) => ({
@@ -131,7 +102,7 @@ export const useCartStore = create<CartState>()(
                 })),
 
             /**
-             * Eliminar item completo
+             * ELIMINAR ITEM
              */
             removeItem: (key) =>
                 set((state) => ({
@@ -139,52 +110,36 @@ export const useCartStore = create<CartState>()(
                 })),
 
             /**
-             * Vaciar carrito
+             * VACIAR
              */
             clearCart: () => set({ items: [] }),
 
             /**
-             * Total con extras + variaciones (blindado)
+             * TOTAL
              */
             getTotalPrice: () =>
                 get().items.reduce((total, item) => {
                     const basePrice = Number(item.price) || 0;
                     const quantity = Number(item.quantity) || 0;
-
                     const extrasTotal = (item.extras ?? []).reduce(
                         (s, e) => s + (Number(e.price) || 0),
                         0,
                     );
-
-                    // const variationsTotal = (item.variations ?? []).reduce(
-                    //     (s, v) => s + (Number(v.price) || 0),
-                    //     0,
-                    // );
-
-                    return total + (basePrice + extrasTotal) * quantity;
+                    const variationsTotal = (item.variations ?? []).reduce(
+                        (s, v) => s + (Number(v.price) || 0),
+                        0,
+                    );
+                    return (
+                        total +
+                        (basePrice + extrasTotal + variationsTotal) * quantity
+                    );
                 }, 0),
         }),
         {
             name: SHOPPING_CART_KEY,
-            // version: 1,
-
-            /**
-             * Solo persistimos items
-             */
             partialize: (state) => ({
                 items: state.items,
             }),
-
-            // /**
-            //  * 🔒 Migración segura de datos antiguos
-            //  */
-            // onRehydrateStorage: () => (state) => {
-            //     state?.items.forEach((item) => {
-            //         item.extras ??= [];
-            //         item.variations ??= [];
-            //         item.notes ??= '';
-            //     });
-            // },
         },
     ),
 );
