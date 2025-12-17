@@ -205,17 +205,16 @@ export default function BusinessDetail({ business, favorite }: Props) {
                 </div>
 
                 {user && (
-                    <CartFloatButton
-                        totalItems={totalItems}
-                        onClick={() => setIsCartOpen(true)}
-                    />
-                )}
-
-                {user && (
-                    <CartDrawer
-                        isOpen={isCartOpen}
-                        onClose={() => setIsCartOpen(false)}
-                    />
+                    <>
+                        <CartFloatButton
+                            totalItems={totalItems}
+                            onClick={() => setIsCartOpen(true)}
+                        />
+                        <CartDrawer
+                            isOpen={isCartOpen}
+                            onClose={() => setIsCartOpen(false)}
+                        />
+                    </>
                 )}
             </div>
         </MainLayout>
