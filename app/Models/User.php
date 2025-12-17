@@ -22,7 +22,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'google_id'
+        'google_id',
+        'accepted_privacy',
+        'privacy_version',
+        'privacy_accepted_at'
     ];
 
     /**

@@ -1,3 +1,4 @@
+import { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Home, ShieldCheck } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
@@ -12,9 +13,8 @@ export default function AuthLayout({
     title,
     description,
 }: PropsWithChildren<AuthLayoutProps>) {
-    const p = usePage();
-
-    console.log(p);
+    const pageData = usePage<SharedData>();
+    const { name: nameApp } = pageData.props;
 
     return (
         <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-100 via-white to-gray-100">
@@ -71,7 +71,7 @@ export default function AuthLayout({
                         {children}
 
                         <p className="mt-10 text-center text-xs text-gray-400">
-                            © {new Date().getFullYear()} Tu {}. Todos los
+                            © {new Date().getFullYear()} - {nameApp}. Todos los
                             derechos reservados.
                         </p>
                     </div>

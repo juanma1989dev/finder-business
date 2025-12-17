@@ -1,7 +1,7 @@
 import { GoogleButtonRegister } from '@/components/app/GoogleButtonRegsiter';
 import AuthLayout from '@/layouts/auth-layout';
 import { SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Register() {
@@ -10,9 +10,19 @@ export default function Register() {
     const [acceptPrivacy, setAcceptPrivacy] = useState(false);
     const [open, setOpen] = useState(false);
 
-    const handleGoogleRegister = () => {
+    const handleGoogleRegister = async () => {
         if (!acceptPrivacy) return;
-        window.location.href = '/auth/google/register';
+
+        router.post(
+            '/session/privacy-accept',
+            {},
+            {
+                onSuccess: () => {
+                    console.log('register ... ');
+                    window.location.href = '/auth/google/register';
+                },
+            },
+        );
     };
 
     return (
@@ -33,10 +43,7 @@ export default function Register() {
                 <GoogleButtonRegister
                     label="Crear cuenta con Google"
                     disabled={!acceptPrivacy}
-                    onClick={() => {
-                        if (!acceptPrivacy) return;
-                        window.location.href = '/auth/google/register';
-                    }}
+                    onClick={handleGoogleRegister}
                 />
 
                 {/* Aviso */}

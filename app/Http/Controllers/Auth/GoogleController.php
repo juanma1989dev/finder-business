@@ -28,7 +28,17 @@ class GoogleController extends Controller
      */
     public function redirectToGoogleRegister(): RedirectResponse
     {
+       # Validar que el usuario haya aceptado el aviso
+        if (!session('accept_privacy', false)) {
+            return redirect()
+                ->route('register')
+                ->with('error', 'Debes aceptar el Aviso de Privacidad para continuar.');
+        }
+
+        # Guardar el  registro
         $this->googleAuthService->setAuthAction('register');
+
+        # Redirigir a Google
         return Socialite::driver('google')->redirect();
     }
 
