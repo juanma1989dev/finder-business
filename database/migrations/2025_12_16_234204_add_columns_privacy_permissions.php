@@ -23,6 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['accepted_privacy', 'privacy_version', 'privacy_accepted_at']);
+        });
     }
 };
