@@ -22,6 +22,15 @@ interface Filters {
     distance: number | null;
 }
 
+const categorias = [
+    { nombre: 'Hamburguesas', icon: '🍔' },
+    { nombre: 'Pizza', icon: '🍕' },
+    { nombre: 'Tacos', icon: '🌮' },
+    { nombre: 'Postres', icon: '🍰' },
+    { nombre: 'Bebidas', icon: '🥤' },
+    { nombre: 'Frutas', icon: '🍎' },
+];
+
 export default function Index({ businesses, categories, filters }: Props) {
     const { auth, errors } = usePage<SharedData>().props;
 
@@ -141,6 +150,23 @@ export default function Index({ businesses, categories, filters }: Props) {
                 filters={filtersUser}
                 onFiltersChange={setFiltersUser}
             />
+
+            {/* Categorias */}
+            <div className="no-scrollbar flex gap-6 overflow-x-auto pb-2">
+                {categorias.map((cat, i) => (
+                    <div
+                        key={i}
+                        className="group flex min-w-[50px] cursor-pointer flex-col items-center gap-2"
+                    >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 bg-white text-2xl shadow-sm transition-colors">
+                            {cat.icon}
+                        </div>
+                        <span className="text-xs font-semibold text-gray-600">
+                            {cat.nombre}
+                        </span>
+                    </div>
+                ))}
+            </div>
 
             {/* Grid de negocios */}
             {businesses.length > 0 ? (
