@@ -2,10 +2,13 @@ import BusinessCard from '@/components/app/BusinessCard';
 import MainFilters from '@/components/app/MainFilters';
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
+import { useCartStore } from '@/store/cart.store';
 import { type SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { CartFloatButton } from './public/business/CartFloatButton';
+import { CartDrawer } from './public/business/drawer-cart';
 
 interface Props {
     businesses: any;
@@ -33,14 +36,19 @@ const categorias = [
 
 export default function Index({ businesses, categories, filters }: Props) {
     const { auth, errors } = usePage<SharedData>().props;
+    const user = auth.user;
+
+    const { items } = useCartStore();
+    const totalItems = items.reduce((t, i) => t + i.quantity, 0);
+
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    const [ready, setReady] = useState(false);
 
     const [filtersUser, setFiltersUser] = useState<Filters>({
         query: filters.q || '',
         category: filters.category || null,
         distance: null,
     });
-
-    const [ready, setReady] = useState(false);
 
     const {
         latitude,
@@ -192,6 +200,19 @@ export default function Index({ businesses, categories, filters }: Props) {
                         categoría diferente
                     </p>
                 </div>
+            )}
+
+            {user && (
+                <>
+                    <CartFloatButton
+                        totalItems={totalItems}
+                        onClick={() => setIsCartOpen(true)}
+                    />
+                    <CartDrawer
+                        isOpen={isCartOpen}
+                        onClose={() => setIsCartOpen(false)}
+                    />
+                </>
             )}
         </MainLayout>
     );
