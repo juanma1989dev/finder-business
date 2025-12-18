@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -10,83 +10,36 @@ import {
 } from '@/components/ui/select';
 import { locations } from '@/data/locations';
 import { makeBreadCrumb } from '@/helpers';
-import AppLayout from '@/layouts/app-layout';
 import { Business } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import 'leaflet/dist/leaflet.css';
-import { Save } from 'lucide-react';
+import {
+    Badge,
+    Image as ImageIcon,
+    Info,
+    LoaderCircle,
+    Navigation,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import { toast } from 'react-toastify';
-
-/***************************** */
-// function Routing({ from, to }: { from: [number, number]; to: [number, number] }) {
-//     const map = useMap();
-
-//     useEffect(() => {
-//         if (!map) return;
-
-//         const L = require('leaflet');
-//         require('leaflet-routing-machine');
-
-//         const control = L.Routing.control({
-//             waypoints: [
-//                 L.latLng(from[0], from[1]),
-//                 L.latLng(to[0], to[1]),
-//             ],
-//             routeWhileDragging: false,
-//             show: false, // no muestra panel lateral
-//             addWaypoints: false,
-//             draggableWaypoints: false,
-//             lineOptions: {
-//                 styles: [{ color: '#ff6600', weight: 5 }],
-//             },
-//         }).addTo(map);
-
-//         return () => map.removeControl(control);
-//     }, [map, from, to]);
-
-//     return null;
-// }
-
-// function RouteExample() {
-//     const start: [number, number] = [17.058, -96.721]; // Oaxaca
-//     const end: [number, number] = [17.06, -96.72]; // Destino
-
-//     return (
-//         <MapContainer center={start} zoom={14} style={{ height: '500px', width: '100%' }}>
-//             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-//             <Routing from={start} to={end} />
-//         </MapContainer>
-//     );
-// }
-/***************************** */
+import { LayoutBusinessModules } from './LayoutBusinessModules';
 
 interface Props {
     business: Business;
 }
 
-interface FormLocationProps {
-    location: string;
-    address: string;
-    cords: {
-        lat: number;
-        long: number;
-    };
-}
-
 export default function Location({ business }: Props) {
     const breadcrumbs = makeBreadCrumb({
-        text: `${business.name ?? ''} - Información general`,
+        text: `${business.name ?? ''} - Ubicación`,
         url: '/',
     });
-    const defaultCords = locations.NOCHIXTLAN;
 
+    const defaultCords = locations.NOCHIXTLAN;
     const [mapReady, setMapReady] = useState(false);
-    const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<any>(null);
 
-    const formLocation = useForm<FormLocationProps>({
+    const { data, setData, post, processing, errors } = useForm({
         location: business.location,
         address: business.address,
         cords: {
@@ -96,199 +49,187 @@ export default function Location({ business }: Props) {
     });
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (mapContainerRef.current) {
-                setMapReady(true);
-            }
-        }, 50);
+        const timer = setTimeout(() => setMapReady(true), 100);
         return () => clearTimeout(timer);
     }, []);
 
-    useEffect(() => {
-        if (mapReady && mapRef.current) {
-            setTimeout(() => {
-                mapRef.current.invalidateSize();
-            }, 300);
-        }
-    }, [mapReady]);
-
-    const handleMarkerDragEnd = (e: any) => {
-        const marker = e.target;
-        const latlng = marker.getLatLng();
-        const cords = { lat: latlng.lat, long: latlng.lng };
-        formLocation.setData('cords', cords);
-    };
-
-    // Subcomponente para mover el mapa sin re-renderizar todo
-    function MapUpdater({ position }: { position: [number, number] }) {
-        const map = useMap();
-        const hasMoved = useRef(false);
-
-        useEffect(() => {
-            if (!mapRef.current) {
-                mapRef.current = map;
-            }
-        }, [map]);
-
-        useEffect(() => {
-            const timer = setTimeout(() => {
-                map.invalidateSize();
-
-                if (!hasMoved.current) {
-                    // 🚀 Primer render: sin animación
-                    map.setView(position, map.getZoom());
-                    hasMoved.current = true;
-                } else {
-                    // 🎯 Cambios posteriores: con animación rápida
-                    map.flyTo(position, map.getZoom(), {
-                        animate: true,
-                        duration: 0.4, // 400 ms
-                    });
-                }
-            }, 150);
-
-            return () => clearTimeout(timer);
-        }, [position, map]);
-
-        return null;
-    }
-
-    const handleClickSaveLocation = () => {
-        formLocation.post(`/dashboard/business/${business.id}/location`, {
-            onSuccess: ({ props }) => {
-                const flashData = props?.flash as
-                    | { success?: string }
-                    | undefined;
-                const success = flashData?.success;
-                if (success) toast.success(success);
-            },
-            onError: (errors) => {
-                toast.error(errors.general);
-            },
+    const handleSave = () => {
+        post(`/dashboard/business/${business.id}/location`, {
+            onSuccess: () =>
+                toast.success('Ubicación actualizada correctamente'),
+            onError: (err) => toast.error(err.general || 'Error al guardar'),
         });
     };
 
+    function MapUpdater({ position }: { position: [number, number] }) {
+        const map = useMap();
+        useEffect(() => {
+            map.flyTo(position, map.getZoom(), {
+                animate: true,
+                duration: 0.5,
+            });
+        }, [position, map]);
+        return null;
+    }
+
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard - Nuevo negocio" />
-            <div className="relative m-3 space-y-6 p-3">
-                {/* Botón de guardar */}
-                <Button
-                    onClick={handleClickSaveLocation}
-                    className="absolute top-0 right-2 cursor-pointer bg-orange-500 text-white hover:scale-105 hover:border-1 hover:bg-orange-700 hover:text-white"
-                    variant={'outline'}
-                    title="Guardar"
-                >
-                    <Save className="h-4 w-4" />
-                </Button>
-
-                {/* Selección de ubicación */}
-                <div className="mt-5">
-                    <Label htmlFor="location">Ubicación</Label>
-                    <Select
-                        name="location"
-                        onValueChange={(location: keyof typeof locations) => {
-                            const { cords } = locations[location];
-                            formLocation.setData('location', location);
-                            formLocation.setData('cords', {
-                                lat: cords.lat,
-                                long: cords.long,
-                            });
-                            formLocation.setData('address', '');
-                        }}
-                        value={formLocation.data.location}
-                    >
-                        <SelectTrigger>
-                            <SelectValue
-                                placeholder="Selecciona una ubicación"
-                                defaultValue={formLocation.data.location}
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {Object.entries(locations).map(([key, data]) => (
-                                <SelectItem key={key} value={key}>
-                                    {data.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {formLocation.errors.location && (
-                        <div className="mt-1 text-sm text-red-500">
-                            {formLocation.errors.location}
-                        </div>
-                    )}
-                </div>
-
-                {/* Dirección */}
-                <div>
-                    <Label htmlFor="address">Dirección</Label>
-                    <Input
-                        id="address"
-                        value={formLocation.data.address}
-                        onChange={(e) =>
-                            formLocation.setData('address', e.target.value)
-                        }
-                        placeholder="Escribe la dirección..."
-                        autoComplete="off"
-                    />
-                    <span className="text-gray-700/90">
-                        Ingresa la dirección completa y exacta de tu negocio
-                        para mejorar su localización
-                        <span className="font-semibold">(*Recomendado)</span>.
-                    </span>
-                    {formLocation.errors.address && (
-                        <div className="mt-1 text-sm text-red-500">
-                            {formLocation.errors.address}
-                        </div>
-                    )}
-                </div>
-
-                {/* Mapa */}
-                <div
-                    ref={mapContainerRef}
-                    style={{ height: '550px', width: '100%' }}
-                    className="mt-5 overflow-hidden rounded-lg shadow-lg"
-                >
-                    <p className="my-2 text-xl font-semibold">
-                        Ubica en el mapa la dirección exacta de tu negocio
-                    </p>
-                    {mapReady && (
-                        <MapContainer
-                            center={[
-                                formLocation.data.cords.lat,
-                                formLocation.data.cords.long,
-                            ]}
-                            zoom={14}
-                            style={{ height: '100%', width: '100%' }}
-                            scrollWheelZoom={true}
-                            attributionControl={false}
-                            whenReady={() => {
-                                setTimeout(() => {
-                                    if (mapRef.current) {
-                                        mapRef.current.invalidateSize();
-                                    }
-                                }, 300);
+        <LayoutBusinessModules
+            titleHead="Localización"
+            headerTitle="Localización"
+            headerDescription="Configura la ubicación de tu negocio"
+            buttonText="Guardar"
+            icon={ImageIcon}
+            onSubmit={handleSave}
+            processing={false}
+            breadcrumbs={breadcrumbs}
+        >
+            {/* Panel de Controles (Izquierda) */}
+            <div className="space-y-4 lg:col-span-4">
+                <Card className="space-y-5 rounded-2xl border-gray-200/60 p-4 shadow-sm">
+                    <div className="space-y-2">
+                        <Label className="text-[11px] font-bold tracking-wider text-gray-500 uppercase">
+                            Municipio / Localidad
+                        </Label>
+                        <Select
+                            value={data.location}
+                            onValueChange={(val: keyof typeof locations) => {
+                                setData({
+                                    ...data,
+                                    location: val,
+                                    cords: locations[val].cords,
+                                    address: '',
+                                });
                             }}
                         >
+                            <SelectTrigger className="h-10 rounded-xl border-gray-200 text-sm focus:ring-orange-500">
+                                <SelectValue placeholder="Selecciona localidad" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl">
+                                {Object.entries(locations).map(([key, loc]) => (
+                                    <SelectItem
+                                        key={key}
+                                        value={key}
+                                        className="cursor-pointer text-sm"
+                                    >
+                                        {loc.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.location && (
+                            <p className="text-[10px] text-red-500">
+                                {errors.location}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-[11px] font-bold tracking-wider text-gray-500 uppercase">
+                            Dirección Física
+                        </Label>
+                        <div className="relative">
+                            <Navigation
+                                className="absolute top-3 left-3 text-gray-400"
+                                size={14}
+                            />
+                            <Input
+                                value={data.address}
+                                onChange={(e) =>
+                                    setData('address', e.target.value)
+                                }
+                                placeholder="Calle, número, colonia..."
+                                className="h-10 rounded-xl border-gray-200 pl-9 text-xs"
+                            />
+                        </div>
+                        <div className="flex gap-2 rounded-xl border border-blue-100 bg-blue-50/50 p-2.5">
+                            <Info
+                                size={14}
+                                className="mt-0.5 shrink-0 text-blue-500"
+                            />
+                            <p className="text-[10px] leading-tight text-blue-700">
+                                Para mejores resultados, ingresa la dirección
+                                exacta y luego ajusta el pin en el mapa.
+                            </p>
+                        </div>
+                        {errors.address && (
+                            <p className="text-[10px] text-red-500">
+                                {errors.address}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="border-t border-gray-100 pt-2">
+                        <Label className="mb-3 block text-center text-[11px] font-bold text-gray-400 uppercase">
+                            Coordenadas GPS
+                        </Label>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="rounded-lg border border-gray-100 bg-gray-50 p-2 text-center">
+                                <span className="block text-[9px] font-bold text-gray-400 uppercase">
+                                    Latitud
+                                </span>
+                                <span className="font-mono text-xs text-gray-700">
+                                    {data.cords.lat.toFixed(6)}
+                                </span>
+                            </div>
+                            <div className="rounded-lg border border-gray-100 bg-gray-50 p-2 text-center">
+                                <span className="block text-[9px] font-bold text-gray-400 uppercase">
+                                    Longitud
+                                </span>
+                                <span className="font-mono text-xs text-gray-700">
+                                    {data.cords.long.toFixed(6)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+            </div>
+
+            {/* Panel del Mapa (Derecha) */}
+            <div className="relative h-[500px] lg:col-span-8 lg:h-[600px]">
+                <Card className="relative h-full w-full overflow-hidden rounded-2xl border-gray-200/60 shadow-sm">
+                    {!mapReady && (
+                        <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-50">
+                            <LoaderCircle className="animate-spin text-orange-500" />
+                        </div>
+                    )}
+
+                    {mapReady && (
+                        <MapContainer
+                            center={[data.cords.lat, data.cords.long]}
+                            zoom={16}
+                            style={{ height: '100%', width: '100%' }}
+                            attributionControl={false}
+                            scrollWheelZoom={true}
+                        >
                             <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png" />
+
                             <Marker
-                                position={[
-                                    formLocation.data.cords.lat,
-                                    formLocation.data.cords.long,
-                                ]}
-                                draggable
-                                eventHandlers={{ dragend: handleMarkerDragEnd }}
+                                position={[data.cords.lat, data.cords.long]}
+                                draggable={true}
+                                eventHandlers={{
+                                    dragend: (e) => {
+                                        const latlng = e.target.getLatLng();
+                                        setData('cords', {
+                                            lat: latlng.lat,
+                                            long: latlng.lng,
+                                        });
+                                    },
+                                }}
                             />
                             <MapUpdater
-                                position={[
-                                    formLocation.data.cords.lat,
-                                    formLocation.data.cords.long,
-                                ]}
+                                position={[data.cords.lat, data.cords.long]}
                             />
                         </MapContainer>
                     )}
-                </div>
+
+                    {/* Overlay de ayuda sobre el mapa */}
+                    <div className="pointer-events-none absolute bottom-4 left-4 z-[400]">
+                        <Badge className="border-none bg-white/90 px-3 py-1 text-[10px] font-bold tracking-tighter text-gray-800 uppercase shadow-md backdrop-blur">
+                            Tip: Arrastra el marcador azul para mayor precisión
+                        </Badge>
+                    </div>
+                </Card>
             </div>
-        </AppLayout>
+        </LayoutBusinessModules>
     );
 }

@@ -21,149 +21,167 @@ import { Business, SharedData, type NavItem } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
     BookOpenText,
-    CloudUpload,
+    Camera,
     Globe,
     Home,
-    Image,
+    Image as ImageIcon,
     LoaderCircle,
     MapPin,
     ShoppingBag,
 } from 'lucide-react';
-import { useRef, useState } from 'react';
-
-const getImgSrc = function (business: Business | undefined): string {
-    if (!business) return '/images/default.png';
-    if (business.cover_image) return `/storage/${business.cover_image}`;
-    return `/images/${business.category?.image ?? 'default.png'}`;
-};
+import { useMemo, useRef, useState } from 'react';
 
 export function AppSidebar() {
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const { open } = useSidebar();
-    const [uploadingCover, setUploadingCover] = useState<boolean>(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploadingCover, setUploadingCover] = useState(false);
 
-    const props = usePage<SharedData>().props;
-
+    const { props } = usePage<SharedData>();
     const business = getMetaValue<Business>(props, 'business');
 
-    const handleClickChangeCoverImage = () => {
-        fileInputRef.current?.click();
-    };
+    // Optimizamos la obtención de la imagen con useMemo
+    const imgSrc = useMemo(() => {
+        if (!business) return '/images/default.png';
+        if (business.cover_image) return `/storage/${business.cover_image}`;
+        return `/images/${business.category?.image ?? 'default.png'}`;
+    }, [business]);
+
+    // Items de navegación centralizados
+    const mainNavItems: NavItem[] = useMemo(
+        () =>
+            business
+                ? [
+                      {
+                          title: 'Información general',
+                          href: `/dashboard/business/${business.id}/info-general`,
+                          icon: BookOpenText,
+                      },
+                      {
+                          title: 'Ubicación',
+                          href: `/dashboard/business/${business.id}/location`,
+                          icon: MapPin,
+                      },
+                      {
+                          title: 'Productos',
+                          href: `/dashboard/business/${business.id}/services`,
+                          icon: ShoppingBag,
+                      },
+                      {
+                          title: 'Galería',
+                          href: `/dashboard/business/${business.id}/gallery`,
+                          icon: ImageIcon,
+                      },
+                      {
+                          title: 'Redes sociales',
+                          href: `/dashboard/business/${business.id}/social-networks`,
+                          icon: Globe,
+                      },
+                  ]
+                : [],
+        [business],
+    );
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
+        if (!file || !business) return;
 
         router.post(
-            `/dashboard/business/update-cover-image/${business?.id}`,
+            `/dashboard/business/update-cover-image/${business.id}`,
             { cover_image: file },
             {
                 multipart: true,
-                forceFormData: true,
                 preserveScroll: true,
-                onStart: () => {
-                    setUploadingCover(true);
-                },
-                onFinish: () => {
-                    setUploadingCover(false);
-                },
+                onStart: () => setUploadingCover(true),
+                onFinish: () => setUploadingCover(false),
             } as any,
         );
     };
 
-    const imgSrc = getImgSrc(business);
-
-    const mainNavItems: NavItem[] = business
-        ? [
-              {
-                  title: 'Información general',
-                  href: `/dashboard/business/${business?.id}/info-general`,
-                  icon: BookOpenText,
-              },
-              {
-                  title: 'Ubicación',
-                  href: `/dashboard/business/${business.id}/location`,
-                  icon: MapPin,
-              },
-              {
-                  title: 'Productos',
-                  href: `/dashboard/business/${business.id}/services`,
-                  icon: ShoppingBag,
-              },
-              {
-                  title: 'Galería',
-                  href: `/dashboard/business/${business.id}/gallery`,
-                  icon: Image,
-              },
-              {
-                  title: 'Redes sociales',
-                  href: `/dashboard/business/${business.id}/social-networks`,
-                  icon: Globe,
-              },
-          ]
-        : [];
-
     return (
         <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+            <SidebarHeader className="pt-4">
                 <SidebarMenu>
-                    <SidebarMenuItem>
+                    <SidebarMenuItem className="flex flex-col items-center gap-4">
+                        {/* Botón Volver / Home */}
                         <Link
                             href="/dashboard/business"
-                            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                            className="flex w-full items-center gap-2 px-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
                         >
                             <Home className="h-4 w-4" />
                             {open && <span>Mis negocios</span>}
                         </Link>
 
-                        {/* Imagen del negocio */}
-                        <div className="mt-4 flex flex-col items-center">
+                        {/* Contenedor de Avatar/Negocio */}
+                        <div className="group relative">
                             <TooltipProvider delayDuration={200}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <img
-                                            src={imgSrc}
-                                            alt={business?.name}
-                                            className={`rounded-full object-cover shadow transition-all duration-300 ${
+                                        <div
+                                            className={`relative overflow-hidden rounded-full border-2 border-background bg-muted shadow-md transition-all duration-300 ${
                                                 open ? 'h-24 w-24' : 'h-10 w-10'
                                             }`}
-                                        />
+                                        >
+                                            <img
+                                                src={imgSrc}
+                                                alt={business?.name}
+                                                className="h-full w-full object-cover"
+                                            />
+
+                                            {/* Overlay de Carga/Subida (Solo cuando está abierto) */}
+                                            {open && (
+                                                <button
+                                                    onClick={() =>
+                                                        fileInputRef.current?.click()
+                                                    }
+                                                    disabled={uploadingCover}
+                                                    className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-100"
+                                                >
+                                                    {uploadingCover ? (
+                                                        <LoaderCircle className="h-6 w-6 animate-spin text-white" />
+                                                    ) : (
+                                                        <>
+                                                            <Camera className="h-6 w-6 text-white" />
+                                                            <span className="text-[10px] font-medium text-white">
+                                                                Cambiar
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
                                     </TooltipTrigger>
                                     {!open && (
-                                        <TooltipContent side="right">
+                                        <TooltipContent
+                                            side="right"
+                                            className="font-semibold"
+                                        >
                                             {business?.name}
                                         </TooltipContent>
                                     )}
                                 </Tooltip>
                             </TooltipProvider>
 
-                            {open && (
-                                <>
-                                    <h5 className="mt-2 mb-1 text-center text-sm font-medium text-foreground">
-                                        {business?.name}
-                                    </h5>
-
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                        accept="image/*"
-                                    />
-
-                                    <button
-                                        onClick={handleClickChangeCoverImage}
-                                        disabled={uploadingCover}
-                                        className="mt-1 flex items-center gap-1 rounded-md bg-orange-600 px-3 py-1 text-xs text-white transition-all hover:bg-orange-700 disabled:opacity-50"
-                                    >
-                                        {uploadingCover ? (
-                                            <LoaderCircle className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                            <CloudUpload className="h-4 w-4" />
-                                        )}
-                                    </button>
-                                </>
-                            )}
+                            {/* Input oculto */}
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="hidden"
+                                accept="image/*"
+                            />
                         </div>
+
+                        {/* Título del Negocio */}
+                        {open && (
+                            <div className="text-center">
+                                <h5 className="truncate px-2 text-sm font-bold tracking-tight text-foreground">
+                                    {business?.name}
+                                </h5>
+                                <p className="text-[10px] tracking-widest text-muted-foreground uppercase">
+                                    {business?.category?.name || 'Negocio'}
+                                </p>
+                            </div>
+                        )}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>

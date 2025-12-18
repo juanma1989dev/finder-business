@@ -11,22 +11,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { ProductExtras, ProductVariations, ServicesAndProducts } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { LoaderCircle, Plus, Save, Trash2 } from 'lucide-react';
+import {
+    Image as ImageIcon,
+    Layers,
+    LoaderCircle,
+    Package,
+    Plus,
+    Save,
+    Sparkles,
+    Trash2,
+} from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-
-const initialData = {
-    name: '',
-    description: '',
-    price: 0,
-    duration: '',
-    category: 'Product',
-    isActive: true,
-    image: undefined as File | undefined,
-    image_url: '',
-    extras: [] as ProductExtras[],
-    variations: [] as ProductVariations[],
-};
 
 interface Props {
     open: boolean;
@@ -43,11 +39,21 @@ export default function ProductServiceModal({
     service,
     onSuccess,
 }: Props) {
-    const form = useForm(initialData);
+    const form = useForm({
+        name: '',
+        description: '',
+        price: 0,
+        duration: '',
+        category: 'Product',
+        isActive: true,
+        image: undefined as File | undefined,
+        image_url: '',
+        extras: [] as ProductExtras[],
+        variations: [] as ProductVariations[],
+    });
 
     useEffect(() => {
         if (!open) return;
-
         if (service) {
             form.setData({
                 name: service.name ?? '',
@@ -75,322 +81,369 @@ export default function ProductServiceModal({
 
         form.post(url, {
             forceFormData: true,
-            // @ts-expect-error
+            // ignore error
+
             data: isEdit ? { ...form.data, _method: 'PUT' } : form.data,
             onSuccess: () => {
                 toast.success(
                     isEdit
-                        ? 'Servicio actualizado correctamente'
-                        : 'Servicio creado correctamente',
+                        ? 'Actualizado correctamente'
+                        : 'Creado correctamente',
                 );
                 onClose();
                 onSuccess();
-                form.reset();
-            },
-            onError: (errors) => {
-                if (errors?.general) toast.error(errors.general);
-                else toast.error('Error al guardar');
             },
         });
     };
 
-    const handleAddExtra = () => {
-        form.setData('extras', [...form.data.extras, { name: '', price: 0 }]);
-    };
-
-    const handleRemoveExtra = (index: number) => {
-        const newExtras = [...form.data.extras];
-        newExtras.splice(index, 1);
-        form.setData('extras', newExtras);
-    };
-
-    const handleAddVariation = () => {
-        form.setData('variations', [...form.data.variations, { name: '' }]);
-    };
-
-    const handleRemoveVariation = (index: number) => {
-        const newVariations = [...form.data.variations];
-        newVariations.splice(index, 1);
-        form.setData('variations', newVariations);
-    };
-
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="animate-slide-in w-full max-w-6xl rounded-2xl bg-white p-5 shadow-2xl">
-                <DialogHeader className="mb-2 border-b pb-3">
-                    <DialogTitle className="text-xl font-bold text-orange-600">
-                        {service ? 'Editar Producto' : 'Agregar Producto'}
-                    </DialogTitle>
-                </DialogHeader>
-
-                <Tabs defaultValue="general" className="space-y-6">
-                    <TabsList className="mb-1 border-b border-gray-200">
-                        <TabsTrigger value="general">General</TabsTrigger>
-                        {/* <TabsTrigger value="variations">
-                            Variaciones
-                        </TabsTrigger>
-                        <TabsTrigger value="extras">Extras</TabsTrigger> */}
-                    </TabsList>
-
-                    {/* General */}
-                    <TabsContent value="general" className="space-y-6">
-                        <div className="flex gap-6">
-                            <div className="flex flex-1 flex-col gap-2">
-                                <Label>Nombre</Label>
-                                <Input
-                                    value={form.data.name}
-                                    onChange={(e) =>
-                                        form.setData('name', e.target.value)
-                                    }
-                                    className="rounded-lg shadow-lg"
-                                />
-                                {form.errors.name && (
-                                    <span className="mt-1 text-sm text-red-500">
-                                        {form.errors.name}
-                                    </span>
+            <DialogContent className="max-w-4xl overflow-hidden rounded-[2rem] border-none bg-gray-50 p-0 shadow-2xl">
+                {/* Header con gradiente sutil */}
+                <div className="bg-white px-8 pt-8 pb-6">
+                    <DialogHeader>
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
+                                {service ? (
+                                    <Sparkles size={24} />
+                                ) : (
+                                    <Plus size={24} />
                                 )}
                             </div>
+                            <div>
+                                <DialogTitle className="text-2xl font-black tracking-tight text-gray-900">
+                                    {service
+                                        ? 'Editar Producto'
+                                        : 'Nuevo Producto'}
+                                </DialogTitle>
+                                <p className="text-sm font-medium text-gray-500">
+                                    Configura los detalles de tu oferta
+                                </p>
+                            </div>
+                        </div>
+                    </DialogHeader>
+                </div>
 
-                            <div className="flex flex-1 flex-col gap-2">
-                                <Label>Precio ($)</Label>
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    step="1"
-                                    value={form.data.price}
+                <Tabs defaultValue="general" className="w-full">
+                    <div className="bg-white px-8">
+                        <TabsList className="flex h-auto w-full justify-start gap-8 bg-transparent p-0">
+                            {[
+                                {
+                                    id: 'general',
+                                    label: 'General',
+                                    icon: Package,
+                                },
+                                {
+                                    id: 'variations',
+                                    label: 'Variaciones',
+                                    icon: Layers,
+                                },
+                                {
+                                    id: 'extras',
+                                    label: 'Extras / Toppings',
+                                    icon: Plus,
+                                },
+                            ].map((tab) => (
+                                <TabsTrigger
+                                    key={tab.id}
+                                    value={tab.id}
+                                    className="relative flex items-center gap-2 rounded-none border-b-2 border-transparent px-1 pb-4 text-sm font-bold text-gray-400 transition-all data-[state=active]:border-orange-500 data-[state=active]:bg-transparent data-[state=active]:text-orange-600"
+                                >
+                                    <tab.icon size={16} />
+                                    {tab.label}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </div>
+
+                    <div className="max-h-[60vh] overflow-y-auto px-8 py-6">
+                        {/* CONTENIDO GENERAL */}
+                        <TabsContent value="general" className="mt-0 space-y-8">
+                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                                            Nombre del producto
+                                        </Label>
+                                        <Input
+                                            value={form.data.name}
+                                            onChange={(e) =>
+                                                form.setData(
+                                                    'name',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className="h-12 rounded-xl border-gray-200 bg-white px-4 shadow-sm focus:ring-orange-500"
+                                            placeholder="Ej: Hamburguesa Especial"
+                                        />
+                                        {form.errors.name && (
+                                            <p className="text-xs font-bold text-red-500">
+                                                {form.errors.name}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                                            Precio Base ($)
+                                        </Label>
+                                        <div className="relative">
+                                            <span className="absolute top-1/2 left-4 -translate-y-1/2 font-bold text-gray-400">
+                                                $
+                                            </span>
+                                            <Input
+                                                type="number"
+                                                value={form.data.price}
+                                                onChange={(e) =>
+                                                    form.setData(
+                                                        'price',
+                                                        Number(e.target.value),
+                                                    )
+                                                }
+                                                className="h-12 rounded-xl border-gray-200 bg-white pl-8 shadow-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                                        Imagen del producto
+                                    </Label>
+                                    <div
+                                        onClick={() =>
+                                            document
+                                                .getElementById('image-upload')
+                                                ?.click()
+                                        }
+                                        className="group relative flex h-full min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-[2rem] border-2 border-dashed border-gray-200 bg-white transition-all hover:border-orange-400 hover:bg-orange-50/50"
+                                    >
+                                        {form.data.image ||
+                                        form.data.image_url ? (
+                                            <img
+                                                src={
+                                                    form.data.image
+                                                        ? URL.createObjectURL(
+                                                              form.data.image,
+                                                          )
+                                                        : form.data.image_url
+                                                }
+                                                className="h-full w-full rounded-[1.8rem] object-cover p-2"
+                                            />
+                                        ) : (
+                                            <div className="flex flex-col items-center gap-2 text-gray-400">
+                                                <ImageIcon
+                                                    size={32}
+                                                    className="group-hover:text-orange-500"
+                                                />
+                                                <span className="text-xs font-bold">
+                                                    Click para subir foto
+                                                </span>
+                                            </div>
+                                        )}
+                                        <input
+                                            id="image-upload"
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) =>
+                                                form.setData(
+                                                    'image',
+                                                    e.target.files?.[0],
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                                    Descripción
+                                </Label>
+                                <Textarea
+                                    rows={3}
+                                    value={form.data.description}
                                     onChange={(e) =>
                                         form.setData(
-                                            'price',
-                                            Number(e.target.value),
+                                            'description',
+                                            e.target.value,
                                         )
                                     }
-                                    className="rounded-lg shadow-lg"
+                                    className="rounded-2xl border-gray-200 bg-white p-4 shadow-sm"
+                                    placeholder="Describe los ingredientes o detalles importantes..."
                                 />
-                                {form.errors.price && (
-                                    <span className="mt-1 text-sm text-red-500">
-                                        {form.errors.price}
-                                    </span>
-                                )}
                             </div>
-                        </div>
 
-                        <div className="flex flex-col gap-2">
-                            <Label>Descripción</Label>
-                            <Textarea
-                                rows={4}
-                                value={form.data.description}
-                                onChange={(e) =>
-                                    form.setData('description', e.target.value)
-                                }
-                                className="rounded-lg shadow-lg"
-                            />
-                            {form.errors.description && (
-                                <span className="mt-1 text-sm text-red-500">
-                                    {form.errors.description}
-                                </span>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                checked={form.data.isActive}
-                                onChange={(e) =>
-                                    form.setData('isActive', e.target.checked)
-                                }
-                                className="h-5 w-5 rounded border-gray-300 focus:ring-2 focus:ring-orange-400"
-                            />
-                            <Label className="text-sm font-normal">
-                                Activo (visible a clientes)
-                            </Label>
-                        </div>
-
-                        <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center transition hover:border-orange-400">
-                            <input
-                                id="image-upload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) =>
-                                    form.setData('image', e.target.files?.[0])
-                                }
-                            />
-                            <label
-                                htmlFor="image-upload"
-                                className="cursor-pointer text-sm font-medium text-orange-600 hover:text-orange-700"
-                            >
-                                Subir imagen
-                            </label>
-                            {(form.data.image || form.data.image_url) && (
-                                <img
-                                    src={
-                                        form.data.image
-                                            ? URL.createObjectURL(
-                                                  form.data.image,
-                                              )
-                                            : form.data.image_url
-                                    }
-                                    className="mx-auto mt-4 h-32 w-32 rounded-lg object-cover shadow-md"
-                                />
-                            )}
-                        </div>
-                    </TabsContent>
-
-                    {/* Variations */}
-                    <TabsContent value="variations" className="space-y-6">
-                        <Label className="font-semibold">Variaciones</Label>
-                        {form.data.variations.map((varia, index) => (
                             <div
-                                key={index}
-                                className="mb-2 flex items-center gap-2"
+                                className={`flex items-center gap-3 rounded-2xl p-4 transition-colors ${form.data.isActive ? 'bg-green-50' : 'bg-gray-100'}`}
                             >
-                                <div className="flex flex-1 flex-col">
+                                <input
+                                    type="checkbox"
+                                    checked={form.data.isActive}
+                                    onChange={(e) =>
+                                        form.setData(
+                                            'isActive',
+                                            e.target.checked,
+                                        )
+                                    }
+                                    className="h-6 w-6 rounded-lg border-gray-300 text-green-600 focus:ring-green-500"
+                                />
+                                <div className="flex flex-col">
+                                    <Label className="text-sm font-black text-gray-900">
+                                        Producto Activo
+                                    </Label>
+                                    <span className="text-xs font-medium text-gray-500">
+                                        Los clientes podrán ver y pedir este
+                                        producto
+                                    </span>
+                                </div>
+                            </div>
+                        </TabsContent>
+
+                        {/* VARIACIONES (Mismo estilo de tarjetas) */}
+                        <TabsContent
+                            value="variations"
+                            className="mt-0 space-y-4"
+                        >
+                            <div className="rounded-2xl bg-blue-50 p-4 text-blue-700">
+                                <p className="text-xs font-bold">
+                                    Usa las variaciones para opciones
+                                    obligatorias como "Tamaño" (Pequeño,
+                                    Grande).
+                                </p>
+                            </div>
+                            {form.data.variations.map((varia, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm animate-in fade-in slide-in-from-top-2"
+                                >
                                     <Input
                                         value={varia.name}
-                                        placeholder="Nombre"
+                                        placeholder="Ej: Familiar, Personal..."
+                                        className="h-10 border-none bg-transparent font-bold shadow-none focus-visible:ring-0"
                                         onChange={(e) => {
-                                            const newVariations = [
-                                                ...form.data.variations,
-                                            ];
-                                            newVariations[index].name =
-                                                e.target.value;
-                                            form.setData(
-                                                'variations',
-                                                newVariations,
-                                            );
+                                            const v = [...form.data.variations];
+                                            v[index].name = e.target.value;
+                                            form.setData('variations', v);
                                         }}
                                     />
-                                    {form.errors[
-                                        `variations.${index}.name`
-                                    ] && (
-                                        <span className="mt-1 text-xs text-red-500">
-                                            {
-                                                form.errors[
-                                                    `variations.${index}.name`
-                                                ]
-                                            }
-                                        </span>
-                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-red-400 hover:bg-red-50 hover:text-red-600"
+                                        onClick={() => {
+                                            const v = [...form.data.variations];
+                                            v.splice(index, 1);
+                                            form.setData('variations', v);
+                                        }}
+                                    >
+                                        <Trash2 size={18} />
+                                    </Button>
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => handleRemoveVariation(index)}
-                                >
-                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                </Button>
-                            </div>
-                        ))}
-                        <Button
-                            variant="outline"
-                            className="mt-2 flex items-center gap-1"
-                            onClick={handleAddVariation}
-                        >
-                            <Plus className="h-4 w-4" /> Agregar
-                        </Button>
-                    </TabsContent>
-
-                    {/* Extras */}
-                    <TabsContent value="extras" className="space-y-4">
-                        <Label className="font-semibold">Extras</Label>
-                        {form.data.extras.map((top, index) => (
-                            <div
-                                key={index}
-                                className="grid grid-cols-[1fr_1fr_auto] items-start gap-2"
+                            ))}
+                            <Button
+                                variant="outline"
+                                className="w-full rounded-2xl border-2 border-dashed py-6 hover:bg-gray-100"
+                                onClick={() =>
+                                    form.setData('variations', [
+                                        ...form.data.variations,
+                                        { name: '' },
+                                    ])
+                                }
                             >
-                                {/* Nombre */}
-                                <div className="flex flex-col">
-                                    <Input
-                                        value={top.name}
-                                        placeholder="Nombre"
-                                        onChange={(e) => {
-                                            const newExtra = [
-                                                ...form.data.extras,
-                                            ];
-                                            newExtra[index].name =
-                                                e.target.value;
-                                            form.setData('extras', newExtra);
-                                        }}
-                                    />
-                                    {form.errors[`extras.${index}.name`] && (
-                                        <span className="mt-1 text-xs text-red-500">
-                                            {
-                                                form.errors[
-                                                    `extras.${index}.name`
-                                                ]
-                                            }
-                                        </span>
-                                    )}
-                                </div>
+                                <Plus size={18} className="mr-2" /> Agregar
+                                Variación
+                            </Button>
+                        </TabsContent>
 
-                                {/* Precio */}
-                                <div className="flex flex-col">
-                                    <Input
-                                        type="number"
-                                        min="0"
-                                        step="1"
-                                        value={top.price}
-                                        placeholder="Precio"
-                                        onChange={(e) => {
-                                            const newExtra = [
-                                                ...form.data.extras,
-                                            ];
-                                            newExtra[index].price = Number(
-                                                e.target.value,
-                                            );
-                                            form.setData('extras', newExtra);
-                                        }}
-                                    />
-                                    {form.errors[`extras.${index}.price`] && (
-                                        <span className="mt-1 text-xs text-red-500">
-                                            {
-                                                form.errors[
-                                                    `extras.${index}.price`
-                                                ]
-                                            }
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Eliminar */}
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => handleRemoveExtra(index)}
+                        {/* EXTRAS */}
+                        <TabsContent value="extras" className="mt-0 space-y-4">
+                            {form.data.extras.map((extra, index) => (
+                                <div
+                                    key={index}
+                                    className="grid grid-cols-[1fr_120px_auto] items-center gap-4 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm"
                                 >
-                                    <Trash2 className="h-5 w-5 text-red-500" />
-                                </Button>
-                            </div>
-                        ))}
-
-                        <Button
-                            variant="outline"
-                            className="mt-2 flex items-center gap-1"
-                            onClick={handleAddExtra}
-                        >
-                            <Plus className="h-4 w-4" /> Agregar topping
-                        </Button>
-                    </TabsContent>
+                                    <Input
+                                        value={extra.name}
+                                        placeholder="Nombre del extra"
+                                        className="h-10 border-none font-bold shadow-none focus-visible:ring-0"
+                                        onChange={(e) => {
+                                            const ex = [...form.data.extras];
+                                            ex[index].name = e.target.value;
+                                            form.setData('extras', ex);
+                                        }}
+                                    />
+                                    <div className="relative">
+                                        <span className="absolute top-1/2 left-3 -translate-y-1/2 text-xs font-bold text-gray-400">
+                                            $
+                                        </span>
+                                        <Input
+                                            type="number"
+                                            value={extra.price}
+                                            className="h-10 rounded-xl bg-gray-50 pl-7 text-sm font-bold shadow-none"
+                                            onChange={(e) => {
+                                                const ex = [
+                                                    ...form.data.extras,
+                                                ];
+                                                ex[index].price = Number(
+                                                    e.target.value,
+                                                );
+                                                form.setData('extras', ex);
+                                            }}
+                                        />
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-red-400 hover:text-red-600"
+                                        onClick={() => {
+                                            const ex = [...form.data.extras];
+                                            ex.splice(index, 1);
+                                            form.setData('extras', ex);
+                                        }}
+                                    >
+                                        <Trash2 size={18} />
+                                    </Button>
+                                </div>
+                            ))}
+                            <Button
+                                variant="outline"
+                                className="w-full rounded-2xl border-2 border-dashed py-6 hover:bg-gray-100"
+                                onClick={() =>
+                                    form.setData('extras', [
+                                        ...form.data.extras,
+                                        { name: '', price: 0 },
+                                    ])
+                                }
+                            >
+                                <Plus size={18} className="mr-2" /> Agregar
+                                Topping / Extra
+                            </Button>
+                        </TabsContent>
+                    </div>
                 </Tabs>
 
-                {/* Acciones */}
-                <div className="mt-8 flex justify-end gap-4 border-t pt-4">
+                {/* Footer Fijo */}
+                <div className="flex items-center justify-between border-t bg-white px-8 py-6">
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         onClick={onClose}
-                        disabled={form.processing}
+                        className="rounded-xl font-bold text-gray-500 hover:bg-gray-100"
                     >
-                        Cancelar
+                        Descartar
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={form.processing}
-                        className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                        className="h-12 rounded-[1.2rem] bg-orange-600 px-8 font-black text-white shadow-lg shadow-orange-200 transition-all hover:bg-orange-700 active:scale-95"
                     >
                         {form.processing ? (
-                            <LoaderCircle className="h-5 w-5 animate-spin" />
+                            <LoaderCircle className="animate-spin" />
                         ) : (
-                            <Save className="h-5 w-5" />
+                            <Save className="mr-2" size={18} />
                         )}
-                        Guardar
+                        {service ? 'Guardar Cambios' : 'Publicar Producto'}
                     </Button>
                 </div>
             </DialogContent>
