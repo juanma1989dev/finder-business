@@ -49,7 +49,7 @@ export default function DropdownMenu({ user }: any) {
                             <Heart className="h-4 w-4" /> <span>Favoritos</span>
                         </a>
                         <a
-                            href="/dashboard/business"
+                            href="/dashboard"
                             className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50"
                         >
                             <User className="h-4 w-4" /> <span>Perfil</span>
