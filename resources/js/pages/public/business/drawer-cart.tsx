@@ -9,6 +9,8 @@ import {
     Trash2,
     X,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
     isOpen: boolean;
@@ -19,106 +21,114 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
     const { items, increment, decrement, removeItem, getTotalPrice } =
         useCartStore();
     const totalPrice = getTotalPrice();
+    const [mounted, setMounted] = useState(false);
 
-    return (
+    useEffect(() => {
+        setMounted(true);
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
+    if (!mounted) return null;
+
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Overlay con desenfoque */}
+                    {/* OVERLAY */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm"
+                        className="fixed inset-0 z-[9998] bg-gray-900/20 backdrop-blur-[2px]"
                     />
 
-                    {/* Contenedor del Drawer */}
+                    {/* DRAWER CONTAINER */}
                     <motion.div
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{
                             type: 'spring',
-                            damping: 25,
-                            stiffness: 200,
+                            damping: 30,
+                            stiffness: 300,
                         }}
-                        className="fixed top-0 right-0 z-[70] flex h-full w-full max-w-md flex-col bg-gray-50 shadow-2xl"
+                        className="fixed top-0 right-0 z-[9999] flex h-[100dvh] w-full flex-col bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.05)] sm:max-w-[380px]"
                     >
                         {/* HEADER */}
-                        <header className="flex items-center justify-between border-b bg-white p-5">
-                            <div className="flex items-center gap-2">
-                                <ShoppingBasket className="h-5 w-5 text-green-600" />
-                                <h2 className="text-lg font-black tracking-tight text-gray-900">
-                                    Tu pedido
-                                </h2>
-                                <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">
-                                    {items.length}
-                                </span>
+                        <header className="flex items-center justify-between border-b border-gray-50 px-6 py-5">
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                    <h2 className="text-lg font-black tracking-tight text-gray-900 uppercase">
+                                        Tu Pedido
+                                    </h2>
+                                    <span className="flex h-5 min-w-[20px] items-center justify-center rounded-lg bg-purple-600 px-1.5 text-[10px] font-black text-white">
+                                        {items.length}
+                                    </span>
+                                </div>
+                                <p className="text-[9px] font-bold tracking-[0.1em] text-orange-500 uppercase">
+                                    Resumen seleccionado
+                                </p>
                             </div>
+
                             <button
                                 onClick={onClose}
-                                className="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-50 text-gray-400 transition-all hover:bg-orange-50 hover:text-orange-500 active:scale-95"
                             >
-                                <X size={20} />
+                                <X size={18} />
                             </button>
                         </header>
 
-                        {/* LISTA DE ITEMS */}
-                        <div className="flex-1 space-y-4 overflow-y-auto p-5">
+                        {/* LISTA DE PRODUCTOS */}
+                        <div className="scrollbar-hide flex-1 space-y-3 overflow-y-auto px-4 py-4">
                             {items.length === 0 ? (
                                 <div className="flex h-full flex-col items-center justify-center text-center">
-                                    <div className="mb-4 rounded-full bg-gray-100 p-4">
-                                        <ShoppingBasket className="h-10 w-10 text-gray-300" />
+                                    <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 text-gray-200">
+                                        <ShoppingBasket size={28} />
                                     </div>
-                                    <p className="text-sm font-medium text-gray-500">
-                                        Aún no hay nada por aquí
+                                    <p className="text-[10px] font-black tracking-widest text-gray-300 uppercase">
+                                        Carrito vacío
                                     </p>
                                 </div>
                             ) : (
                                 items.map((item) => (
-                                    <div
+                                    <motion.div
+                                        layout
                                         key={item.key}
-                                        className="relative flex flex-col rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+                                        className="group relative flex flex-col rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-orange-100"
                                     >
-                                        <div className="flex justify-between gap-4">
+                                        <div className="flex items-start justify-between">
                                             <div className="flex-1">
-                                                <h3 className="text-sm font-bold text-gray-900">
+                                                <h3 className="text-[12px] leading-tight font-black text-gray-800 uppercase">
                                                     {item.name}
                                                 </h3>
-
-                                                {/* Variaciones y Extras en formato Tag */}
-                                                <div className="mt-1 flex flex-wrap gap-1">
+                                                <div className="mt-1 flex flex-wrap gap-x-2">
                                                     {item.variations?.map(
                                                         (v: any) => (
                                                             <span
                                                                 key={v.id}
-                                                                className="text-[10px] font-semibold text-gray-400"
+                                                                className="text-[9px] font-bold text-purple-500 uppercase"
                                                             >
                                                                 {v.name}
                                                             </span>
                                                         ),
                                                     )}
-                                                    {item.extras?.map(
-                                                        (e: any) => (
-                                                            <span
-                                                                key={e.id}
-                                                                className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-600 uppercase"
-                                                            >
-                                                                + {e.name}
-                                                            </span>
-                                                        ),
-                                                    )}
                                                 </div>
                                             </div>
-
                                             <button
                                                 onClick={() =>
                                                     removeItem(item.key)
                                                 }
-                                                className="text-gray-300 transition-colors hover:text-red-500"
+                                                className="text-gray-200 transition-colors hover:text-red-400"
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={14} />
                                             </button>
                                         </div>
 
@@ -131,50 +141,48 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                                                 ).toFixed(2)}
                                             </span>
 
-                                            {/* Selector de cantidad minimalista */}
-                                            <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-1">
+                                            <div className="flex items-center gap-1 rounded-lg border border-gray-100 bg-gray-50 p-1">
                                                 <button
                                                     onClick={() =>
                                                         decrement(item.key)
                                                     }
-                                                    className="flex h-6 w-6 items-center justify-center rounded-lg bg-white shadow-sm transition-transform active:scale-90"
+                                                    className="flex h-6 w-6 items-center justify-center rounded-md bg-white shadow-sm transition-all hover:text-orange-500 active:scale-90"
                                                 >
-                                                    <Minus
-                                                        size={12}
-                                                        className="text-gray-600"
-                                                    />
+                                                    <Minus size={10} />
                                                 </button>
-                                                <span className="min-w-[20px] text-center text-xs font-bold text-gray-900">
+                                                <span className="w-6 text-center text-[11px] font-black text-gray-700">
                                                     {item.quantity}
                                                 </span>
                                                 <button
                                                     onClick={() =>
                                                         increment(item.key)
                                                     }
-                                                    className="flex h-6 w-6 items-center justify-center rounded-lg bg-white shadow-sm transition-transform active:scale-90"
+                                                    className="flex h-6 w-6 items-center justify-center rounded-md bg-white shadow-sm transition-all hover:text-orange-500 active:scale-90"
                                                 >
-                                                    <Plus
-                                                        size={12}
-                                                        className="text-gray-600"
-                                                    />
+                                                    <Plus size={10} />
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))
                             )}
                         </div>
 
-                        {/* FOOTER ACCIONES */}
+                        {/* FOOTER */}
                         {items.length > 0 && (
-                            <div className="space-y-4 border-t bg-white p-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-                                <div className="flex items-center justify-between px-1">
-                                    <span className="text-sm font-medium text-gray-500">
-                                        Subtotal del pedido
-                                    </span>
-                                    <span className="text-xl font-black text-gray-900">
-                                        ${totalPrice.toFixed(2)}
-                                    </span>
+                            <div className="border-t border-gray-50 bg-white px-6 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+                                <div className="mb-5 flex items-end justify-between">
+                                    <div className="flex flex-col">
+                                        <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase">
+                                            Subtotal
+                                        </span>
+                                        <span className="text-2xl font-black tracking-tighter text-gray-900">
+                                            ${totalPrice.toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <div className="text-[10px] font-bold text-green-500 uppercase">
+                                        Envío gratis
+                                    </div>
                                 </div>
 
                                 <button
@@ -182,23 +190,21 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                                         onClose();
                                         router.visit('/shopping-cart/details');
                                     }}
-                                    className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-green-600 py-2 text-sm font-black text-white transition-all hover:bg-green-700 active:scale-[0.98]"
+                                    className="group flex w-full items-center justify-between rounded-xl bg-orange-500 p-1.5 pl-6 shadow-lg shadow-orange-100 transition-all hover:bg-orange-600 active:scale-[0.98]"
                                 >
-                                    Ir a pagar
-                                    <ArrowRight
-                                        size={18}
-                                        className="transition-transform group-hover:translate-x-1"
-                                    />
+                                    <span className="text-[12px] font-black tracking-wider text-white uppercase">
+                                        Finalizar Compra
+                                    </span>
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20 text-white transition-transform group-hover:translate-x-0.5">
+                                        <ArrowRight size={18} />
+                                    </div>
                                 </button>
-
-                                <p className="text-center text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                                    Revisa tus productos antes de confirmar
-                                </p>
                             </div>
                         )}
                     </motion.div>
                 </>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body,
     );
 };

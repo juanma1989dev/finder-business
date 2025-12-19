@@ -2,58 +2,69 @@ import BusinessCard from '@/components/app/BusinessCard';
 import MainFilters from '@/components/app/MainFilters';
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
-import { useCartStore } from '@/store/cart.store';
-import { type SharedData } from '@/types';
-import { router, usePage } from '@inertiajs/react';
-import { Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { CartFloatButton } from './public/business/CartFloatButton';
-import { CartDrawer } from './public/business/drawer-cart';
-
-interface Props {
-    businesses: any;
-    categories: any;
-    filters: {
-        q?: string;
-        category?: string;
-    };
-}
+import { router } from '@inertiajs/react';
+import { AlertCircle, MapPin, Search } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Filters {
     query: string;
     category: string | null;
     distance: number | null;
+    foodType: number | null;
 }
 
-const categorias = [
-    { nombre: 'Hamburguesas', icon: '🍔' },
-    { nombre: 'Pizza', icon: '🍕' },
-    { nombre: 'Tacos', icon: '🌮' },
-    { nombre: 'Postres', icon: '🍰' },
-    { nombre: 'Bebidas', icon: '🥤' },
-    { nombre: 'Frutas', icon: '🍎' },
-];
+interface Props {
+    businesses: any[];
+    categories: any[];
+    filters: {
+        q?: string;
+        category?: string;
+        distance?: number;
+    };
+    products: {
+        categories: any[];
+    };
+    meta: {
+        total: number;
+        hasGeolocation: boolean;
+        appliedFilters: string[];
+    };
+}
 
-export default function Index({ businesses, categories, filters }: Props) {
-    const { auth, errors } = usePage<SharedData>().props;
-    const user = auth.user;
+const DEFAULT_DISTANCE = 5;
 
-    const { items } = useCartStore();
-    const totalItems = items.reduce((t, i) => t + i.quantity, 0);
+const GridOverlayLoader = () => (
+    <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-3">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-purple-600" />
+            <span className="text-sm font-medium text-gray-600">
+                Actualizando resultados...
+            </span>
+        </div>
+    </div>
+);
 
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    const [ready, setReady] = useState(false);
-
+export default function Index({
+    businesses,
+    categories,
+    filters,
+    products,
+    meta,
+}: Props) {
+    const [loading, setLoading] = useState(false);
     const [filtersUser, setFiltersUser] = useState<Filters>({
         query: filters.q || '',
         category: filters.category || null,
-        distance: null,
+        distance: filters.distance || DEFAULT_DISTANCE,
+        foodType: null,
     });
+
+    const isFirstRender = useRef(true);
 
     const {
         latitude,
         longitude,
-        error,
+        error: geoError,
         loading: loadingLocation,
     } = useGeolocation({
         enableHighAccuracy: true,
@@ -62,16 +73,15 @@ export default function Index({ businesses, categories, filters }: Props) {
         cacheMinutes: 30,
     });
 
-    useEffect(() => {
-        if (loadingLocation) return;
-
+    const handleSearch = useCallback(() => {
         const queryFilters: any = {};
         if (filtersUser.query) queryFilters.q = filtersUser.query;
         if (filtersUser.category) queryFilters.category = filtersUser.category;
         if (filtersUser.distance) queryFilters.distance = filtersUser.distance;
+        if (filtersUser.foodType) queryFilters.foodType = filtersUser.foodType;
 
         const headers: any = {};
-        if (latitude !== null && longitude !== null) {
+        if (latitude && longitude) {
             headers['X-Latitude'] = latitude.toString();
             headers['X-Longitude'] = longitude.toString();
         }
@@ -81,139 +91,136 @@ export default function Index({ businesses, categories, filters }: Props) {
             preserveState: true,
             preserveScroll: true,
             replace: true,
-            onFinish: () => setReady(true),
+            onFinish: () => setLoading(false),
         });
-    }, [filtersUser, latitude, longitude, loadingLocation]);
+    }, [filtersUser, latitude, longitude]);
 
-    if (loadingLocation || !ready) {
-        return (
-            <MainLayout>
-                <div className="w-full py-16 text-center">
-                    <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-purple-600"></div>
-                    <p className="text-gray-600">
-                        Cargando negocios filtrados...
-                    </p>
-                    <p className="mt-2 text-sm text-gray-400">
-                        Esto nos ayudará a mostrarte negocios cercanos
-                    </p>
-                </div>
-            </MainLayout>
-        );
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        if (loadingLocation) return;
+
+        handleSearch();
+    }, [filtersUser]);
+
+    const updateFilters = (newFilters: Filters) => {
+        setLoading(true);
+        setFiltersUser(newFilters);
+    };
+
+    const handleClearFilters = () => {
+        updateFilters({
+            query: '',
+            category: null,
+            distance: DEFAULT_DISTANCE,
+            foodType: null,
+        });
+    };
+
+    const hasActiveFilters =
+        filtersUser.query || filtersUser.category || filtersUser.distance;
+
+    if (loadingLocation && !loading) {
+        return <GridOverlayLoader />;
     }
 
     return (
         <MainLayout>
-            {/* Errores de validación */}
-            {Object.keys(errors).length > 0 && (
-                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-                    <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                            <svg
-                                className="h-5 w-5 text-red-400"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        </div>
-                        <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800">
-                                Hay errores en los filtros de búsqueda
-                            </h3>
-                            <div className="mt-2 text-sm text-red-700">
-                                <ul className="list-disc space-y-1 pl-5">
-                                    {Object.entries(errors).map(
-                                        ([field, message]) => (
-                                            <li key={field}>
-                                                <strong className="capitalize">
-                                                    {field}:
-                                                </strong>{' '}
-                                                {message}
-                                            </li>
-                                        ),
-                                    )}
-                                </ul>
-                            </div>
-                        </div>
+            {geoError && (
+                <div className="mb-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <AlertCircle className="h-5 w-5 flex-shrink-0 text-amber-600" />
+                    <div>
+                        <h4 className="font-semibold text-amber-800">
+                            No pudimos obtener tu ubicación
+                        </h4>
+                        <p className="mt-1 text-sm text-amber-700">
+                            {businesses.length > 0
+                                ? 'Mostrando negocios disponibles. Habilita la ubicación para ver los más cercanos.'
+                                : 'Habilita la ubicación para ver negocios cercanos.'}
+                        </p>
                     </div>
                 </div>
             )}
 
-            {/* Mensaje de error de geolocalización */}
-            {error && (
-                <div className="mb-4 rounded-lg bg-yellow-50 p-4 text-yellow-800">
-                    <p className="text-sm">
-                        ⚠️ {error}. Mostrando todos los negocios sin filtro de
-                        distancia.
-                    </p>
-                </div>
-            )}
-
+            {/* Filtros principales */}
             <MainFilters
                 categories={categories}
                 filters={filtersUser}
-                onFiltersChange={setFiltersUser}
+                onFiltersChange={updateFilters}
+                foodTypes={products.categories}
             />
 
-            {/* Categorias */}
-            <div className="no-scrollbar flex gap-6 overflow-x-auto pb-2">
-                {categorias.map((cat, i) => (
-                    <div
-                        key={i}
-                        className="group flex min-w-[50px] cursor-pointer flex-col items-center gap-2"
-                    >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 bg-white text-2xl shadow-sm transition-colors">
-                            {cat.icon}
-                        </div>
-                        <span className="text-xs font-semibold text-gray-600">
-                            {cat.nombre}
-                        </span>
-                    </div>
-                ))}
-            </div>
+            {/* Categorías de productos */}
 
             {/* Grid de negocios */}
-            {businesses.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {businesses.map((business: any, index: number) => (
-                        <BusinessCard
-                            key={index}
-                            business={business}
-                            modeEdit={false}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div className="py-16 text-center">
-                    <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-pink-100">
-                        <Search className="h-8 w-8 text-purple-400" />
-                    </div>
-                    <h3 className="mb-2 text-xl font-semibold text-gray-700">
-                        No se encontraron resultados
-                    </h3>
-                    <p className="mx-auto max-w-md text-gray-500">
-                        Intenta con otros términos de búsqueda o selecciona una
-                        categoría diferente
-                    </p>
-                </div>
-            )}
+            <div className="min-h-[400px]">
+                {loading && <GridOverlayLoader />}
+                {businesses.length > 0 ? (
+                    <>
+                        <div className="mb-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <p className="text-sm text-gray-600">
+                                    <span className="font-semibold text-gray-900">
+                                        {meta.total}
+                                    </span>{' '}
+                                    {businesses.length === 1
+                                        ? 'negocio encontrado'
+                                        : 'negocios encontrados'}
+                                </p>
+                                {latitude && longitude && (
+                                    <span className="flex items-center gap-1 rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
+                                        <MapPin className="h-3 w-3" />
+                                        Cerca de ti
+                                    </span>
+                                )}
+                                {hasActiveFilters && (
+                                    <button
+                                        onClick={handleClearFilters}
+                                        className="ml-12 cursor-pointer text-sm text-gray-600 text-purple-500 transition-colors duration-200 hover:text-gray-900 hover:text-purple-700"
+                                    >
+                                        Limpiar filtros
+                                    </button>
+                                )}
+                            </div>
+                        </div>
 
-            {user && (
-                <>
-                    <CartFloatButton
-                        totalItems={totalItems}
-                        onClick={() => setIsCartOpen(true)}
-                    />
-                    <CartDrawer
-                        isOpen={isCartOpen}
-                        onClose={() => setIsCartOpen(false)}
-                    />
-                </>
-            )}
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {businesses.map((business: any) => (
+                                <BusinessCard
+                                    key={business.id}
+                                    business={business}
+                                    modeEdit={false}
+                                />
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex flex-col items-center py-16 text-center">
+                        <Search className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+                        <h3 className="mb-2 text-lg font-semibold text-gray-700">
+                            No hay resultados
+                        </h3>
+                        <p className="mb-4 text-gray-500">
+                            {hasActiveFilters
+                                ? 'Intenta ajustar tus filtros de búsqueda.'
+                                : geoError
+                                  ? 'Habilita tu ubicación para ver negocios cercanos.'
+                                  : 'No hay negocios disponibles.'}
+                        </p>
+                        {hasActiveFilters && (
+                            <button
+                                onClick={handleClearFilters}
+                                className="rounded-lg bg-purple-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-purple-700"
+                            >
+                                Limpiar filtros
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
         </MainLayout>
     );
 }

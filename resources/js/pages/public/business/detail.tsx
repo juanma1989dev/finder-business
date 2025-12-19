@@ -1,21 +1,22 @@
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MainLayout from '@/layouts/main-layout';
 import { useCartStore } from '@/store/cart.store';
 import { Business, SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { TabsContent } from '@radix-ui/react-tabs';
 import {
-    ArrowLeftCircle,
+    ArrowLeft,
+    Clock,
+    CreditCard,
     Heart,
+    Info,
     MapPinned,
     MessageCircle,
     PhoneCall,
     Share2,
+    Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { CartFloatButton } from './CartFloatButton';
-import { CartDrawer } from './drawer-cart';
 import { InfoBusinessTab } from './info-tab';
 import { ProductsBussinessTab } from './products-tab';
 
@@ -30,26 +31,19 @@ export default function BusinessDetail({ business, favorite }: Props) {
 
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
-
-    const { items, increment, decrement, removeItem, getTotalPrice } =
-        useCartStore();
-
-    const totalItems = items.reduce((t, i) => t + i.quantity, 0);
-    const totalPrice = getTotalPrice();
+    const { items } = useCartStore();
 
     const copyUlrDetailBusiness = () => {
         navigator.clipboard
             .writeText(`${window.location.origin}/detail/${business.id}`)
-            .then(() => toast.success('Se copió la URL'))
+            .then(() => toast.success('Enlace copiado al portapapeles'))
             .catch(() => toast.error('Error al copiar'));
     };
 
     const toggleFavorite = () => {
-        if (!user) return;
-
+        if (!user) return toast.info('Inicia sesión para guardar favoritos');
         const next = !stateFavorite;
         setStateFavorite(next);
-
         router.post(
             '/business/detail/set-favorite',
             {
@@ -57,165 +51,174 @@ export default function BusinessDetail({ business, favorite }: Props) {
                 id_business: business.id,
                 favorite: next,
             },
-            {
-                onError: () => {
-                    setStateFavorite(!next);
-                    toast.error('Error');
-                },
-            },
+            { onError: () => setStateFavorite(!next) },
         );
     };
 
     const santizePhoneNumber = (phone: string | null): string => {
         if (!phone) return '';
-
-        const newPhone = '52' + phone.trim();
-
-        return newPhone;
+        return '52' + phone.trim();
     };
 
     return (
         <MainLayout>
-            <div className="min-h-screen bg-slate-50">
-                <div className="relative h-65">
-                    <Link
-                        href="/"
-                        className="absolute top-4 left-4 rounded-xl bg-orange-600 px-4 py-2 text-white"
-                    >
-                        <ArrowLeftCircle />
-                    </Link>
+            <div className="min-h-screen bg-white">
+                <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:py-8">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+                        {/* COLUMNA IZQUIERDA: Adaptativa */}
+                        <div className="lg:col-span-5 xl:col-span-4">
+                            <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-24">
+                                <div className="relative h-48 w-full overflow-hidden rounded-[1.8rem] border border-gray-100 shadow-sm sm:h-64 lg:aspect-[4/3] lg:h-auto">
+                                    <img
+                                        src={
+                                            business.cover_image
+                                                ? `/storage/${business.cover_image}`
+                                                : `/images/${business.category?.image}`
+                                        }
+                                        className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                                        alt={business.name}
+                                    />
 
-                    <img
-                        src={
-                            business.cover_image
-                                ? `/storage/${business.cover_image}`
-                                : `/images/${business.category?.image}`
-                        }
-                        className="h-full w-full object-cover"
-                    />
+                                    {/* Botones Flotantes Optimizados */}
+                                    <div className="absolute inset-x-3 top-3 flex justify-between">
+                                        <Link
+                                            href="/"
+                                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-gray-700 shadow-sm backdrop-blur-sm transition-all active:scale-90"
+                                        >
+                                            <ArrowLeft className="h-4 w-4" />
+                                        </Link>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={copyUlrDetailBusiness}
+                                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-gray-700 shadow-sm backdrop-blur-sm transition-all active:scale-90"
+                                            >
+                                                <Share2 className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                onClick={toggleFavorite}
+                                                className={`flex h-8 w-8 items-center justify-center rounded-lg shadow-sm backdrop-blur-sm transition-all active:scale-90 ${stateFavorite ? 'bg-orange-500 text-white' : 'bg-white/90 text-gray-700'}`}
+                                            >
+                                                <Heart
+                                                    className={`h-4 w-4 ${stateFavorite ? 'fill-current' : ''}`}
+                                                />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <div className="absolute top-4 right-4 flex flex-col gap-2 sm:flex-row sm:gap-2">
-                        {user && (
-                            <button
-                                onClick={toggleFavorite}
-                                className={`flex h-10 w-10 items-center justify-center rounded-full p-3 transition-all duration-200 ${
-                                    stateFavorite
-                                        ? 'bg-orange-600 text-white'
-                                        : 'bg-white text-gray-600'
-                                }`}
-                            >
-                                <Heart
-                                    className={`h-6 w-6 transition-colors duration-200 ${
-                                        stateFavorite
-                                            ? 'fill-current text-white'
-                                            : ''
-                                    }`}
-                                />
-                            </button>
-                        )}
+                                {/* Info del Negocio (Layout más compacto en móvil) */}
+                                <div className="space-y-4 px-1">
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="rounded-md bg-purple-50 px-2 py-0.5 text-[9px] font-black tracking-[0.15em] text-purple-600 uppercase">
+                                                {business.category?.name}
+                                            </span>
+                                        </div>
+                                        <h1 className="text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
+                                            {business.name}
+                                        </h1>
+                                    </div>
 
-                        <button
-                            onClick={copyUlrDetailBusiness}
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-white p-3 shadow-md transition-all duration-200 hover:bg-gray-100"
-                        >
-                            <Share2 className="h-6 w-6 text-gray-600" />
-                        </button>
+                                    {/* Grid de Datos (2 columnas en tablet, 1 en móvil/desktop sidebar) */}
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                                        <div className="flex items-center gap-3 rounded-2xl border border-gray-50 bg-gray-50/50 p-3">
+                                            <div className="rounded-xl bg-orange-100 p-2 text-orange-600">
+                                                <Clock className="h-4 w-4" />
+                                            </div>
+                                            <div>
+                                                <p className="mb-1 text-[9px] leading-none font-bold text-gray-400 uppercase">
+                                                    Horario
+                                                </p>
+                                                <p className="text-xs font-bold text-gray-700 italic">
+                                                    Abierto • Cierra 8pm
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3 rounded-2xl border border-gray-50 bg-gray-50/50 p-3">
+                                            <div className="rounded-xl bg-purple-100 p-2 text-purple-600">
+                                                <CreditCard className="h-4 w-4" />
+                                            </div>
+                                            <div>
+                                                <p className="mb-1 text-[9px] leading-none font-bold text-gray-400 uppercase">
+                                                    Pagos
+                                                </p>
+                                                <p className="text-xs font-bold text-gray-700 italic">
+                                                    Efectivo y Tarjeta
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <a
+                                            href={
+                                                business.use_whatsapp
+                                                    ? `https://wa.me/${santizePhoneNumber(business.phone)}`
+                                                    : `tel:${business.phone}`
+                                            }
+                                            className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-2 text-xs font-bold text-white shadow-sm transition-transform active:scale-95"
+                                        >
+                                            {business.use_whatsapp ? (
+                                                <MessageCircle className="h-3.5 w-3.5" />
+                                            ) : (
+                                                <PhoneCall className="h-3.5 w-3.5" />
+                                            )}
+                                            WhatsApp
+                                        </a>
+                                        <a
+                                            href={`http://maps.google.com/?q=${encodeURIComponent(business.address)}`}
+                                            className="flex items-center justify-center gap-2 rounded-xl bg-gray-900 py-2 text-xs font-bold text-white shadow-sm transition-transform active:scale-95"
+                                        >
+                                            <MapPinned className="h-3.5 w-3.5" />{' '}
+                                            Mapa
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* COLUMNA DERECHA: PRODUCTOS */}
+                        <div className="lg:col-span-7 xl:col-span-8">
+                            <Tabs defaultValue="products" className="w-full">
+                                {/* Contenedor de la lista con fondo suave y bordes muy redondeados */}
+                                <TabsList className="mb-8 inline-flex w-full items-center justify-start gap-2 rounded-[1.2rem] border-none bg-gray-100/50 p-1.5 sm:w-auto">
+                                    <TabsTrigger
+                                        value="products"
+                                        className="flex items-center gap-2 rounded-[1rem] px-6 py-2 text-xs font-black tracking-wider uppercase transition-all duration-300 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:bg-gray-200/50"
+                                    >
+                                        <Sparkles className="h-3.5 w-3.5" />{' '}
+                                        {/* Opcional: Icono para romper la rigidez */}
+                                        Menú
+                                    </TabsTrigger>
+
+                                    <TabsTrigger
+                                        value="main"
+                                        className="flex items-center gap-2 rounded-[1rem] px-6 py-2 text-xs font-black tracking-wider uppercase transition-all duration-300 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:bg-gray-200/50"
+                                    >
+                                        <Info className="h-3.5 w-3.5" />
+                                        Info
+                                    </TabsTrigger>
+                                </TabsList>
+
+                                {/* Contenido con una transición suave de opacidad */}
+                                <TabsContent
+                                    value="products"
+                                    className="duration-300 animate-in outline-none fade-in zoom-in-95"
+                                >
+                                    <ProductsBussinessTab business={business} />
+                                </TabsContent>
+
+                                <TabsContent
+                                    value="main"
+                                    className="duration-300 animate-in outline-none fade-in zoom-in-95"
+                                >
+                                    <InfoBusinessTab business={business} />
+                                </TabsContent>
+                            </Tabs>
+                        </div>
                     </div>
                 </div>
-
-                <div className="p-4 sm:p-6">
-                    <h1 className="mb-4 flex flex-col gap-4 text-2xl font-bold sm:flex-row sm:items-center">
-                        <span>
-                            {business.name}
-                            <span className="mx-0 text-sm text-gray-500 sm:mx-2">
-                                ({business.category?.name})
-                            </span>
-                        </span>
-
-                        {/* Botones */}
-                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-                            {business.use_whatsapp ? (
-                                <a
-                                    className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:bg-green-600 sm:flex-none"
-                                    href={`https://wa.me/${santizePhoneNumber(
-                                        business.phone,
-                                    )}?text=${encodeURIComponent(
-                                        'Hola me podría dar más información de ...',
-                                    )}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <MessageCircle className="mr-2 h-4 w-4" />
-                                    <span className="text-sm sm:text-base">
-                                        WhatsApp
-                                    </span>
-                                </a>
-                            ) : (
-                                <a
-                                    href={`tel:${santizePhoneNumber(business.phone)}`}
-                                    className="flex flex-1 items-center justify-center rounded-lg bg-green-600 px-3 py-2 font-medium text-white shadow-lg transition duration-300 ease-in-out hover:bg-green-700 sm:flex-none"
-                                >
-                                    <PhoneCall className="mr-2 h-4 w-4" />
-                                    <span className="text-sm sm:text-base">
-                                        ¡Llama Ahora!
-                                    </span>
-                                </a>
-                            )}
-
-                            <a
-                                className="flex flex-1 items-center justify-center rounded-xl bg-sky-500 px-3 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:bg-sky-600 sm:flex-none"
-                                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                                    business.address,
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <MapPinned className="mr-2 h-4 w-4" />
-                                <span className="text-sm sm:text-base">
-                                    Cómo llegar
-                                </span>
-                            </a>
-                        </div>
-                    </h1>
-
-                    <Tabs defaultValue="products">
-                        <TabsList className="mb-4 flex flex-row gap-2">
-                            <TabsTrigger
-                                value="main"
-                                className="w-full cursor-pointer py-2 text-center sm:w-auto"
-                            >
-                                General
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="products"
-                                className="w-full cursor-pointer py-2 text-center sm:w-auto"
-                            >
-                                Productos
-                            </TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="main">
-                            <InfoBusinessTab business={business} />
-                        </TabsContent>
-
-                        <TabsContent value="products">
-                            <ProductsBussinessTab business={business} />
-                        </TabsContent>
-                    </Tabs>
-                </div>
-
-                {user && (
-                    <>
-                        <CartFloatButton
-                            totalItems={totalItems}
-                            onClick={() => setIsCartOpen(true)}
-                        />
-                        <CartDrawer
-                            isOpen={isCartOpen}
-                            onClose={() => setIsCartOpen(false)}
-                        />
-                    </>
-                )}
             </div>
         </MainLayout>
     );

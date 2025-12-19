@@ -1,6 +1,6 @@
 import { formatTime, IconDynamic } from '@/lib/utils';
 import { Business } from '@/types';
-import { Badge, Globe, Star } from 'lucide-react';
+import { Clock, CreditCard, Globe, Share2, Sparkles, Star } from 'lucide-react';
 
 interface Props {
     business: Business;
@@ -8,152 +8,175 @@ interface Props {
 
 export const InfoBusinessTab = ({ business }: Props) => {
     return (
-        <div className="flex flex-col gap-3 md:flex-row">
-            <div className="w-full md:w-4/6">
-                {/* Descripcion */}
-                <p className="max-w-2xl leading-relaxed text-gray-600">
-                    {business.long_description}
-                </p>
-
-                {/* Tags */}
-                <div className="my-4 flex w-full justify-center gap-3">
-                    {business?.tags?.length > 0 &&
-                        business.tags.map((tag: string) => (
-                            <Badge
-                                className="flex items-center justify-center bg-slate-300/60 p-1 font-semibold text-orange-600 capitalize"
-                                key={tag}
-                            >
-                                <Star className="font-semibold text-orange-600" />
-                                {tag}
-                            </Badge>
-                        ))}
+        <div className="flex flex-col gap-8 lg:flex-row">
+            {/* COLUMNA PRINCIPAL (IZQUIERDA) */}
+            <div className="flex-1 space-y-8">
+                {/* Descripción Larga */}
+                <div>
+                    <h3 className="mb-3 text-sm font-black tracking-widest text-gray-400 uppercase">
+                        Sobre nosotros
+                    </h3>
+                    <p className="text-sm leading-relaxed text-gray-600 lg:text-base">
+                        {business.long_description ||
+                            'Este establecimiento no ha proporcionado una descripción detallada aún.'}
+                    </p>
                 </div>
 
-                {/* Imagenes */}
-                {business.images && business.images.length > 0 && (
-                    <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-3">
-                        {business.images.map((img, index: number) => (
-                            <div
-                                key={index}
-                                className="h-32 w-full overflow-hidden rounded-lg border"
+                {/* Tags / Especialidades */}
+                {business?.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {business.tags.map((tag: string) => (
+                            <span
+                                key={tag}
+                                className="flex items-center gap-1.5 rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-[11px] font-bold text-orange-600 uppercase"
                             >
-                                <img
-                                    src={`/storage/${img.url}`}
-                                    alt={`Imagen ${index + 1}`}
-                                    className="h-full w-full object-cover"
-                                />
-                            </div>
+                                <Star className="h-3 w-3 fill-current" />
+                                {tag}
+                            </span>
                         ))}
+                    </div>
+                )}
+
+                {/* Galería de Imágenes */}
+                {business.images && business.images.length > 0 && (
+                    <div className="space-y-4">
+                        <h3 className="text-sm font-black tracking-widest text-gray-400 uppercase">
+                            Galería del lugar
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            {business.images.map((img, index: number) => (
+                                <div
+                                    key={index}
+                                    className="group relative aspect-square overflow-hidden rounded-[1.5rem] border border-gray-100 bg-gray-50 shadow-sm"
+                                >
+                                    <img
+                                        src={`/storage/${img.url}`}
+                                        alt={`Imagen ${index + 1}`}
+                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
 
-            <div className="w-full gap-2 space-y-2 md:w-2/6">
-                <div className="rounded-xl bg-gray-50 p-3">
-                    <h3 className="mt-2 mb-2 text-center font-semibold text-gray-800">
-                        Horarios
-                    </h3>
+            {/* COLUMNA LATERAL (DERECHA) */}
+            <div className="w-full space-y-4 lg:w-[320px]">
+                {/* Horarios */}
+                <div className="overflow-hidden rounded-[1.5rem] border border-gray-100 bg-white p-5 shadow-sm">
+                    <div className="mb-4 flex items-center gap-2 text-gray-900">
+                        <Clock className="h-4 w-4 text-purple-600" />
+                        <h3 className="text-sm font-black tracking-wider uppercase">
+                            Horarios
+                        </h3>
+                    </div>
                     {business?.schedules && business?.schedules.length > 0 ? (
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             {business?.schedules.map((day: any) => {
                                 const open = formatTime(day?.open);
-
                                 const close = formatTime(day?.close);
-
-                                const horarioStr = day?.isOpen
-                                    ? `${open} - ${close}`
-                                    : 'Cerrado';
-
                                 return (
                                     <div
                                         key={day?.label}
-                                        className="flex items-center justify-between border-b border-gray-200 py-1 text-sm last:border-b-0"
+                                        className="flex items-center justify-between text-xs"
                                     >
-                                        <span className="font-medium text-gray-700 capitalize">
+                                        <span className="font-bold text-gray-500 capitalize">
                                             {day?.label}
                                         </span>
-                                        <div className="flex items-center">
-                                            <span className="text-gray-600">
-                                                {horarioStr}
-                                            </span>
-                                        </div>
+                                        <span
+                                            className={`font-medium ${day?.isOpen ? 'text-gray-700' : 'text-red-400 italic'}`}
+                                        >
+                                            {day?.isOpen
+                                                ? `${open} - ${close}`
+                                                : 'Cerrado'}
+                                        </span>
                                     </div>
                                 );
                             })}
                         </div>
                     ) : (
-                        <p className="text-center text-gray-600">
-                            No disponibles.
+                        <p className="text-xs text-gray-400 italic">
+                            No disponibles
                         </p>
                     )}
                 </div>
 
-                {/* Amenidades */}
-                {business?.amenities && business?.amenities.length > 0 && (
-                    <div className="rounded-xl bg-gray-50 p-3">
-                        <h3 className="mt-2 mb-2 text-center font-semibold text-gray-800">
-                            Amenidades
-                        </h3>
-                        <div className="space-y-2">
-                            {business?.amenities.map((service: any) => (
-                                <div
-                                    key={service.id}
-                                    className="flex items-center space-x-2"
-                                >
-                                    <IconDynamic
-                                        iconName={service.icon}
-                                        className="h-4 w-4 text-orange-600"
-                                    />
-                                    <span className="text-sm font-medium text-gray-700">
-                                        {service.name}
-                                    </span>
-                                </div>
-                            ))}
+                {/* Amenidades y Pagos combinados */}
+                <div className="space-y-6 rounded-[1.5rem] border border-gray-100 bg-white p-5 shadow-sm">
+                    {/* Amenidades */}
+                    {business?.amenities && business?.amenities.length > 0 && (
+                        <div>
+                            <div className="mb-3 flex items-center gap-2 text-gray-900">
+                                <Sparkles className="h-4 w-4 text-purple-600" />
+                                <h3 className="text-sm text-[11px] font-black tracking-wider uppercase">
+                                    Amenidades
+                                </h3>
+                            </div>
+                            <div className="grid grid-cols-1 gap-2">
+                                {business?.amenities.map((service: any) => (
+                                    <div
+                                        key={service.id}
+                                        className="flex items-center gap-2 text-xs text-gray-600"
+                                    >
+                                        <IconDynamic
+                                            iconName={service.icon}
+                                            className="h-3.5 w-3.5 text-gray-400"
+                                        />
+                                        <span>{service.name}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Metodos de pago */}
-                {business?.payments && business?.payments.length > 0 && (
-                    <div className="rounded-xl bg-gray-50 p-3">
-                        <h3 className="mt-2 mb-2 text-center font-semibold text-gray-800">
-                            Metodos de pago
-                        </h3>
-                        <div className="space-y-2">
-                            {business?.payments.map((payment: any) => (
-                                <div
-                                    key={payment.id}
-                                    className="flex items-center space-x-2"
-                                >
-                                    <IconDynamic
-                                        iconName={payment.icon}
-                                        className="h-4 w-4 text-orange-600"
-                                    />
-                                    <span className="text-sm font-medium text-gray-700">
-                                        {payment.name}
-                                    </span>
-                                </div>
-                            ))}
+                    {/* Métodos de Pago */}
+                    {business?.payments && business?.payments.length > 0 && (
+                        <div>
+                            <div className="mb-3 flex items-center gap-2 border-t border-gray-50 pt-4 text-gray-900">
+                                <CreditCard className="h-4 w-4 text-purple-600" />
+                                <h3 className="text-sm text-[11px] font-black tracking-wider uppercase">
+                                    Pagos
+                                </h3>
+                            </div>
+                            <div className="grid grid-cols-1 gap-2">
+                                {business?.payments.map((payment: any) => (
+                                    <div
+                                        key={payment.id}
+                                        className="flex items-center gap-2 text-xs text-gray-600"
+                                    >
+                                        <IconDynamic
+                                            iconName={payment.icon}
+                                            className="h-3.5 w-3.5 text-gray-400"
+                                        />
+                                        <span>{payment.name}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
+                {/* Redes Sociales */}
                 {Object.entries(business?.social_networks ?? {}).length > 0 && (
-                    <div className="rounded-xl bg-gray-50 p-3">
-                        <h3 className="mt-2 mb-3 text-center font-semibold text-gray-800">
-                            Síguenos en
-                        </h3>
-                        <div className="flex flex-wrap items-center justify-center gap-2">
+                    <div className="rounded-[1.5rem] border border-gray-100 bg-white p-5 shadow-sm">
+                        <div className="mb-4 flex items-center gap-2 text-gray-900">
+                            <Share2 className="h-4 w-4 text-purple-600" />
+                            <h3 className="text-sm text-[11px] font-black tracking-wider uppercase">
+                                Síguenos
+                            </h3>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
                             {Object.entries(business.social_networks ?? {}).map(
                                 ([key, url]) => (
                                     <a
                                         key={key}
-                                        href={url}
+                                        href={url as string}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex cursor-pointer items-center gap-2 rounded-md bg-white px-3 py-1 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-orange-100 hover:text-orange-600"
+                                        className="flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-1.5 text-[11px] font-bold text-gray-700 transition-all hover:bg-purple-50 hover:text-purple-600"
                                     >
-                                        <Globe className="h-4 w-4" />
+                                        <Globe className="h-3 w-3" />
                                         <span className="capitalize">
                                             {key}
                                         </span>
