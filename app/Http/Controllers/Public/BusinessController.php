@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\BusinessSearchRequest;
+use App\Http\Requests\Public\SetFavoriteRequest;
 use App\Services\Public\SearchService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Response;
 
 final class BusinessController extends Controller
 {
@@ -14,41 +15,99 @@ final class BusinessController extends Controller
         private readonly SearchService $searchService
     ) {}
 
-    public function index(BusinessSearchRequest $request)
+    /**
+     * Página principal con búsqueda de negocios
+     */
+    public function index(BusinessSearchRequest $request): Response
     {
         $filters = $request->filters();
         $geoData = $request->geo();
-
-        // dd($geoData);
 
         $data = $this->searchService->getData($filters, $geoData);
 
         return inertia('Index', [
             ...$data,
-            'filters' => $filters,
+            'filters' => $filters, // Retornar filtros aplicados para el frontend
         ]);
     }
 
-    public function details(string $id)
+    /**
+     * Detalles de un negocio específico
+     */
+    public function details(string $id): Response
     {
-        return inertia('public/business/detail', $this->searchService->getBusinessDetails($id, Auth::id()));
+        $data = $this->searchService->getBusinessDetails($id, Auth::id());
+
+        return inertia('public/business/detail', $data);
     }
 
-    public function favorites()
+    /**
+     * Lista de negocios favoritos del usuario autenticado
+     */
+    public function favorites(): Response
     {
         return inertia('public/Favorites', [
             'businesses' => $this->searchService->getFavoritesByUser(Auth::id()),
         ]);
     }
 
-    public function setFavorite(Request $request)
+    /**
+     * Marcar/desmarcar negocio como favorito
+     */
+    public function setFavorite(SetFavoriteRequest $request)
     {
-        $this->searchService->setFavorite(
+        $validated = $request->validated();
+
+        $success = $this->searchService->setFavorite(
             userId: $request->user()->id,
-            businessId: $request->input('id_business'),
-            isFavorite: $request->boolean('favorite')
+            businessId: $validated['id_business'],
+            isFavorite: $validated['favorite']
         );
 
-        return back()->with('meta', ['favorite' => $request->boolean('favorite')]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => $success,
+                'favorite' => $validated['favorite'],
+                'message' => $validated['favorite'] 
+                    ? 'Negocio agregado a favoritos' 
+                    : 'Negocio removido de favoritos'
+            ]);
+        }
+
+        return back()->with('meta', [
+            'favorite' => $validated['favorite'],
+            'success' => $success,
+        ]);
     }
+
+    // /**
+    //  * API de autocompletado para búsqueda en tiempo real
+    //  */
+    // public function autocomplete(BusinessSearchRequest $request): JsonResponse
+    // {
+    //     $query = $request->input('q', '');
+        
+    //     if (strlen($query) < 2) {
+    //         return response()->json([]);
+    //     }
+
+    //     $geoData = $request->geo();
+        
+    //     $results = $this->searchService->autocomplete($query, $geoData);
+
+    //     return response()->json($results);
+    // }
+
+    // /**
+    //  * Obtener estadísticas de búsqueda (útil para analytics)
+    //  */
+    // public function searchStats(BusinessSearchRequest $request): JsonResponse
+    // {
+    //     $filters = $request->filters();
+    //     $geoData = $request->geo();
+
+    //     $stats = $this->searchService->getSearchStats($filters, $geoData);
+
+    //     return response()->json($stats);
+    // }
 }

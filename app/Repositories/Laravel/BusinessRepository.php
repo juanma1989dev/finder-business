@@ -26,7 +26,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         return $business;
     }
 
-    public function syncPayments(string $id, array $payments = []) : Businesses
+    public function syncPayments(string $id, array $payments = []): Businesses
     {
         $business = $this->findById($id);
         $business->payments()->sync($payments);
@@ -73,42 +73,79 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         return $business->productsAndServices()->create($data);
     }
 
-
+    /**
+     * Buscar negocios con filtros y geolocalización mejorada
+     *
+     * @param array $filters ['q' => string, 'category' => string|int, 'dist' => object{lat, long, radius}]
+     * @return Collection
+     */
     public function search(array $filters): Collection
     {
-        $query = $this->model->with(['category:id,name,image']);
+        $query = $this->model->query()
+            ->with([
+                'category:id,name,image',
+                'productsAndServices' => fn($q) => $q->where('isActive', true)->select('id', 'business_id', 'name', 'price', 'image_url')
+            ]);
 
+        # Búsqueda por texto (nombre, descripción, tags)
         if (!empty($filters['q'])) {
-            $q = $filters['q'];
-            $query->where(function ($query) use ($q) {
-                $query->where('name', 'like', "%{$q}%")
-                    ->orWhere('long_description', 'like', "%{$q}%")
-                    ->orWhere('tags', 'like', "%{$q}%");
+            $searchTerm = $filters['q'];
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('short_description', 'like', "%{$searchTerm}%")
+                  ->orWhere('long_description', 'like', "%{$searchTerm}%")
+                  ->orWhere('tags', 'like', "%{$searchTerm}%");
             });
         }
 
+        # Filtro por tipo de comida  
+        if (!empty($filters['foodType'])) { 
+            
+            $foodType = $filters['foodType'] ?? null;
+
+            $query->whereHas('productsAndServices', function ($q) use ( $foodType ) {
+                $q->where('product_category_id', $foodType);
+            });
+        }
+
+        # Filtro por categoría 
         if (!empty($filters['category'])) {
             $query->where('id_category', $filters['category']);
         }
         
+        # Geolocalización con distancia (usando Spatial)
         $dist = $filters['dist'] ?? null;
-        if ($dist && $dist->lat && $dist->long && $dist->radius) {
+        
+        if ($dist && isset($dist->lat) && isset($dist->long)) {
             $point = new Point($dist->lat, $dist->long);
-            $radiusInMeters = $dist->radius * 1000;
+            
+            # Si hay radio, filtrar por distancia
+            if (isset($dist->radius) && $dist->radius > 0) {
+                $radiusInMeters = $dist->radius * 1000; # Convertir KM a metros
+                $query->whereDistanceSphere('cords', $point, '<=', $radiusInMeters);
+            }
 
-            $query->whereDistanceSphere('cords', $point, '<=', $radiusInMeters);
+            # Obtener el nombre real de la tabla desde el modelo
+            $tableName = $this->model->getTable();
 
-            $query->selectRaw('*, ROUND( ST_Distance_Sphere(cords, POINT(?, ?)) /1000, 1 ) as distance', [
-                $dist->long,  
-                $dist->lat
-            ]);
+            # Calcular distancia en KM y agregar al resultado
+            $query->selectRaw(
+                "{$tableName}.*, ROUND(ST_Distance_Sphere(cords, POINT(?, ?)) / 1000, 1) as distance",
+                [$dist->long, $dist->lat]
+            );
 
+            # Ordenar por distancia (más cercanos primero)
             $query->orderBy('distance', 'asc');
+        } else {
+            $query->orderBy('name', 'asc');
         }
 
         return $query->get();
     }
 
+    /**
+     * Obtener negocios favoritos de un usuario
+     */
     public function getFavoritesByUser(int $userId): Collection
     {
         return $this->model
@@ -117,25 +154,30 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
                       ->where('is_favorite', true);
             })
             ->with(['category:id,name,image'])
+            ->orderBy('name', 'asc')
             ->get();
     }
 
-
+    /**
+     * Crear variación de producto
+     */
     public function createProductVariation(string $productId, array $variation)
     {
-        return  BusinessProductVariation::create([
+        return BusinessProductVariation::create([
             'product_id' => $productId,
             'name' => $variation['name'],
         ]);
     }
 
-    public function createProductExtra(string $productId, array $variation)
+    /**
+     * Crear extra de producto
+     */
+    public function createProductExtra(string $productId, array $extra)
     {
-        return  BusinessProductExtra::create([
+        return BusinessProductExtra::create([
             'product_id' => $productId,
-            'name' => $variation['name'],
-            'price' => $variation['price'],
+            'name' => $extra['name'],
+            'price' => $extra['price'],
         ]);
     }
 }
-

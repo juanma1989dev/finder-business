@@ -11,6 +11,7 @@ use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
 use App\Repositories\Contracts\AmenitiesRepositoryInterface;
 use App\Repositories\Contracts\GalleryRepositoryInterface;
 use App\Repositories\Contracts\PaymentsRepositoryInterface;
+use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 
 # Repositorios
 use App\Repositories\Laravel\BusinessCategoryRepository;
@@ -19,6 +20,7 @@ use App\Repositories\Laravel\FavoriteBusinessRepository;
 use App\Repositories\Laravel\AmenitiesRepository;
 use App\Repositories\Laravel\GalleryRepository;
 use App\Repositories\Laravel\PaymentsRepository;
+use App\Repositories\Laravel\ProductCategoryRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -30,5 +32,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AmenitiesRepositoryInterface::class, AmenitiesRepository::class);
         $this->app->bind(GalleryRepositoryInterface::class, GalleryRepository::class);
         $this->app->bind(PaymentsRepositoryInterface::class, PaymentsRepository::class);
+        $this->app->bind(ProductCategoryRepositoryInterface::class, ProductCategoryRepository::class);
     }
 } 
