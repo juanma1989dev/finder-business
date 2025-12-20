@@ -15,11 +15,11 @@ class ProductsAndServicesMapper
             return [
                 "id" => $product->id,
                 "business_id" => $product->business_id,
+                "category" => $product->product_category_id,
                 "name" =>  $product->name,
                 "description" =>  $product->description,
                 "price" =>  $product->price,
                 "duration" =>  $product->duration,
-                "category" =>  $product->category,
                 "isActive" =>  boolval($product->isActive),
                 "image_url" => $image_url,
                 "extras" => BusinessProductExtrasMapper::toArray($product->extras),

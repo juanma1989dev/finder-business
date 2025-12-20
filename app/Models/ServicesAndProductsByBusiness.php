@@ -21,7 +21,8 @@ class ServicesAndProductsByBusiness extends Model
         'category',
         'isActive',
         'id_business',
-        'image_url'
+        'image_url',
+        'product_category_id',
     ];
 
     public $incrementing = false;

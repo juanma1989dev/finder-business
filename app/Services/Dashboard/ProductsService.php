@@ -7,14 +7,17 @@ use App\DTOs\ProductsDTO;
 use App\Mappers\ProductsAndServicesMapper;
 use App\Models\Businesses;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 class ProductsService
 {
     public function __construct(
-        private readonly BusinessRepositoryInterface $businessRepository
+        private readonly BusinessRepositoryInterface $businessRepository,
+        private readonly ProductCategoryRepositoryInterface $productCategoryRepository
     ) {}
 
     /**
@@ -22,11 +25,14 @@ class ProductsService
      */
     public function getData(string $idBusiness): array
     {
-        $business = $this->businessRepository->findById($idBusiness, ['category']);
+        $business  = $this->businessRepository->findById($idBusiness, ['category']);
+        $foodTypes = $this->productCategoryRepository->getActives();
+        $products  = ProductsAndServicesMapper::toArray($business->productsAndServices);
 
         return [
             'business' => $business,
-            'productsAndServices' => ProductsAndServicesMapper::toArray($business->productsAndServices)
+            'productTypes' => $foodTypes,
+            'productsAndServices' => $products
         ];
     }
 
@@ -35,59 +41,67 @@ class ProductsService
      */
     public function create(string $idBusiness, ProductsDTO $product): void
     {
-        $data = $product->toArray();
+        DB::transaction(function () use ($idBusiness, $product) {
 
-        $data['id'] = (string) Str::uuid();
+            $data = $product->toPersistenceArray();
+            $data['id'] = (string) Str::uuid();
 
-        if ($product->image) {
-            $data['image_url'] = $this->storeServiceImage($product->image, $idBusiness);
-        }
+            if ($product->image) {
+                $data['image_url'] = $this->storeServiceImage(
+                    $product->image,
+                    $idBusiness
+                );
+            }
 
-        $productModel = $this->businessRepository->createProductOrService($idBusiness, $data);
+            $productModel = $this->businessRepository
+                ->createProductOrService($idBusiness, $data);
 
-        # Guardar variaciones
-        foreach ($product->variations as $variation) {
-            $this->businessRepository->createProductVariation($productModel->id, $variation);
-        }
+            foreach ($product->variations as $variation) {
+                $this->businessRepository
+                    ->createProductVariation($productModel->id, $variation);
+            }
 
-        # Guardar Extras
-        foreach ($product->extas as $extra) {
-            $this->businessRepository->createProductExtra($productModel->id, $extra);
-        }
+            foreach ($product->extras as $extra) {
+                $this->businessRepository
+                    ->createProductExtra($productModel->id, $extra);
+            }
+        });
     }
 
     /**
      * Actualiza un producto o servicio existente.
      */
-    public function update(string $idBusiness, string $idService, ProductsDTO $product)
+    public function update(string $idBusiness, string $idService, ProductsDTO $productDto)
     {
-        $data = $product->toArray();
+        DB::transaction(function () use ($idBusiness, $productDto, $idService) {
+            $data = $productDto->toPersistenceArray();
 
-        $service = $this->findServiceOrFail($idBusiness, $idService);
+            $product = $this->findProduct($idBusiness, $idService);
 
-        if ($product->image) {
-            $data['image_url'] = $this->replaceImage($service, $product->image, $idBusiness);
-        }
+            if ($productDto->image) {
+                $data['image_url'] = $this->replaceImage($product, $productDto->image, $idBusiness);
+            }
 
-        $service->update($data); //// migrar al repo
+            $product->update($data); //// migrar al repo
 
-        # Eliminar variaciones existentes
-        $service->variations()->delete(); //// migrar al repo
+            # Eliminar variaciones existentes
+            $product->variations()->delete(); //// migrar al repo
 
-        # Insertar nuevas variaciones
-        foreach ($product->variations as $variation) {
-            $this->businessRepository->createProductVariation($service->id, $variation);
-        }
+            # Insertar nuevas variaciones
+            foreach ($productDto->variations as $variation) {
+                $this->businessRepository->createProductVariation($product->id, $variation);
+            }
 
-        # Eliminar extras existentes
-        $service->extras()->delete(); //// migrar al repo
+            # Eliminar extras existentes
+            $product->extras()->delete(); //// migrar al repo
 
-        # Guardar Extras
-        foreach ($product->extas as $extra) {
-            $this->businessRepository->createProductExtra($service->id, $extra);
-        }
+            # Guardar Extras
+            foreach ($productDto->extras as $extra) {
+                $this->businessRepository->createProductExtra($product->id, $extra);
+            }
 
-        return $service->fresh();
+            return $product->fresh();
+        });
     }
 
     /**
@@ -95,7 +109,7 @@ class ProductsService
      */
     public function delete(string $idBusiness, string $idService): bool
     {
-        $service = $this->findServiceOrFail($idBusiness, $idService);
+        $service = $this->findProduct($idBusiness, $idService);
 
         if ($service->image_url) {
             Storage::disk('public')->delete($service->image_url);
@@ -134,7 +148,7 @@ class ProductsService
     /**
      * Busca un servicio y lanza excepción si no existe.
      */
-    private function findServiceOrFail(string $idBusiness, string $idService)
+    private function findProduct(string $idBusiness, string $idService)
     {
         $business = $this->businessRepository->findById($idBusiness);
         $service = $this->findByBusiness($business, $idService);
