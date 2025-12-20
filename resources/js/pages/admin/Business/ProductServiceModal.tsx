@@ -7,10 +7,23 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { ProductExtras, ProductVariations, ServicesAndProducts } from '@/types';
+import {
+    ProductExtras,
+    ProductsTypes,
+    ProductVariations,
+    ServicesAndProducts,
+} from '@/types';
 import { useForm } from '@inertiajs/react';
+
 import {
     Image as ImageIcon,
     Layers,
@@ -30,7 +43,21 @@ interface Props {
     businessId: string;
     service: ServicesAndProducts | null;
     onSuccess: () => void;
+    productTypes: ProductsTypes[];
 }
+
+type ProductForm = {
+    name: string;
+    description: string;
+    price: number;
+    duration: string;
+    category: number | undefined;
+    isActive: boolean;
+    image: File | undefined;
+    image_url: string;
+    extras: ProductExtras[];
+    variations: ProductVariations[];
+};
 
 export default function ProductServiceModal({
     open,
@@ -38,29 +65,31 @@ export default function ProductServiceModal({
     businessId,
     service,
     onSuccess,
+    productTypes,
 }: Props) {
-    const form = useForm({
+    const form = useForm<ProductForm>({
         name: '',
         description: '',
         price: 0,
         duration: '',
-        category: 'Product',
+        category: undefined,
         isActive: true,
-        image: undefined as File | undefined,
+        image: undefined,
         image_url: '',
-        extras: [] as ProductExtras[],
-        variations: [] as ProductVariations[],
+        extras: [],
+        variations: [],
     });
 
     useEffect(() => {
         if (!open) return;
+
         if (service) {
             form.setData({
                 name: service.name ?? '',
                 description: service.description ?? '',
                 price: service.price ?? 0,
                 duration: service.duration ?? '',
-                category: service.category ?? 'Product',
+                category: service.category ?? undefined,
                 isActive: service.isActive ?? true,
                 image: undefined,
                 image_url: service.image_url ?? '',
@@ -81,8 +110,6 @@ export default function ProductServiceModal({
 
         form.post(url, {
             forceFormData: true,
-            // ignore error
-
             data: isEdit ? { ...form.data, _method: 'PUT' } : form.data,
             onSuccess: () => {
                 toast.success(
@@ -93,40 +120,36 @@ export default function ProductServiceModal({
                 onClose();
                 onSuccess();
             },
-        });
+        } as any);
     };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl overflow-hidden rounded-[2rem] border-none bg-gray-50 p-0 shadow-2xl">
-                {/* Header con gradiente sutil */}
-                <div className="bg-white px-8 pt-8 pb-6">
+            <DialogContent className="max-w-5xl overflow-hidden rounded-[2rem] border-none bg-gray-50 p-0 shadow-2xl">
+                <div className="bg-white px-4 py-4">
                     <DialogHeader>
                         <div className="flex items-center gap-3">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
-                                {service ? (
-                                    <Sparkles size={24} />
-                                ) : (
-                                    <Plus size={24} />
-                                )}
+                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
+                                {service ? <Sparkles /> : <Plus />}
                             </div>
                             <div>
-                                <DialogTitle className="text-2xl font-black tracking-tight text-gray-900">
+                                <DialogTitle className="text-xl font-black text-gray-900">
                                     {service
                                         ? 'Editar Producto'
                                         : 'Nuevo Producto'}
                                 </DialogTitle>
                                 <p className="text-sm font-medium text-gray-500">
-                                    Configura los detalles de tu oferta
+                                    Configura los detalles de tu producto
                                 </p>
                             </div>
                         </div>
                     </DialogHeader>
                 </div>
 
-                <Tabs defaultValue="general" className="w-full">
-                    <div className="bg-white px-8">
-                        <TabsList className="flex h-auto w-full justify-start gap-8 bg-transparent p-0">
+                <Tabs defaultValue="general">
+                    {/* TABS */}
+                    <div className="bg-white px-6">
+                        <TabsList className="flex gap-8 bg-transparent p-0">
                             {[
                                 {
                                     id: 'general',
@@ -138,16 +161,12 @@ export default function ProductServiceModal({
                                     label: 'Variaciones',
                                     icon: Layers,
                                 },
-                                {
-                                    id: 'extras',
-                                    label: 'Extras / Toppings',
-                                    icon: Plus,
-                                },
+                                { id: 'extras', label: 'Extras', icon: Plus },
                             ].map((tab) => (
                                 <TabsTrigger
                                     key={tab.id}
                                     value={tab.id}
-                                    className="relative flex items-center gap-2 rounded-none border-b-2 border-transparent px-1 pb-4 text-sm font-bold text-gray-400 transition-all data-[state=active]:border-orange-500 data-[state=active]:bg-transparent data-[state=active]:text-orange-600"
+                                    className="flex items-center gap-2 border-b-2 border-transparent px-1 pb-4 text-sm font-bold text-gray-400 data-[state=active]:border-orange-500 data-[state=active]:text-orange-600"
                                 >
                                     <tab.icon size={16} />
                                     {tab.label}
@@ -156,14 +175,48 @@ export default function ProductServiceModal({
                         </TabsList>
                     </div>
 
-                    <div className="max-h-[60vh] overflow-y-auto px-8 py-6">
-                        {/* CONTENIDO GENERAL */}
-                        <TabsContent value="general" className="mt-0 space-y-8">
-                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                                <div className="space-y-6">
+                    <div className="max-h-[60vh] overflow-y-auto px-6 py-6">
+                        {/* GENERAL */}
+                        <TabsContent value="general" className="space-y-8">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                <div className="space-y-3">
                                     <div className="space-y-2">
                                         <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
-                                            Nombre del producto
+                                            Categoria
+                                        </Label>
+                                        <Select
+                                            value={
+                                                form.data.category !== undefined
+                                                    ? String(form.data.category)
+                                                    : undefined
+                                            }
+                                            onValueChange={(value) =>
+                                                form.setData(
+                                                    'category',
+                                                    Number(value),
+                                                )
+                                            }
+                                        >
+                                            <SelectTrigger className="h-10 rounded-xl">
+                                                <SelectValue placeholder="Selecciona tipo" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                {productTypes.map((type) => (
+                                                    <SelectItem
+                                                        key={type.id}
+                                                        value={String(type.id)}
+                                                    >
+                                                        {`${type.icon} ${type.name}`}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                                            Nombre
                                         </Label>
                                         <Input
                                             value={form.data.name}
@@ -173,87 +226,61 @@ export default function ProductServiceModal({
                                                     e.target.value,
                                                 )
                                             }
-                                            className="h-12 rounded-xl border-gray-200 bg-white px-4 shadow-sm focus:ring-orange-500"
-                                            placeholder="Ej: Hamburguesa Especial"
+                                            className="rounded-xl border-gray-200"
                                         />
-                                        {form.errors.name && (
-                                            <p className="text-xs font-bold text-red-500">
-                                                {form.errors.name}
-                                            </p>
-                                        )}
                                     </div>
 
                                     <div className="space-y-2">
                                         <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
-                                            Precio Base ($)
+                                            Precio
                                         </Label>
-                                        <div className="relative">
-                                            <span className="absolute top-1/2 left-4 -translate-y-1/2 font-bold text-gray-400">
-                                                $
-                                            </span>
-                                            <Input
-                                                type="number"
-                                                value={form.data.price}
-                                                onChange={(e) =>
-                                                    form.setData(
-                                                        'price',
-                                                        Number(e.target.value),
-                                                    )
-                                                }
-                                                className="h-12 rounded-xl border-gray-200 bg-white pl-8 shadow-sm"
-                                            />
-                                        </div>
+                                        <Input
+                                            type="number"
+                                            value={form.data.price}
+                                            onChange={(e) =>
+                                                form.setData(
+                                                    'price',
+                                                    Number(e.target.value),
+                                                )
+                                            }
+                                            className="rounded-xl border-gray-200"
+                                        />
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
-                                        Imagen del producto
-                                    </Label>
-                                    <div
-                                        onClick={() =>
-                                            document
-                                                .getElementById('image-upload')
-                                                ?.click()
-                                        }
-                                        className="group relative flex h-full min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-[2rem] border-2 border-dashed border-gray-200 bg-white transition-all hover:border-orange-400 hover:bg-orange-50/50"
-                                    >
-                                        {form.data.image ||
-                                        form.data.image_url ? (
-                                            <img
-                                                src={
-                                                    form.data.image
-                                                        ? URL.createObjectURL(
-                                                              form.data.image,
-                                                          )
-                                                        : form.data.image_url
-                                                }
-                                                className="h-full w-full rounded-[1.8rem] object-cover p-2"
-                                            />
-                                        ) : (
-                                            <div className="flex flex-col items-center gap-2 text-gray-400">
-                                                <ImageIcon
-                                                    size={32}
-                                                    className="group-hover:text-orange-500"
-                                                />
-                                                <span className="text-xs font-bold">
-                                                    Click para subir foto
-                                                </span>
-                                            </div>
-                                        )}
-                                        <input
-                                            id="image-upload"
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={(e) =>
-                                                form.setData(
-                                                    'image',
-                                                    e.target.files?.[0],
-                                                )
+                                <div
+                                    onClick={() =>
+                                        document
+                                            .getElementById('image-upload')
+                                            ?.click()
+                                    }
+                                    className="flex min-h-[180px] cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+                                >
+                                    {form.data.image || form.data.image_url ? (
+                                        <img
+                                            src={
+                                                form.data.image
+                                                    ? URL.createObjectURL(
+                                                          form.data.image,
+                                                      )
+                                                    : form.data.image_url
                                             }
+                                            className="h-full w-full rounded-xl object-cover p-2"
                                         />
-                                    </div>
+                                    ) : (
+                                        <ImageIcon className="text-gray-400" />
+                                    )}
+                                    <input
+                                        id="image-upload"
+                                        type="file"
+                                        className="hidden"
+                                        onChange={(e) =>
+                                            form.setData(
+                                                'image',
+                                                e.target.files?.[0],
+                                            )
+                                        }
+                                    />
                                 </div>
                             </div>
 
@@ -262,7 +289,6 @@ export default function ProductServiceModal({
                                     Descripción
                                 </Label>
                                 <Textarea
-                                    rows={3}
                                     value={form.data.description}
                                     onChange={(e) =>
                                         form.setData(
@@ -270,81 +296,48 @@ export default function ProductServiceModal({
                                             e.target.value,
                                         )
                                     }
-                                    className="rounded-2xl border-gray-200 bg-white p-4 shadow-sm"
-                                    placeholder="Describe los ingredientes o detalles importantes..."
+                                    className="rounded-xl border-gray-200"
                                 />
-                            </div>
-
-                            <div
-                                className={`flex items-center gap-3 rounded-2xl p-4 transition-colors ${form.data.isActive ? 'bg-green-50' : 'bg-gray-100'}`}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={form.data.isActive}
-                                    onChange={(e) =>
-                                        form.setData(
-                                            'isActive',
-                                            e.target.checked,
-                                        )
-                                    }
-                                    className="h-6 w-6 rounded-lg border-gray-300 text-green-600 focus:ring-green-500"
-                                />
-                                <div className="flex flex-col">
-                                    <Label className="text-sm font-black text-gray-900">
-                                        Producto Activo
-                                    </Label>
-                                    <span className="text-xs font-medium text-gray-500">
-                                        Los clientes podrán ver y pedir este
-                                        producto
-                                    </span>
-                                </div>
                             </div>
                         </TabsContent>
 
-                        {/* VARIACIONES (Mismo estilo de tarjetas) */}
-                        <TabsContent
-                            value="variations"
-                            className="mt-0 space-y-4"
-                        >
-                            <div className="rounded-2xl bg-blue-50 p-4 text-blue-700">
-                                <p className="text-xs font-bold">
-                                    Usa las variaciones para opciones
-                                    obligatorias como "Tamaño" (Pequeño,
-                                    Grande).
-                                </p>
-                            </div>
-                            {form.data.variations.map((varia, index) => (
+                        {/* VARIATIONS */}
+                        <TabsContent value="variations" className="space-y-4">
+                            {form.data.variations.map((v, i) => (
                                 <div
-                                    key={index}
-                                    className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm animate-in fade-in slide-in-from-top-2"
+                                    key={i}
+                                    className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-sm"
                                 >
                                     <Input
-                                        value={varia.name}
-                                        placeholder="Ej: Familiar, Personal..."
-                                        className="h-10 border-none bg-transparent font-bold shadow-none focus-visible:ring-0"
+                                        value={v.name}
+                                        className="border-none font-bold"
                                         onChange={(e) => {
-                                            const v = [...form.data.variations];
-                                            v[index].name = e.target.value;
-                                            form.setData('variations', v);
+                                            const arr = [
+                                                ...form.data.variations,
+                                            ];
+                                            arr[i].name = e.target.value;
+                                            form.setData('variations', arr);
                                         }}
                                     />
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="text-red-400 hover:bg-red-50 hover:text-red-600"
+                                        className="text-red-400"
                                         onClick={() => {
-                                            const v = [...form.data.variations];
-                                            v.splice(index, 1);
-                                            form.setData('variations', v);
+                                            const arr = [
+                                                ...form.data.variations,
+                                            ];
+                                            arr.splice(i, 1);
+                                            form.setData('variations', arr);
                                         }}
                                     >
                                         <Trash2 size={18} />
                                     </Button>
                                 </div>
                             ))}
+
                             <Button
-                                variant="outline"
-                                className="w-full rounded-2xl border-2 border-dashed py-6 hover:bg-gray-100"
+                                className="h-12 w-full rounded-2xl bg-orange-600 font-bold text-white hover:bg-orange-700"
                                 onClick={() =>
                                     form.setData('variations', [
                                         ...form.data.variations,
@@ -352,64 +345,55 @@ export default function ProductServiceModal({
                                     ])
                                 }
                             >
-                                <Plus size={18} className="mr-2" /> Agregar
-                                Variación
+                                <Plus size={18} className="mr-2" />
+                                Agregar variación
                             </Button>
                         </TabsContent>
 
                         {/* EXTRAS */}
-                        <TabsContent value="extras" className="mt-0 space-y-4">
-                            {form.data.extras.map((extra, index) => (
+                        <TabsContent value="extras" className="space-y-4">
+                            {form.data.extras.map((e, i) => (
                                 <div
-                                    key={index}
-                                    className="grid grid-cols-[1fr_120px_auto] items-center gap-4 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm"
+                                    key={i}
+                                    className="grid grid-cols-[1fr_120px_auto] items-center gap-4 rounded-2xl bg-white p-3 shadow-sm"
                                 >
                                     <Input
-                                        value={extra.name}
-                                        placeholder="Nombre del extra"
-                                        className="h-10 border-none font-bold shadow-none focus-visible:ring-0"
-                                        onChange={(e) => {
-                                            const ex = [...form.data.extras];
-                                            ex[index].name = e.target.value;
-                                            form.setData('extras', ex);
+                                        value={e.name}
+                                        className="border-none font-bold"
+                                        onChange={(ev) => {
+                                            const arr = [...form.data.extras];
+                                            arr[i].name = ev.target.value;
+                                            form.setData('extras', arr);
                                         }}
                                     />
-                                    <div className="relative">
-                                        <span className="absolute top-1/2 left-3 -translate-y-1/2 text-xs font-bold text-gray-400">
-                                            $
-                                        </span>
-                                        <Input
-                                            type="number"
-                                            value={extra.price}
-                                            className="h-10 rounded-xl bg-gray-50 pl-7 text-sm font-bold shadow-none"
-                                            onChange={(e) => {
-                                                const ex = [
-                                                    ...form.data.extras,
-                                                ];
-                                                ex[index].price = Number(
-                                                    e.target.value,
-                                                );
-                                                form.setData('extras', ex);
-                                            }}
-                                        />
-                                    </div>
+                                    <Input
+                                        type="number"
+                                        value={e.price}
+                                        onChange={(ev) => {
+                                            const arr = [...form.data.extras];
+                                            arr[i].price = Number(
+                                                ev.target.value,
+                                            );
+                                            form.setData('extras', arr);
+                                        }}
+                                    />
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="text-red-400 hover:text-red-600"
+                                        className="text-red-400"
                                         onClick={() => {
-                                            const ex = [...form.data.extras];
-                                            ex.splice(index, 1);
-                                            form.setData('extras', ex);
+                                            const arr = [...form.data.extras];
+                                            arr.splice(i, 1);
+                                            form.setData('extras', arr);
                                         }}
                                     >
                                         <Trash2 size={18} />
                                     </Button>
                                 </div>
                             ))}
+
                             <Button
-                                variant="outline"
-                                className="w-full rounded-2xl border-2 border-dashed py-6 hover:bg-gray-100"
+                                className="h-12 w-full rounded-2xl bg-orange-600 font-bold text-white hover:bg-orange-700"
                                 onClick={() =>
                                     form.setData('extras', [
                                         ...form.data.extras,
@@ -417,33 +401,26 @@ export default function ProductServiceModal({
                                     ])
                                 }
                             >
-                                <Plus size={18} className="mr-2" /> Agregar
-                                Topping / Extra
+                                <Plus size={18} className="mr-2" />
+                                Agregar extra
                             </Button>
                         </TabsContent>
                     </div>
                 </Tabs>
 
-                {/* Footer Fijo */}
-                <div className="flex items-center justify-between border-t bg-white px-8 py-6">
-                    <Button
-                        variant="ghost"
-                        onClick={onClose}
-                        className="rounded-xl font-bold text-gray-500 hover:bg-gray-100"
-                    >
-                        Descartar
-                    </Button>
+                {/* FOOTER */}
+                <div className="flex justify-end border-t bg-white px-4 py-3">
                     <Button
                         onClick={handleSubmit}
                         disabled={form.processing}
-                        className="h-12 rounded-[1.2rem] bg-orange-600 px-8 font-black text-white shadow-lg shadow-orange-200 transition-all hover:bg-orange-700 active:scale-95"
+                        className="rounded-xl bg-orange-600 px-4 font-black text-white hover:bg-orange-700"
                     >
                         {form.processing ? (
                             <LoaderCircle className="animate-spin" />
                         ) : (
                             <Save className="mr-2" size={18} />
                         )}
-                        {service ? 'Guardar Cambios' : 'Publicar Producto'}
+                        Guardar
                     </Button>
                 </div>
             </DialogContent>
