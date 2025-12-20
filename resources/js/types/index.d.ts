@@ -52,6 +52,12 @@ export interface User {
 
 /**************************/
 
+export interface ProductsTypes {
+    id?: number;
+    name: string;
+    icon: string;
+}
+
 export interface ProductExtras {
     id?: string;
     business_product_id?: string;
@@ -73,7 +79,7 @@ export interface ServicesAndProducts {
     description: string;
     price: number;
     duration?: string;
-    category: string;
+    category: number;
     isActive: boolean;
     image_url: string;
     extras?: ProductExtras[];
@@ -133,7 +139,7 @@ export interface Business {
     long_description: string;
     id_category: string | number;
     address: string;
-    tags: string[];
+    tags: string | string[] | null;
     cover_image?: string;
     social_networks?: SocialLinks;
     category?: BusinessCategories;
