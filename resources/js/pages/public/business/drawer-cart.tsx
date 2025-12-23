@@ -74,7 +74,7 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                                     </span>
                                 </div>
                                 <p className="text-[9px] font-bold tracking-[0.1em] text-orange-500 uppercase">
-                                    Resumen seleccionado
+                                    Resumen
                                 </p>
                             </div>
 
@@ -180,9 +180,9 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                                             ${totalPrice.toFixed(2)}
                                         </span>
                                     </div>
-                                    <div className="text-[10px] font-bold text-green-500 uppercase">
+                                    {/* <div className="text-[10px] font-bold text-green-500 uppercase">
                                         Envío gratis
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 <button
