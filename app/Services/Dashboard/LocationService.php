@@ -31,7 +31,7 @@ class LocationService
         );
 
         $data = $location->toArray();
-        $data['cord'] = $cords;
+        $data['cords'] = $cords;
 
         $this->businessRepository->update($id, $data);
     }
