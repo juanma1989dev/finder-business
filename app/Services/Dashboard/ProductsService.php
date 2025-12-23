@@ -75,40 +75,63 @@ class ProductsService
     /**
      * Actualiza un producto o servicio existente.
      */
-    public function update(string $idBusiness, string $idService, ProductsDTO $productDto)
-    {
-        DB::transaction(function () use ($idBusiness, $productDto, $idService) {
-            $data = $productDto->toPersistenceArray();
+    public function update(
+        string $idBusiness,
+        string $idService,
+        ProductsDTO $productDto
+    ) {
+        return DB::transaction(function () use ($idBusiness, $idService, $productDto) {
 
             $product = $this->findProduct($idBusiness, $idService);
 
+            $data = $productDto->toPersistenceArray();
+
+            // 1. Viene nueva imagen → reemplazar
             if ($productDto->image) {
-                $data['image_url'] = $this->replaceImage($product, $productDto->image, $idBusiness);
-            } else {
+                $data['image_url'] = $this->replaceImage(
+                    $product,
+                    $productDto->image,
+                    $idBusiness
+                );
+            }
+
+            // 2. No viene image ni image_url → eliminar imagen
+            if (
+                !$productDto->image &&
+                empty($productDto->image_url) &&
+                $product->image_url
+            ) {
+                Storage::disk('public')->delete($product->image_url);
                 $data['image_url'] = null;
             }
 
-            $product->update($data); //// migrar al repo
-
-            # Eliminar variaciones existentes
-            $product->variations()->delete(); //// migrar al repo
-
-            # Insertar nuevas variaciones
-            foreach ($productDto->variations as $variation) {
-                $this->businessRepository->createProductVariation($product->id, $variation);
+            // 3. Viene image_url → no hacer nada (no tocar image_url)
+            if (!empty($productDto->image_url)) {
+                unset($data['image_url']);
             }
 
-            # Eliminar extras existentes
-            $product->extras()->delete(); //// migrar al repo
+            $product->update($data);
 
-            # Guardar Extras
+            $product->variations()->delete();
+
+            foreach ($productDto->variations as $variation) {
+                $this->businessRepository
+                    ->createProductVariation($product->id, $variation);
+            }
+
+
+            $product->extras()->delete();
+
             foreach ($productDto->extras as $extra) {
-                $this->businessRepository->createProductExtra($product->id, $extra);
+                $this->businessRepository
+                    ->createProductExtra($product->id, $extra);
             }
 
             return $product->fresh();
         });
     }
+
+
 
     /**
      * Elimina un servicio (y su imagen si existe).

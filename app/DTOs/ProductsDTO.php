@@ -17,6 +17,7 @@ final class ProductsDTO
 
         // 🖼️ Recursos
         public readonly ?ImageDTO $image,
+        public readonly ?string $image_url,
 
         // 🧩 Agregados
         public readonly array $extras,
@@ -33,12 +34,11 @@ final class ProductsDTO
             'description' => 'required|string',
             'price'       => 'required|numeric|gt:0',
             'duration'    => 'nullable|string|max:255',
-
-            // UI
             'category'    => 'required|integer|exists:product_categories,id',
-
             'isActive'    => 'required|boolean',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image_url'   => 'nullable|string',
+
 
             'extras'              => 'sometimes|array',
             'extras.*.name'       => 'required_with:extras|string|max:255',
@@ -47,6 +47,7 @@ final class ProductsDTO
             'variations'          => 'sometimes|array',
             'variations.*.name'   => 'required_with:variations|string|max:255',
         ]);
+
 
         $imageFile = $request->file('image');
 
@@ -68,7 +69,10 @@ final class ProductsDTO
             product_category_id: (int) $data['category'],
 
             isActive: (bool) $data['isActive'],
+            
             image: $image,
+            image_url: $data['image_url'] ?? null,
+
             extras: $data['extras'] ?? [],
             variations: $data['variations'] ?? [],
         );

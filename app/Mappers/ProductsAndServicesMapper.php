@@ -10,7 +10,7 @@ class ProductsAndServicesMapper
     public static function toArray(Collection $products) 
     {
         return $products->map(function(ServicesAndProductsByBusiness $product)  {
-            $image_url = $product->image_url ? "/storage/{$product->image_url}" : "/images/not-found.png";
+            $image_url = $product->image_url ? "/storage/{$product->image_url}" : null;
 
             return [
                 "id" => $product->id,
