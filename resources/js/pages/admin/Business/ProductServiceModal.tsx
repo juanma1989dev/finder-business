@@ -42,7 +42,7 @@ interface Props {
     open: boolean;
     onClose: () => void;
     businessId: string;
-    service: ServicesAndProducts | null;
+    product: ServicesAndProducts | null;
     onSuccess: () => void;
     productTypes: ProductsTypes[];
 }
@@ -64,7 +64,7 @@ export default function ProductServiceModal({
     open,
     onClose,
     businessId,
-    service,
+    product,
     onSuccess,
     productTypes,
 }: Props) {
@@ -84,29 +84,29 @@ export default function ProductServiceModal({
     useEffect(() => {
         if (!open) return;
 
-        if (service) {
+        if (product) {
             form.setData({
-                name: service.name ?? '',
-                description: service.description ?? '',
-                price: service.price ?? 0,
-                duration: service.duration ?? '',
-                category: service.category ?? undefined,
-                isActive: service.isActive ?? true,
+                name: product.name ?? '',
+                description: product.description ?? '',
+                price: product.price ?? 0,
+                duration: product.duration ?? '',
+                category: product.category ?? undefined,
+                isActive: product.isActive ?? true,
                 image: undefined,
-                image_url: service.image_url ?? '',
-                extras: service.extras ?? [],
-                variations: service.variations ?? [],
+                image_url: product.image_url ?? '',
+                extras: product.extras ?? [],
+                variations: product.variations ?? [],
             });
         } else {
             form.reset();
             form.clearErrors();
         }
-    }, [open, service]);
+    }, [open, product]);
 
     const handleSubmit = () => {
-        const isEdit = Boolean(service);
+        const isEdit = Boolean(product);
         const url = isEdit
-            ? `/dashboard/business/${businessId}/services/${service?.id}`
+            ? `/dashboard/business/${businessId}/services/${product?.id}`
             : `/dashboard/business/${businessId}/services`;
 
         form.post(url, {
@@ -131,11 +131,11 @@ export default function ProductServiceModal({
                     <DialogHeader>
                         <div className="flex items-center gap-3">
                             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
-                                {service ? <Sparkles /> : <Plus />}
+                                {product ? <Sparkles /> : <Plus />}
                             </div>
                             <div>
                                 <DialogTitle className="text-xl font-black text-gray-900">
-                                    {service
+                                    {product
                                         ? 'Editar Producto'
                                         : 'Nuevo Producto'}
                                 </DialogTitle>
@@ -148,40 +148,39 @@ export default function ProductServiceModal({
                 </div>
 
                 <Tabs defaultValue="general">
-                    {/* TABS */}
-                    <div className="bg-white px-6">
-                        <TabsList className="flex gap-8 bg-transparent p-0">
-                            {[
-                                {
-                                    id: 'general',
-                                    label: 'General',
-                                    icon: Package,
-                                },
-                                {
-                                    id: 'variations',
-                                    label: 'Variaciones',
-                                    icon: Layers,
-                                },
-                                { id: 'extras', label: 'Extras', icon: Plus },
-                            ].map((tab) => (
-                                <TabsTrigger
-                                    key={tab.id}
-                                    value={tab.id}
-                                    className="flex items-center gap-2 border-b-2 border-transparent px-1 pb-4 text-sm font-bold text-gray-400 data-[state=active]:border-orange-500 data-[state=active]:text-orange-600"
-                                >
-                                    <tab.icon size={16} />
-                                    {tab.label}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                    </div>
-
+                    <TabsList className="flex gap-2 self-center border-b-0 bg-transparent p-2">
+                        {[
+                            {
+                                id: 'general',
+                                label: 'General',
+                                icon: Package,
+                            },
+                            {
+                                id: 'variations',
+                                label: `Variaciones (${form.data.variations.length})`,
+                                icon: Layers,
+                            },
+                            {
+                                id: 'extras',
+                                label: `Extras (${form.data.extras.length})`,
+                                icon: Plus,
+                            },
+                        ].map((tab) => (
+                            <TabsTrigger
+                                key={tab.id}
+                                value={tab.id}
+                                className="flex cursor-pointer items-center gap-2 border-b-2 border-transparent p-3 text-sm font-bold text-gray-400 hover:text-orange-600 data-[state=active]:border-orange-500 data-[state=active]:text-orange-600"
+                            >
+                                {tab.label}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
                     <div className="max-h-[60vh] overflow-y-auto px-6 py-6">
-                        <TabsContent value="general" className="space-y-8">
+                        <TabsContent value="general" className="space-y-3">
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-3">
+                                <div className="space-y-2">
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                                        <Label className="text-xs font-black tracking-widest text-gray-600 uppercase">
                                             Categoria
                                         </Label>
                                         <Select
@@ -197,7 +196,7 @@ export default function ProductServiceModal({
                                                 )
                                             }
                                         >
-                                            <SelectTrigger className="h-10 rounded-xl">
+                                            <SelectTrigger className="rounded-xl">
                                                 <SelectValue placeholder="Selecciona tipo" />
                                             </SelectTrigger>
 
@@ -220,7 +219,7 @@ export default function ProductServiceModal({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                                        <Label className="text-xs font-black tracking-widest text-gray-600 uppercase">
                                             Nombre
                                         </Label>
                                         <Input
@@ -241,7 +240,7 @@ export default function ProductServiceModal({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                                        <Label className="text-xs font-black tracking-widest text-gray-600 uppercase">
                                             Precio
                                         </Label>
                                         <Input
@@ -269,9 +268,10 @@ export default function ProductServiceModal({
                                             .getElementById('image-upload')
                                             ?.click()
                                     }
-                                    className="relative flex min-h-[180px] cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+                                    className="relative flex cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
                                 >
-                                    {/* {form.data.image &&  form.data.image_url && (
+                                    {(!!form.data.image ||
+                                        !!form.data.image_url) && (
                                         <Trash2
                                             className="absolute top-3 right-3 z-50 h-8 w-8 rounded-full bg-white p-2 text-red-500"
                                             onClick={(e) => {
@@ -283,7 +283,7 @@ export default function ProductServiceModal({
                                                 form.setData('image_url', '');
                                             }}
                                         />
-                                    )} */}
+                                    )}
 
                                     {form.data.image || form.data.image_url ? (
                                         <img
@@ -318,8 +318,8 @@ export default function ProductServiceModal({
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
-                                <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
+                            <div className="space-y-2">
+                                <Label className="text-xs font-black tracking-widest text-gray-600 uppercase">
                                     Descripción
                                 </Label>
                                 <Textarea
@@ -344,42 +344,59 @@ export default function ProductServiceModal({
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="variations" className="space-y-4">
+                        <TabsContent value="variations" className="space-y-1">
                             {form.data.variations.map((v, i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-sm"
-                                >
-                                    <Input
-                                        value={v.name}
-                                        className="border-none font-bold"
-                                        onChange={(e) => {
-                                            const arr = [
-                                                ...form.data.variations,
-                                            ];
-                                            arr[i].name = e.target.value;
-                                            form.setData('variations', arr);
-                                        }}
-                                    />
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-red-400"
-                                        onClick={() => {
-                                            const arr = [
-                                                ...form.data.variations,
-                                            ];
-                                            arr.splice(i, 1);
-                                            form.setData('variations', arr);
-                                        }}
+                                <>
+                                    <div
+                                        key={i}
+                                        className="flex items-center gap-1 rounded-2xl bg-white p-2 shadow-sm"
                                     >
-                                        <Trash2 size={18} />
-                                    </Button>
-                                </div>
+                                        <Input
+                                            value={v.name}
+                                            className="border-none font-bold"
+                                            onChange={(e) => {
+                                                const arr = [
+                                                    ...form.data.variations,
+                                                ];
+                                                arr[i].name = e.target.value;
+                                                form.setData('variations', arr);
+                                            }}
+                                        />
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="text-red-400"
+                                            onClick={() => {
+                                                const arr = [
+                                                    ...form.data.variations,
+                                                ];
+                                                arr.splice(i, 1);
+                                                form.setData('variations', arr);
+                                            }}
+                                        >
+                                            <Trash2 size={18} />
+                                        </Button>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1">
+                                            {form.errors[
+                                                `variations.${i}.name` as keyof ProductForm
+                                            ] && (
+                                                <span className="mt-1 text-xs text-red-500 animate-in fade-in">
+                                                    {
+                                                        form.errors[
+                                                            `variations.${i}.name` as keyof ProductForm
+                                                        ]
+                                                    }
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </>
                             ))}
 
                             <Button
-                                className="h-12 w-full rounded-2xl bg-orange-600 font-bold text-white hover:bg-orange-700"
+                                className="w-full rounded-2xl bg-orange-600 font-bold text-white hover:bg-orange-700"
                                 onClick={() =>
                                     form.setData('variations', [
                                         ...form.data.variations,
@@ -393,49 +410,72 @@ export default function ProductServiceModal({
                         </TabsContent>
 
                         {/* EXTRAS */}
-                        <TabsContent value="extras" className="space-y-4">
+                        <TabsContent value="extras" className="space-y-1">
                             {form.data.extras.map((e, i) => (
-                                <div
-                                    key={i}
-                                    className="grid grid-cols-[1fr_120px_auto] items-center gap-4 rounded-2xl bg-white p-3 shadow-sm"
-                                >
-                                    <Input
-                                        value={e.name}
-                                        className="border-none font-bold"
-                                        onChange={(ev) => {
-                                            const arr = [...form.data.extras];
-                                            arr[i].name = ev.target.value;
-                                            form.setData('extras', arr);
-                                        }}
-                                    />
-                                    <Input
-                                        type="number"
-                                        value={e.price}
-                                        onChange={(ev) => {
-                                            const arr = [...form.data.extras];
-                                            arr[i].price = Number(
-                                                ev.target.value,
-                                            );
-                                            form.setData('extras', arr);
-                                        }}
-                                    />
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-red-400"
-                                        onClick={() => {
-                                            const arr = [...form.data.extras];
-                                            arr.splice(i, 1);
-                                            form.setData('extras', arr);
-                                        }}
+                                <>
+                                    <div
+                                        key={i}
+                                        className="grid grid-cols-[1fr_120px_auto] items-center gap-4 rounded-2xl bg-white p-2 shadow-sm"
                                     >
-                                        <Trash2 size={18} />
-                                    </Button>
-                                </div>
+                                        <Input
+                                            value={e.name}
+                                            className="border-none font-bold"
+                                            onChange={(ev) => {
+                                                const arr = [
+                                                    ...form.data.extras,
+                                                ];
+                                                arr[i].name = ev.target.value;
+                                                form.setData('extras', arr);
+                                            }}
+                                        />
+                                        <Input
+                                            type="number"
+                                            value={e.price}
+                                            onChange={(ev) => {
+                                                const arr = [
+                                                    ...form.data.extras,
+                                                ];
+                                                arr[i].price = Number(
+                                                    ev.target.value,
+                                                );
+                                                form.setData('extras', arr);
+                                            }}
+                                        />
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="text-red-400"
+                                            onClick={() => {
+                                                const arr = [
+                                                    ...form.data.extras,
+                                                ];
+                                                arr.splice(i, 1);
+                                                form.setData('extras', arr);
+                                            }}
+                                        >
+                                            <Trash2 size={18} />
+                                        </Button>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1">
+                                            {form.errors[
+                                                `extras.${i}.name` as keyof ProductForm
+                                            ] && (
+                                                <span className="mt-1 text-xs text-red-500 animate-in fade-in">
+                                                    {
+                                                        form.errors[
+                                                            `extras.${i}.name` as keyof ProductForm
+                                                        ]
+                                                    }
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </>
                             ))}
 
                             <Button
-                                className="h-12 w-full rounded-2xl bg-orange-600 font-bold text-white hover:bg-orange-700"
+                                className="w-full rounded-2xl bg-orange-600 font-bold text-white hover:bg-orange-700"
                                 onClick={() =>
                                     form.setData('extras', [
                                         ...form.data.extras,
