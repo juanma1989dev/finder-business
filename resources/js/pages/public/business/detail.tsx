@@ -1,6 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MainLayout from '@/layouts/main-layout';
-import { useCartStore } from '@/store/cart.store';
 import { Business, SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
@@ -27,11 +26,9 @@ interface Props {
 
 export default function BusinessDetail({ business, favorite }: Props) {
     const [stateFavorite, setStateFavorite] = useState(favorite);
-    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
-    const { items } = useCartStore();
 
     const copyUlrDetailBusiness = () => {
         navigator.clipboard
@@ -65,7 +62,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
             <div className="min-h-screen bg-white">
                 <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:py-8">
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
-                        {/* COLUMNA IZQUIERDA: Adaptativa */}
+                        {/* Informacion */}
                         <div className="lg:col-span-5 xl:col-span-4">
                             <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-24">
                                 <div className="relative h-48 w-full overflow-hidden rounded-[1.8rem] border border-gray-100 shadow-sm sm:h-64 lg:aspect-[4/3] lg:h-auto">
@@ -79,7 +76,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         alt={business.name}
                                     />
 
-                                    {/* Botones Flotantes Optimizados */}
                                     <div className="absolute inset-x-3 top-3 flex justify-between">
                                         <Link
                                             href="/"
@@ -106,7 +102,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                     </div>
                                 </div>
 
-                                {/* Info del Negocio (Layout más compacto en móvil) */}
                                 <div className="space-y-4 px-1">
                                     <div className="flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
@@ -119,7 +114,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         </h1>
                                     </div>
 
-                                    {/* Grid de Datos (2 columnas en tablet, 1 en móvil/desktop sidebar) */}
                                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
                                         <div className="flex items-center gap-3 rounded-2xl border border-gray-50 bg-gray-50/50 p-3">
                                             <div className="rounded-xl bg-orange-100 p-2 text-orange-600">
@@ -178,7 +172,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                             </div>
                         </div>
 
-                        {/* COLUMNA DERECHA: PRODUCTOS */}
+                        {/*   PRODUCTOS */}
                         <div className="lg:col-span-7 xl:col-span-8">
                             <Tabs defaultValue="products" className="w-full">
                                 {/* Contenedor de la lista con fondo suave y bordes muy redondeados */}
@@ -188,7 +182,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         className="flex items-center gap-2 rounded-[1rem] px-6 py-2 text-xs font-black tracking-wider uppercase transition-all duration-300 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:bg-gray-200/50"
                                     >
                                         <Sparkles className="h-3.5 w-3.5" />{' '}
-                                        {/* Opcional: Icono para romper la rigidez */}
                                         Menú
                                     </TabsTrigger>
 
@@ -201,7 +194,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                     </TabsTrigger>
                                 </TabsList>
 
-                                {/* Contenido con una transición suave de opacidad */}
                                 <TabsContent
                                     value="products"
                                     className="duration-300 animate-in outline-none fade-in zoom-in-95"

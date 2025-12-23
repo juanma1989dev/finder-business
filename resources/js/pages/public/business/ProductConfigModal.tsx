@@ -28,7 +28,6 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
     const hasVariations = product.variations?.length > 0;
     const isInvalid = hasVariations && !variation;
 
-    // Cálculo de precio para el feedback visual del usuario
     const currentTotal =
         Number(product.price) +
         (variation ? Number(variation.price) : 0) +
@@ -37,10 +36,9 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
     return (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm">
             <div className="relative w-full max-w-[420px] overflow-hidden rounded-2xl bg-white shadow-2xl duration-200 animate-in fade-in zoom-in">
-                {/* HEADER */}
                 <div className="flex items-center justify-between border-b border-gray-50 px-6 py-5">
                     <div>
-                        <h2 className="text-[10px] font-black tracking-[0.15em] text-gray-400 uppercase">
+                        <h2 className="py-1 text-base font-black text-gray-400 uppercase">
                             Personalizar pedido
                         </h2>
                         <p className="text-sm font-black text-orange-500 uppercase">
@@ -56,11 +54,10 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                 </div>
 
                 <div className="scrollbar-hide max-h-[60vh] overflow-y-auto px-6 py-4">
-                    {/* VARIACIONES (OBLIGATORIAS SI EXISTEN) */}
                     {hasVariations && (
                         <div className="mb-6">
-                            <p className="mb-3 text-[10px] font-black tracking-widest text-gray-900 uppercase">
-                                Selecciona una opción{' '}
+                            <p className="mb-3 text-xs font-black tracking-widest text-gray-900 uppercase">
+                                Selecciona una opción
                                 <span className="text-orange-500">*</span>
                             </p>
                             <div className="grid grid-cols-1 gap-2">
@@ -90,7 +87,7 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                                 })}
                             </div>
                             {isInvalid && (
-                                <p className="mt-2 text-[9px] font-bold tracking-tighter text-red-500 uppercase">
+                                <p className="mt-2 text-xs font-bold tracking-tighter text-red-500 uppercase">
                                     Por favor, selecciona una opción para
                                     continuar
                                 </p>
@@ -98,10 +95,9 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                         </div>
                     )}
 
-                    {/* EXTRAS (OPCIONALES) */}
                     {product.extras?.length > 0 && (
                         <div className="mb-6">
-                            <p className="mb-3 text-[10px] font-black tracking-widest text-gray-900 uppercase">
+                            <p className="mb-3 text-xs font-black tracking-widest text-gray-900 uppercase">
                                 ¿Deseas agregar extras?
                             </p>
                             <div className="flex flex-col gap-2">
@@ -134,8 +130,8 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                     )}
 
                     {/* NOTAS */}
-                    <div className="mb-2">
-                        <p className="mb-3 text-[10px] font-black tracking-widest text-gray-900 uppercase">
+                    <div className="mb-1">
+                        <p className="mb-1 text-xs font-black tracking-widest text-gray-900 uppercase">
                             Notas adicionales
                         </p>
                         <textarea
@@ -163,7 +159,7 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                     <div className="flex gap-3">
                         <button
                             onClick={onClose}
-                            className="flex-1 rounded-xl px-4 py-3 text-[11px] font-black tracking-wider text-gray-400 uppercase transition-colors hover:bg-gray-50"
+                            className="flex-1 rounded-xl px-4 py-3 text-xs font-black tracking-wider text-gray-400 uppercase transition-colors hover:bg-gray-50"
                         >
                             Volver
                         </button>
@@ -173,11 +169,11 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                             onClick={() =>
                                 onConfirm({
                                     extras,
-                                    variations: variation ? [variation] : [], // Enviado como Array para respetar el tipo original
+                                    variations: variation ? [variation] : [],
                                     notes,
                                 })
                             }
-                            className={`flex-[2] rounded-xl py-3 text-[11px] font-black tracking-wider text-white uppercase shadow-lg transition-all active:scale-95 ${
+                            className={`flex-[2] rounded-xl py-3 text-xs font-black tracking-wider text-white uppercase shadow-lg transition-all active:scale-95 ${
                                 isInvalid
                                     ? 'cursor-not-allowed bg-gray-200 text-gray-400 shadow-none'
                                     : 'bg-orange-500 shadow-orange-100 hover:bg-orange-600 hover:shadow-orange-200'

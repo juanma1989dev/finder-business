@@ -51,7 +51,6 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                     key={product.id}
                                     className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:border-orange-200 hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)]"
                                 >
-                                    {/* CONTENEDOR DE IMAGEN */}
                                     <div className="relative h-48 w-full overflow-hidden bg-gray-50">
                                         {product.image_url ? (
                                             <img
@@ -65,7 +64,6 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                             </div>
                                         )}
 
-                                        {/* BADGE DE CANTIDAD (MORADO) */}
                                         {quantity > 0 && (
                                             <div className="absolute top-4 right-4 flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-purple-600 px-2 text-[11px] font-black text-white shadow-lg ring-2 shadow-purple-200 ring-white">
                                                 {quantity}
@@ -139,7 +137,6 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                 )}
             </section>
 
-            {/* MODAL CONFIGURACIÓN */}
             {selectedProduct && (
                 <ProductConfigModal
                     product={selectedProduct}
