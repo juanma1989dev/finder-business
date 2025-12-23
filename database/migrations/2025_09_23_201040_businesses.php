@@ -23,13 +23,13 @@ return new class extends Migration
             $table->string('address', 250);
             $table->string('phone');
 
-            // $table->foreignId('category_id')
-            //     ->constrained('business_categories')
-            //     ->cascadeOnDelete();
+            $table->foreignId('category_id')
+                ->constrained('business_categories')
+                ->cascadeOnDelete();
 
-            // $table->foreignId('user_id')
-            //     ->constrained()
-            //     ->cascadeOnDelete();
+            $table->foreignId('user_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
             $table->boolean('use_whatsapp')->default(false);
             $table->string('cover_image', 250)->nullable();
