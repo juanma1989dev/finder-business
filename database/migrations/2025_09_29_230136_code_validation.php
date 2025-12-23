@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('code_validation', function(Blueprint $table){
-            $table->uuid('id')->primary()->default(DB::raw('(UUID())'));
+            $table->id();
             $table->string('user_email');
             $table->string('code', 15);
             $table->boolean('confirmed')->default(false);

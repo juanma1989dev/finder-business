@@ -14,13 +14,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('business_hours', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('(UUID())'));
-            $table->uuid('business_id');  
-            $table->enum('day', DayOfWeek::allValues());  
+            $table->id();
+
+            $table->foreignId('business_id')
+                ->constrained('businesses')
+                ->cascadeOnDelete();
+
+            $table->enum('day', DayOfWeek::allValues());
             $table->time('open')->nullable();
             $table->time('close')->nullable();
             $table->boolean('is_open')->default(false);
             $table->timestamps();
+            $table->unique(['business_id', 'day']);
         });
     }
 

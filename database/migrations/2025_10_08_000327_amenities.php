@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('business_services', function(Blueprint $table){
+        Schema::create('amenities', function(Blueprint $table){
             $table->id();
             $table->string('name', 200);
             $table->string('icon', 30)->nullable(); 
@@ -31,7 +31,7 @@ return new class extends Migration
         ];
 
         foreach($categories as $category){
-            DB::table('business_services')->insert($category);
+            DB::table('amenities')->insert($category);
         }
     }
 
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('business_services');
+        Schema::drop('amenities');
     }
 };

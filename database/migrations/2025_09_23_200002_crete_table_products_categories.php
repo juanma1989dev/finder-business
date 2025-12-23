@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+
     /**
      * Run the migrations.
      */
@@ -14,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('product_categories', function(Blueprint $table){
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('icon')->nullable();  
             $table->boolean('status')->default(1);
             $table->timestamps();
@@ -31,10 +32,8 @@ return new class extends Migration
         ];
 
         foreach($categories as $category){
-            // Añadimos timestamps manualmente ya que DB::table no los genera solo
             $category['created_at'] = now();
             $category['updated_at'] = now();
-            
             DB::table('product_categories')->insert($category);
         }
     }

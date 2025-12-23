@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('social_networks_by_business', function(Blueprint $table){
+        Schema::create('business_social_networks', function(Blueprint $table){
             $table->id();
-            $table->uuid('id_business');
+            $table->foreignId('business_id')
+                    ->constrained('businesses')
+                    ->cascadeOnDelete()
+                    ->unique();
             $table->string('web')->nullable(); 
             $table->string('instagram')->nullable(); 
             $table->string('youtube')->nullable();
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('social_networks_by_business');
+        Schema::drop('business_social_networks');
     }
 };

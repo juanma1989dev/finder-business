@@ -4,6 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+Schema::table('users', function (Blueprint $table) {
+           
+        });
+
 return new class extends Migration
 {
     /**
@@ -17,6 +21,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('google_id')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('accepted_privacy')->default(false);
+            $table->string('privacy_version')->nullable();
+            $table->timestamp('privacy_accepted_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('business_payments', function(Blueprint $table){
+        Schema::create('payments', function(Blueprint $table){
             $table->id();
             $table->string('name', 200);
             $table->string('icon', 30)->nullable(); 
@@ -26,7 +26,7 @@ return new class extends Migration
         ];
 
         foreach($categories as $category){
-            DB::table('business_payments')->insert($category);
+            DB::table('payments')->insert($category);
         }
     }
 
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('business_payments');
+        Schema::drop('payments');
     }
 };

@@ -10,8 +10,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('business_images', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('(UUID())'));
-            $table->uuid('business_id');  
+            $table->id();
+            $table->foreignId('business_id')->constrained('businesses')->cascadeOnDelete();
             $table->string('url'); 
             $table->boolean('is_primary')->default(false); 
             $table->timestamps();
