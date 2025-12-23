@@ -18,12 +18,12 @@ export default function Header() {
                         >
                             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-orange-500 shadow-lg shadow-purple-200 transition-transform group-hover:scale-105">
                                 <span className="text-xl font-black text-white">
-                                    D
+                                    F
                                 </span>
                             </div>
                             <h1 className="hidden text-lg font-black tracking-tight text-gray-900 sm:block">
                                 <span className="bg-gradient-to-r from-purple-700 to-purple-500 bg-clip-text text-transparent">
-                                    Directorio
+                                    Finder
                                 </span>
                             </h1>
                         </Link>
