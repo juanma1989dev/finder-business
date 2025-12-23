@@ -12,36 +12,24 @@ class Businesses extends Model
     use HasFactory; 
     use HasSpatial;
 
-    protected $table = 'business';
-
-    protected $primaryKey = 'id';
-    public $incrementing = false;
-    protected $keyType = 'string';
-
     protected $fillable = [
-        'name',
-        'description',
-        'long_description',
-        'phone',
-        'id_category',
+        'category_id',
         'user_id',
+        'name',
+        'slogan',
+        'description',
+        'phone',
         'use_whatsapp',
         'cover_image',
         'tags',
-
         'location',
         'address',
         'cords'
     ];
 
     protected $casts = [
-        'id' => 'string',
         'cords' => Point::class
     ];
-
-  
-    // Si no tienes columnas created_at / updated_at
-    public $timestamps = false;
 
     public function category()
     {
