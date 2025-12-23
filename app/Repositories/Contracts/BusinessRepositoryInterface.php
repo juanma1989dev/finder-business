@@ -14,7 +14,7 @@ interface BusinessRepositoryInterface extends BaseRepositoryInterface
 
     public function updateNetworks(string $id, array $data);
 
-    public function createProductOrService($idBusiness, array $data);
+    public function createProduct($idBusiness, array $data);
 
     public function search(array $filters);
 

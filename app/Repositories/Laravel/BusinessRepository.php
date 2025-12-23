@@ -57,6 +57,9 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         return $business->fresh(['hours']);
     }
 
+    /**
+     * Actualizar redes sociales de un negocio
+     */
     public function updateNetworks(string $id, array $data): void
     {
         $business = $this->findById($id);
@@ -67,7 +70,10 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         );
     }
 
-    public function createProductOrService($idBusiness, array $data)
+    /**
+     * Crear producto o servicio asociado a un negocio
+     */
+    public function createProduct($idBusiness, array $data)
     {
         $business = $this->findById($idBusiness);
         return $business->productsAndServices()->create($data);

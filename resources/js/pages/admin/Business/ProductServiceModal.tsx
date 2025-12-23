@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 import {
     ProductExtras,
     ProductsTypes,
@@ -176,7 +177,6 @@ export default function ProductServiceModal({
                     </div>
 
                     <div className="max-h-[60vh] overflow-y-auto px-6 py-6">
-                        {/* GENERAL */}
                         <TabsContent value="general" className="space-y-8">
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 <div className="space-y-3">
@@ -212,6 +212,11 @@ export default function ProductServiceModal({
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                        {form.errors.category && (
+                                            <span className="mt-1 text-xs text-red-500 animate-in fade-in">
+                                                {form.errors.category}
+                                            </span>
+                                        )}
                                     </div>
 
                                     <div className="space-y-2">
@@ -228,6 +233,11 @@ export default function ProductServiceModal({
                                             }
                                             className="rounded-xl border-gray-200"
                                         />
+                                        {form.errors.name && (
+                                            <span className="mt-1 text-xs text-red-500 animate-in fade-in">
+                                                {form.errors.name}
+                                            </span>
+                                        )}
                                     </div>
 
                                     <div className="space-y-2">
@@ -245,6 +255,11 @@ export default function ProductServiceModal({
                                             }
                                             className="rounded-xl border-gray-200"
                                         />
+                                        {form.errors.price && (
+                                            <span className="mt-1 text-xs text-red-500 animate-in fade-in">
+                                                {form.errors.price}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
 
@@ -254,8 +269,22 @@ export default function ProductServiceModal({
                                             .getElementById('image-upload')
                                             ?.click()
                                     }
-                                    className="flex min-h-[180px] cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+                                    className="relative flex min-h-[180px] cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
                                 >
+                                    {/* {form.data.image &&  form.data.image_url && (
+                                        <Trash2
+                                            className="absolute top-3 right-3 z-50 h-8 w-8 rounded-full bg-white p-2 text-red-500"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                form.setData(
+                                                    'image',
+                                                    undefined,
+                                                );
+                                                form.setData('image_url', '');
+                                            }}
+                                        />
+                                    )} */}
+
                                     {form.data.image || form.data.image_url ? (
                                         <img
                                             src={
@@ -281,10 +310,15 @@ export default function ProductServiceModal({
                                             )
                                         }
                                     />
+                                    {form.errors.image && (
+                                        <span className="mt-1 text-xs text-red-500 animate-in fade-in">
+                                            {form.errors.image}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-1">
                                 <Label className="text-xs font-black tracking-widest text-gray-400 uppercase">
                                     Descripción
                                 </Label>
@@ -296,12 +330,20 @@ export default function ProductServiceModal({
                                             e.target.value,
                                         )
                                     }
-                                    className="rounded-xl border-gray-200"
+                                    className={cn(
+                                        'rounded-xl border-gray-200',
+                                        form.errors.description &&
+                                            'border-red-500 focus:ring-red-500',
+                                    )}
                                 />
+                                {form.errors.description && (
+                                    <span className="mt-1 text-xs text-red-500 animate-in fade-in">
+                                        {form.errors.description}
+                                    </span>
+                                )}
                             </div>
                         </TabsContent>
 
-                        {/* VARIATIONS */}
                         <TabsContent value="variations" className="space-y-4">
                             {form.data.variations.map((v, i) => (
                                 <div

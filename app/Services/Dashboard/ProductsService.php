@@ -46,15 +46,8 @@ class ProductsService
             $data = $product->toPersistenceArray();
             $data['id'] = (string) Str::uuid();
 
-            if ($product->image) {
-                $data['image_url'] = $this->storeServiceImage(
-                    $product->image,
-                    $idBusiness
-                );
-            }
-
             $productModel = $this->businessRepository
-                ->createProductOrService($idBusiness, $data);
+                ->createProduct($idBusiness, $data);
 
             foreach ($product->variations as $variation) {
                 $this->businessRepository
@@ -66,6 +59,17 @@ class ProductsService
                     ->createProductExtra($productModel->id, $extra);
             }
         });
+
+        if ($product->image) {
+            $data['image_url'] = $this->storeServiceImage(
+                $product->image,
+                $idBusiness
+            );
+
+            $this->businessRepository
+                ->update($data['id'], ['image_url' => $data['image_url']]);
+        }
+
     }
 
     /**
@@ -80,6 +84,8 @@ class ProductsService
 
             if ($productDto->image) {
                 $data['image_url'] = $this->replaceImage($product, $productDto->image, $idBusiness);
+            } else {
+                $data['image_url'] = null;
             }
 
             $product->update($data); //// migrar al repo
