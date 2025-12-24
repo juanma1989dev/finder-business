@@ -53,6 +53,15 @@ class User extends Authenticatable
 
     public function favorites()
     {
-        return $this->hasMany(FavoriteBusiness::class, 'id_user', 'id');
+        return $this->belongsToMany(Businesses::class)
+            ->using(BusinessUser::class)
+            ->withPivot('is_favorite');
+    }
+
+    public function businesses()
+    {
+        return $this->belongsToMany(Businesses::class)
+            ->using(BusinessUser::class)
+            ->withPivot('is_favorite');
     }
 }

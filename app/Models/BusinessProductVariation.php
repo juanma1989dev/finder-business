@@ -22,7 +22,7 @@ class BusinessProductVariation extends Model
     public function product()
     {
         return $this->belongsTo(
-            ServicesAndProductsByBusiness::class, // Modelo de productos
+            BusinessProduct::class, // Modelo de productos
             'product_id',                         // FK en esta tabla
             'id'                                  // PK en productos
         );

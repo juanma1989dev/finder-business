@@ -33,56 +33,51 @@ class Businesses extends Model
 
     public function category()
     {
-        return $this->belongsTo(BusinessCategory::class, 'id_category', 'id');
+        return $this->belongsTo(BusinessCategory::class);
     }
 
     public function favorites()
     {
-        return $this->hasMany(FavoriteBusiness::class, 'id_business', 'id');
+        return $this->belongsToMany(User::class)
+            ->using(BusinessUser::class)
+            ->withPivot('is_favorite')
+            ->wherePivot('is_favorite', true);
     }
+
+    // public function favoritesCount()
+    // {
+    //     return $this->belongsToMany(User::class)
+    //         ->wherePivot('is_favorite', true);
+    // }
 
     public function hours()
     {
-        return $this->hasMany(BusinessHour::class, 'business_id', 'id');
+        return $this->hasMany(BusinessHour::class);
     }
 
-    public function services()
+    public function amenities()
     {
-        return $this->belongsToMany(
-            Services::class,          // Modelo de servicios
-            'services_by_business',   // Tabla pivote
-            'id_business',            // FK en la pivote hacia business
-            'id_service'              // FK en la pivote hacia services
-        );
+        return $this->belongsToMany(Amenity::class);
     }
 
     public function payments()
     {
-        return $this->belongsToMany(
-            Payments::class,          // Modelo de servicios
-            'payments_by_business',   // Tabla pivote
-            'id_business',            // FK en la pivote hacia business
-            'id_payment'              // FK en la pivote hacia services
-        );
+        return $this->belongsToMany(Payments::class);
     }
 
     public function socialNetworks()
     {
-        return $this->hasOne(NetworksByBusiness::class, 'id_business', 'id');
+        return $this->hasOne(BusinessSocialNetwork::class);
     }
 
     public function productsAndServices()
     {
-        return $this->hasMany(
-            ServicesAndProductsByBusiness::class, // Modelo relacionado
-            'business_id',                        // Clave foránea en la tabla hija
-            'id'                                  // Clave primaria en la tabla padre
-        );
+        return $this->hasMany(BusinessProduct::class);
     }
 
     public function images()
     {
-        return $this->hasMany(BusinessImage::class, 'business_id', 'id');
+        return $this->hasMany(BusinessImage::class);
     }
 }
  

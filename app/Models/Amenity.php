@@ -5,16 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Payments extends Model
+class Amenity extends Model
 {
     use HasFactory;
-
-    protected $table = 'payments';
 
     protected $fillable = [
         'name',
         'icon',
-        'status', 
+        'status',
     ];
 
     public $timestamps = false;
@@ -24,9 +22,8 @@ class Payments extends Model
         return $this->belongsToMany(
             Businesses::class,
             'services_by_business',
-            'id_payment',
+            'id_service',
             'id_business'
         );
     }
-
 }
