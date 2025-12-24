@@ -67,8 +67,8 @@ export default function BusinessDetail({ business, favorite }: Props) {
     return (
         <MainLayout>
             <div className="min-h-screen bg-white">
-                <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:py-8">
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+                <div className="mx-auto max-w-7xl px-2 py-2 sm:px-2 lg:py-3">
+                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:gap-4">
                         {/* Informacion */}
                         <div className="lg:col-span-4 xl:col-span-4">
                             <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-24">
@@ -116,7 +116,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                                 {business.category?.name}
                                             </span>
                                         </div>
-                                        <h1 className="text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
+                                        <h1 className="text-xl font-black tracking-tight text-gray-900 sm:text-2xl">
                                             {business.name}
                                         </h1>
                                     </div>
