@@ -150,21 +150,6 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
     }
 
     /**
-     * Obtener negocios favoritos de un usuario
-     */
-    // public function getFavoritesByUser(int $userId): Collection
-    // {
-    //     return $this->model
-    //         ->whereHas('favorites', function ($query) use ($userId) {
-    //             $query->where('id_user', $userId)
-    //                   ->where('is_favorite', true);
-    //         })
-    //         ->with(['category:id,name,image'])
-    //         ->orderBy('name', 'asc')
-    //         ->get();
-    // }
-
-    /**
      * Crear variación de producto
      */
     public function createProductVariation(string $productId, array $variation)

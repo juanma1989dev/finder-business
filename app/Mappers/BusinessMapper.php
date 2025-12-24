@@ -13,28 +13,45 @@ class BusinessMapper
     public static function toArray(Businesses $bussines)
     {
         return [
-            'id'            => $bussines->id,
-            'category_id'   => $bussines->category_id,
-            'name'          => $bussines->name,
-            'phone'         => $bussines->phone,
-            'use_whatsapp'  => $bussines->use_whatsapp,
-            'slogan'        => $bussines->slogan,
-            'description'   => $bussines->description,
-            'address'       => $bussines->address,
-            'cover_image'   => $bussines->cover_image,
-            'tags'          => Str::of($bussines->tags)->explode(',')->filter()->values()->toArray(),
+            'id'                => $bussines->id,
+            'category_id'       => $bussines->category_id,
+            'name'              => $bussines->name,
+            'phone'             => $bussines->phone,
+            'use_whatsapp'      => $bussines->use_whatsapp,
+            'slogan'            => $bussines->slogan,
+            'description'       => $bussines->description,
+            'address'           => $bussines->address,
+            'cover_image'       => $bussines->cover_image,
+            'tags'              => self::tags($bussines->tags),
+            'social_networks'   => self::socialNetworks($bussines->socialNetworks),
 
-            'products'      => ProductsAndServicesMapper::toArray( $bussines->productsAndServices),
-            'amenities'     => AmenitiesMapper::toArray($bussines->amenities),
-            'payments'      => PaymentsMapper::toArray($bussines->payments) ,
-            'schedules'     => SchedulesMapper::toArray($bussines->hours),
-            'category'      => BusinessCategoryMapper::toArray($bussines->category),
-            'social_networks' =>  self::getSocialNetworks($bussines->socialNetworks),
-            'images'        => BusinessImagesMapper::toArray($bussines->images)
+            'products'          => ProductsAndServicesMapper::toArray( $bussines->productsAndServices),
+            'amenities'         => AmenitiesMapper::toArray($bussines->amenities),
+            'payments'          => PaymentsMapper::toArray($bussines->payments) ,
+            'schedules'         => SchedulesMapper::toArray($bussines->hours),
+            'category'          => BusinessCategoryMapper::toArray($bussines->category),
+            'images'            => BusinessImagesMapper::toArray($bussines->images)
         ];
     }
 
-    private static function getSocialNetworks(?BusinessSocialNetwork $networks) : array
+    public static function toCollection(iterable $businesses)
+    {
+        return collect($businesses)
+            ->map(fn (Businesses $b) => self::toArray($b))
+            ->values();
+    }
+
+    private static function tags(?string $tags) : array
+    {
+        if(!$tags) return [];
+
+        $tagsArray = explode(',', $tags);
+        $tagsArray = array_map('trim', $tagsArray);
+        
+        return $tagsArray;
+    }
+
+    private static function socialNetworks(?BusinessSocialNetwork $networks) : array
     {
         if(!$networks) return [];
 

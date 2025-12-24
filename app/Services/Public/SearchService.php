@@ -55,7 +55,7 @@ final class SearchService
             : [];
 
         return [
-            'businesses' => $businesses,
+            'businesses' => BusinessMapper::toCollection($businesses),
             'categories' => $this->businessCategoryRepository->findBy(columns: ['id', 'name', 'image'], conditions: [ 'status' => true]),
             'products' => [
                 'categories' => $this->productCategoryRepository->getActives(),
@@ -70,6 +70,7 @@ final class SearchService
             ],
         ];
     }
+
 
     /**
      * Obtener detalles completos de un negocio
