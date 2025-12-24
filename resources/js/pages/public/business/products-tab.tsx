@@ -56,7 +56,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                             <img
                                                 src={product.image_url}
                                                 alt={product.name}
-                                                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                className="h-full w-full object-cover transition-transform"
                                             />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center bg-slate-50">
@@ -65,7 +65,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                         )}
 
                                         {quantity > 0 && (
-                                            <div className="absolute top-4 right-4 flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-purple-600 px-2 text-[11px] font-black text-white shadow-lg ring-2 shadow-purple-200 ring-white">
+                                            <div className="absolute top-4 right-4 flex h-7 min-w-[28px] items-center justify-center rounded-lg bg-orange-500 px-2 text-[11px] font-black text-white shadow-lg ring-2">
                                                 {quantity}
                                             </div>
                                         )}
@@ -90,7 +90,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                                 <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
                                                     Precio
                                                 </span>
-                                                <span className="text-base font-black text-gray-900">
+                                                <span className="text-[11px] font-black text-gray-900">
                                                     ${product.price}
                                                 </span>
                                             </div>
@@ -102,7 +102,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                                             product,
                                                         )
                                                     }
-                                                    className={`group/btn flex items-center gap-2 rounded-xl px-3 py-2 text-[10px] font-black tracking-wider uppercase shadow-lg transition-all active:scale-95 ${
+                                                    className={`group/btn flex items-center gap-2 rounded-xl px-2 py-1 text-[10px] font-black uppercase shadow-lg ${
                                                         quantity === 0
                                                             ? 'bg-orange-500 text-white shadow-orange-100 hover:bg-orange-600'
                                                             : 'bg-purple-600 text-white shadow-purple-100 hover:bg-purple-700'

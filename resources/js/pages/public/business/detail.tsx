@@ -30,6 +30,13 @@ export default function BusinessDetail({ business, favorite }: Props) {
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
 
+    // console.log(business.schedules);
+
+    const LEGENDS = {
+        payments: business.payments.map((p) => p.name).join(' | '),
+        schedul: 'Abierto • Cierra 8pm *******',
+    };
+
     const copyUlrDetailBusiness = () => {
         navigator.clipboard
             .writeText(`${window.location.origin}/detail/${business.id}`)
@@ -63,7 +70,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                 <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:py-8">
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
                         {/* Informacion */}
-                        <div className="lg:col-span-5 xl:col-span-4">
+                        <div className="lg:col-span-4 xl:col-span-4">
                             <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-24">
                                 <div className="relative h-48 w-full overflow-hidden rounded-[1.8rem] border border-gray-100 shadow-sm sm:h-64 lg:aspect-[4/3] lg:h-auto">
                                     <img
@@ -102,7 +109,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 px-1">
+                                <div className="space-y-2 px-1">
                                     <div className="flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
                                             <span className="rounded-md bg-purple-50 px-2 py-0.5 text-[9px] font-black tracking-[0.15em] text-purple-600 uppercase">
@@ -124,7 +131,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                                     Horario
                                                 </p>
                                                 <p className="text-xs font-bold text-gray-700 italic">
-                                                    Abierto • Cierra 8pm
+                                                    {LEGENDS.schedul}
                                                 </p>
                                             </div>
                                         </div>
@@ -138,7 +145,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                                     Pagos
                                                 </p>
                                                 <p className="text-xs font-bold text-gray-700 italic">
-                                                    Efectivo y Tarjeta
+                                                    {LEGENDS.payments}
                                                 </p>
                                             </div>
                                         </div>
@@ -173,7 +180,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                         </div>
 
                         {/*   PRODUCTOS */}
-                        <div className="lg:col-span-7 xl:col-span-8">
+                        <div className="lg:col-span-8 xl:col-span-8">
                             <Tabs defaultValue="products" className="w-full">
                                 {/* Contenedor de la lista con fondo suave y bordes muy redondeados */}
                                 <TabsList className="mb-8 inline-flex w-full items-center justify-start gap-2 rounded-[1.2rem] border-none bg-gray-100/50 p-1.5 sm:w-auto">

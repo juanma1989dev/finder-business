@@ -9,23 +9,20 @@ interface Props {
 export const InfoBusinessTab = ({ business }: Props) => {
     return (
         <div className="flex flex-col gap-8 lg:flex-row">
-            {/* COLUMNA PRINCIPAL (IZQUIERDA) */}
             <div className="flex-1 space-y-8">
-                {/* Descripción Larga */}
                 <div>
                     <h3 className="mb-3 text-sm font-black tracking-widest text-gray-400 uppercase">
                         Sobre nosotros
                     </h3>
                     <p className="text-sm leading-relaxed text-gray-600 lg:text-base">
-                        {business.long_description ||
+                        {business.description ||
                             'Este establecimiento no ha proporcionado una descripción detallada aún.'}
                     </p>
                 </div>
 
-                {/* Tags / Especialidades */}
-                {business?.tags?.length > 0 && (
+                {(business?.tags ?? []).length > 0 && (
                     <div className="flex flex-wrap gap-2">
-                        {business.tags.map((tag: string) => (
+                        {(business?.tags ?? []).map((tag: string) => (
                             <span
                                 key={tag}
                                 className="flex items-center gap-1.5 rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-[11px] font-bold text-orange-600 uppercase"
@@ -41,7 +38,7 @@ export const InfoBusinessTab = ({ business }: Props) => {
                 {business.images && business.images.length > 0 && (
                     <div className="space-y-4">
                         <h3 className="text-sm font-black tracking-widest text-gray-400 uppercase">
-                            Galería del lugar
+                            Galería
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                             {business.images.map((img, index: number) => (
@@ -61,7 +58,6 @@ export const InfoBusinessTab = ({ business }: Props) => {
                 )}
             </div>
 
-            {/* COLUMNA LATERAL (DERECHA) */}
             <div className="w-full space-y-4 lg:w-[320px]">
                 {/* Horarios */}
                 <div className="overflow-hidden rounded-[1.5rem] border border-gray-100 bg-white p-5 shadow-sm">
