@@ -3,10 +3,11 @@
 namespace App\Repositories\Contracts;
 
 use App\DTOs\SchedulesDTO;
+use App\Models\Businesses;
 
 interface BusinessRepositoryInterface extends BaseRepositoryInterface
 {
-    public function syncServices($id, array $services = []);
+    public function syncAmenities($id, array $services = []);
 
     public function syncPayments(string $id, array $payments = []);
 
@@ -18,7 +19,7 @@ interface BusinessRepositoryInterface extends BaseRepositoryInterface
 
     public function search(array $filters);
 
-    public function getFavoritesByUser(int $userId);
+    public function getDetails(int $businessId, int $userId): Businesses;
 
     public function createProductVariation(string $productId, array $variation);
 

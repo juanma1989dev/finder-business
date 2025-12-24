@@ -2,8 +2,6 @@
 
 namespace App\Repositories\Contracts;
 
-use Intervention\Image\Collection;
-
 interface ProductCategoryRepositoryInterface
 {
     /**
