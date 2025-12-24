@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('business_payment', function(Blueprint $table){
-            $table->foreignId('business_id')
+        Schema::create('businesses_payments', function(Blueprint $table){
+            $table->foreignId('businesses_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('payment_id')
+            $table->foreignId('payments_id')
                 ->constrained('payments')
                 ->cascadeOnDelete();
 
-            $table->primary(['business_id', 'payment_id']);
+            $table->primary(['businesses_id', 'payments_id']);
         });    
     }
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('business_payment');
+        Schema::drop('businesses_payments');
     }
 };

@@ -11,7 +11,9 @@ return new class extends Migration
     {
         Schema::create('business_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('business_id')->constrained('businesses')->cascadeOnDelete();
+            $table->foreignId('businesses_id')
+                ->constrained('businesses')
+                ->cascadeOnDelete();
             $table->string('url'); 
             $table->boolean('is_primary')->default(false); 
             $table->timestamps();

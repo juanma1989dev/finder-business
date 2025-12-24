@@ -14,15 +14,7 @@ return new class extends Migration
     {
         Schema::create('businesses', function (Blueprint $table) {
             $table->id();
-
-            $table->string('name');
-            $table->string('slogan')->nullable();
-            $table->mediumText('description')->nullable();
-
-            $table->string('location', 60);
-            $table->string('address', 250);
-            $table->string('phone');
-
+            
             $table->foreignId('category_id')
                 ->constrained('business_categories')
                 ->cascadeOnDelete();
@@ -31,10 +23,16 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
+            $table->string('name');
+            $table->string('slogan')->nullable();
+            $table->mediumText('description')->nullable();            
+            $table->string('phone');
             $table->boolean('use_whatsapp')->default(false);
             $table->string('cover_image', 250)->nullable();
             $table->string('tags', 250)->nullable();
 
+            $table->string('location', 60);
+            $table->string('address', 250);
             $table->geometry('cords', 'point')->nullable();
 
             $table->timestamps();
