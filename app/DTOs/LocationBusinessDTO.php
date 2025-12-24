@@ -39,6 +39,7 @@ class LocationBusinessDTO
 
         $cordsData = $data['cords'] ?? null;
 
+
         $cords = isset($cordsData['lat'], $cordsData['long'])
             ? new Cord($cordsData['lat'], $cordsData['long'])
             : null;
