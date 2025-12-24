@@ -128,7 +128,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                             <PackageSearch size={40} />
                         </div>
                         <h3 className="text-sm font-black text-gray-400 uppercase">
-                            Sin productos a la vista
+                            Sin productos registrados
                         </h3>
                         <p className="mt-1 text-[11px] font-bold tracking-widest text-gray-300 uppercase">
                             Vuelve pronto para ver novedades

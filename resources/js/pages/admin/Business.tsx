@@ -53,6 +53,8 @@ interface Props {
 }
 
 export default function Business({ businesses, catalogs }: Props) {
+    console.log(businesses);
+
     const [loadingBusinessId, setLoadingBusinessId] = useState<string | null>(
         null,
     );
@@ -71,9 +73,9 @@ export default function Business({ businesses, catalogs }: Props) {
     } = useDialog({
         initialData: {
             name: '',
-            id_category: '',
+            category_id: '',
+            slogan: '',
             description: '',
-            long_description: '',
             phone: '',
             use_whatsapp: false,
             location: '',
@@ -103,6 +105,7 @@ export default function Business({ businesses, catalogs }: Props) {
                 }
             },
             onError: (errors) => {
+                console.log(errors);
                 if (errors.general) toast.error(errors.general);
             },
         });
@@ -265,7 +268,7 @@ export default function Business({ businesses, catalogs }: Props) {
                                         {business.name}
                                     </h3>
                                     <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-slate-500">
-                                        {business.description}
+                                        {business.slogan}
                                     </p>
 
                                     <div className="mt-5 space-y-2 border-t pt-4 text-[13px] text-slate-400">
@@ -305,7 +308,6 @@ export default function Business({ businesses, catalogs }: Props) {
                 )}
             </main>
 
-            {/* Modal Refinado: Blanco y elegante con acento superior */}
             <Dialog open={open} onOpenChange={(isOpen) => !isOpen && close()}>
                 <DialogContent className="max-w-2xl overflow-hidden rounded-2xl border-t-4 border-t-orange-500 p-0">
                     <DialogHeader className="px-8 pt-8 text-left">
@@ -350,9 +352,9 @@ export default function Business({ businesses, catalogs }: Props) {
                                 Categoría
                             </Label>
                             <Select
-                                value={formBusiness.data.id_category}
+                                value={formBusiness.data.category_id}
                                 onValueChange={(v) =>
-                                    formBusiness.setData('id_category', v)
+                                    formBusiness.setData('category_id', v)
                                 }
                             >
                                 <SelectTrigger className="h-11 border-none bg-slate-50">
@@ -398,14 +400,14 @@ export default function Business({ businesses, catalogs }: Props) {
 
                         <div className="space-y-2 sm:col-span-2">
                             <Label className="font-semibold text-slate-600">
-                                Descripción corta
+                                Eslogan
                             </Label>
                             <Input
                                 className="h-11 border-none bg-slate-50 focus-visible:ring-orange-500"
-                                value={formBusiness.data.description}
+                                value={formBusiness.data.slogan}
                                 onChange={(e) =>
                                     formBusiness.setData(
-                                        'description',
+                                        'slogan',
                                         e.target.value,
                                     )
                                 }

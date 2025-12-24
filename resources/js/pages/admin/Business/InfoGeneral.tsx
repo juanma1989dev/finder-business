@@ -37,9 +37,9 @@ interface Props {
 interface BusinessForm {
     name: string;
     phone: string;
+    slogan: string;
     description: string;
-    long_description: string;
-    id_category: string | number;
+    category_id: string | number;
     amenities: number[];
     payments: number[];
     schedules: Schedules[];
@@ -53,6 +53,8 @@ export default function EditBusiness({
     payments,
     amenities,
 }: Props) {
+    console.log(business);
+
     const breadcrumbs = makeBreadCrumb({
         text: 'Información general',
         url: '#',
@@ -67,9 +69,9 @@ export default function EditBusiness({
     const form = useForm<BusinessForm>({
         name: business?.name ?? '',
         phone: business?.phone ?? '',
+        slogan: business?.slogan ?? '',
         description: business?.description ?? '',
-        long_description: business?.long_description ?? '',
-        id_category: business?.id_category ?? '',
+        category_id: business?.category_id ?? '',
         amenities: (business?.amenities ?? []).map((a) => Number(a.id)),
         payments: (business?.payments ?? []).map((p) => Number(p.id)),
         schedules: business?.schedules ?? [],
@@ -151,10 +153,10 @@ export default function EditBusiness({
                                         Categoría
                                     </Label>
                                     <select
-                                        value={data.id_category}
+                                        value={data.category_id}
                                         onChange={(e) =>
                                             setData(
-                                                'id_category',
+                                                'category_id',
                                                 e.target.value,
                                             )
                                         }
@@ -171,8 +173,8 @@ export default function EditBusiness({
 
                                 <Field
                                     label="Eslogan"
-                                    value={data.description}
-                                    onChange={(v) => setData('description', v)}
+                                    value={data.slogan}
+                                    onChange={(v) => setData('slogan', v)}
                                     full
                                     labelClass={labelStyle}
                                     inputClass={inputStyle}
@@ -243,10 +245,10 @@ export default function EditBusiness({
                                         Descripción detallada
                                     </Label>
                                     <Textarea
-                                        value={data.long_description}
+                                        value={data.description}
                                         onChange={(e) =>
                                             setData(
-                                                'long_description',
+                                                'description',
                                                 e.target.value,
                                             )
                                         }

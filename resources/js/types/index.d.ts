@@ -135,9 +135,9 @@ export interface Business {
     phone: string;
     location?: string;
     use_whatsapp: boolean;
+    slogan: string;
     description: string;
-    long_description: string;
-    id_category: string | number;
+    category_id: string | number;
     address: string;
     tags: string | string[] | null;
     cover_image?: string;
