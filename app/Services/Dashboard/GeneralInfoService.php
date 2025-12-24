@@ -23,7 +23,8 @@ class GeneralInfoService
 
     public function getInfo($idBusiness) 
     {
-        $business   = $this->businessRepository->findById($idBusiness, ['hours', 'category', 'services', 'payments']) ;
+        $business   = $this->businessRepository->findById($idBusiness, ['hours', 'category', 'amenities', 'payments']); 
+
         $amenities  = $this->amenitiesRepository->getAll();
         $payments   = $this->paymentsRepository->getAll();
         $categories = $this->businessCategoryRepository->where(['status' => true]);
@@ -40,12 +41,13 @@ class GeneralInfoService
     {
         return DB::transaction(function () use ($idBusiness, $info) {
 
-            $business = $this->businessRepository->update(
-                $idBusiness, 
-                $info->business->toArray(['user_id', 'location'])
-            );
+            $infoData = $info->business->toArray(['user_id', 'location', 'cords']);
 
-            $this->businessRepository->syncServices(
+            // dd($infoData);
+
+            $business = $this->businessRepository->update($idBusiness, $infoData);
+
+            $this->businessRepository->syncAmenities(
                 $idBusiness, 
                 $info->amenities ?? []
             );

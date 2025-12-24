@@ -7,6 +7,7 @@ use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
 use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Support\Collection;
 
 final class SearchService
@@ -15,7 +16,8 @@ final class SearchService
         private readonly BusinessRepositoryInterface $businessRepository,
         private readonly BusinessCategoryRepositoryInterface $businessCategoryRepository, 
         private readonly FavoriteBusinessRepositoryInterface $favoriteBusinessRepository,
-        private readonly ProductCategoryRepositoryInterface $productCategoryRepository
+        private readonly ProductCategoryRepositoryInterface $productCategoryRepository,
+        private readonly UserRepositoryInterface $userRepositoryInterface
     ) {}
 
     /**
@@ -69,32 +71,16 @@ final class SearchService
         ];
     }
 
-
     /**
      * Obtener detalles completos de un negocio
      */
-    public function getBusinessDetails(string $idBusiness, ?int $userId = null): array
+    public function getBusinessDetails(int $businessId, ?int $userId = null): array
     {
-        $business = $this->businessRepository->findById(
-            $idBusiness,
-            [
-                'category', 
-                'hours', 
-                'services', 
-                'payments', 
-                'socialNetworks', 
-                'productsAndServices',
-                'images'
-            ]
-        );
- 
-        $isFavorite = $userId 
-            ? $this->favoriteBusinessRepository->isFavorite($userId, $idBusiness) 
-            : false;
-         
+        $business = $this->businessRepository->getDetails($businessId, $userId);
+
         return [
-            'business' => BusinessMapper::toArray($business),
-            'favorite' => (bool) $isFavorite,
+            'business' => BusinessMapper::toArray($business), 
+            'favorite' => (bool) ($business->is_favorite ?? false)  
         ];
     }
 
@@ -103,7 +89,7 @@ final class SearchService
      */
     public function getFavoritesByUser(int $userId): Collection
     {
-        return $this->businessRepository->getFavoritesByUser($userId);
+        return $this->userRepositoryInterface->favoriteBusiness($userId);
     }
 
     /**

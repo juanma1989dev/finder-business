@@ -29,16 +29,16 @@ class BusinessService
 
     public function create(BusinessDTO $businessDTO)
     {
-        return $this->businessRepository->create(
-            $businessDTO->toArray()
-        );
+        $data = $businessDTO->toSave();
+
+        return $this->businessRepository->create( $data );
     }
 
     public function update(BusinessDTO $businessDTO, $idBusiness)
     {
         $business = $this->businessRepository->findById($idBusiness);
             
-        return $business->update($businessDTO->toArray());
+        return $business->update($businessDTO->toSave());
     }
 
     public function delete($idBusiness)

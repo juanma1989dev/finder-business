@@ -44,8 +44,7 @@ class ProductsService
         DB::transaction(function () use ($idBusiness, $product) {
 
             $data = $product->toPersistenceArray();
-            $data['id'] = (string) Str::uuid();
-
+            
             $productModel = $this->businessRepository
                 ->createProduct($idBusiness, $data);
 
