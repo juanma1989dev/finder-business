@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Dashboard\Business;
 
 use App\DTOs\NetworksDTO;
 use App\Http\Controllers\Controller;
-use App\Models\Businesses;
 use App\Services\Dashboard\NetworksService;
 use Illuminate\Http\Request;
 

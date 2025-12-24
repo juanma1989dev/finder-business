@@ -36,7 +36,7 @@ class BusinessController extends Controller
             return redirect()->back()->with('success', 'Se creó correctamente el negocio.');
 
         } catch (Throwable $e) { 
-            return back()->withErrors(['general' => 'Ocurrió un error al guardar el negocio.'  ]);
+            return back()->withErrors(['general' => 'Ocurrió un error al guardar el negocio.' .$e->getMessage()  ]);
         }
     }
 

@@ -27,7 +27,7 @@ final class BusinessController extends Controller
 
         return inertia('Index', [
             ...$data,
-            'filters' => $filters, // Retornar filtros aplicados para el frontend
+            'filters' => $filters
         ]);
     }
 
