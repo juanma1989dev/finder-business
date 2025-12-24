@@ -39,7 +39,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     public function createOrUpdate(string $businessId, string $url, bool $isPrimary = false): BusinessImage
     {
         return BusinessImage::updateOrCreate(
-            ['business_id' => $businessId, 'url' => $url],
+            ['businesses_id' => $businessId, 'url' => $url],
             ['is_primary' => $isPrimary]
         );
     }

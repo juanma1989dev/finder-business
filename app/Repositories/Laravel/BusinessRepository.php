@@ -18,10 +18,10 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         $this->model = $model;
     }
 
-    public function syncServices($id, array $services = []): Businesses
+    public function syncAmenities($id, array $services = []): Businesses
     {
         $business = $this->findById($id);
-        $business->services()->sync($services);
+        $business->amenities()->sync($services);
         
         return $business;
     }
@@ -45,7 +45,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
             
             foreach($schedules->data ?? [] as $schedule){
                 $newSchedule = $schedule->toArray();
-                $newSchedule['business_id'] = $business->id;
+                $newSchedule['businesses_id'] = $business->id;
                 $hoursData[] = $newSchedule;
             }
 
@@ -65,7 +65,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         $business = $this->findById($id);
 
         $business->socialNetworks()->updateOrCreate(
-            ['id_business' => $business->id],
+            ['businesses_id' => $business->id],
             $data
         );
     }
@@ -90,7 +90,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         $query = $this->model->query()
             ->with([
                 'category:id,name,image',
-                'productsAndServices' => fn($q) => $q->where('isActive', true)->select('id', 'business_id', 'name', 'price', 'image_url')
+                'productsAndServices' => fn($q) => $q->where('is_active', true)->select('id', 'businesses_id', 'name', 'price', 'image_url')
             ]);
 
         # Búsqueda por texto (nombre, descripción, tags)
@@ -116,7 +116,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
 
         # Filtro por categoría 
         if (!empty($filters['category'])) {
-            $query->where('id_category', $filters['category']);
+            $query->where('category_id', $filters['category']);
         }
         
         # Geolocalización con distancia (usando Spatial)
@@ -152,17 +152,17 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
     /**
      * Obtener negocios favoritos de un usuario
      */
-    public function getFavoritesByUser(int $userId): Collection
-    {
-        return $this->model
-            ->whereHas('favorites', function ($query) use ($userId) {
-                $query->where('id_user', $userId)
-                      ->where('is_favorite', true);
-            })
-            ->with(['category:id,name,image'])
-            ->orderBy('name', 'asc')
-            ->get();
-    }
+    // public function getFavoritesByUser(int $userId): Collection
+    // {
+    //     return $this->model
+    //         ->whereHas('favorites', function ($query) use ($userId) {
+    //             $query->where('id_user', $userId)
+    //                   ->where('is_favorite', true);
+    //         })
+    //         ->with(['category:id,name,image'])
+    //         ->orderBy('name', 'asc')
+    //         ->get();
+    // }
 
     /**
      * Crear variación de producto
@@ -186,4 +186,18 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
             'price' => $extra['price'],
         ]);
     }
+
+    public function getDetails(int $businessId, int $userId): Businesses
+    {
+        $relationships = ['category', 'hours', 'amenities', 'payments', 'socialNetworks', 'images']; // productsAndServices
+
+        return $this->model
+            ->with($relationships)
+            ->withExists([
+                'favorites as is_favorite' => fn ($q) =>
+                    $q->where('users.id', $userId)
+            ])
+            ->findOrFail($businessId);
+    }
+
 }

@@ -2,31 +2,32 @@
 
 namespace App\Repositories\Laravel;
 
-use App\Models\FavoriteBusiness;
+use App\Models\BusinessUser;
+use App\Models\User;
 use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
 
 class FavoriteBusinessRepository extends BaseRepository implements FavoriteBusinessRepositoryInterface
 {
     public function __construct(
-        FavoriteBusiness $model
+        BusinessUser $model
     )
     {
         $this->model = $model;
     }
 
-    public function isFavorite(int $userId, string $businessId)
+    public function setFavorite(int $userId, int $businessId, bool $isFavorite): bool
     {
-        return (bool) FavoriteBusiness::where([
-            'id_user' => $userId,
-            'id_business' => $businessId,
-        ])->value('is_favorite') ?? false;
-    }
+        $user = User::findOrFail($userId);
 
-    public function setFavorite(int $userId, string $businessId, bool $isFavorite): bool
-    {
-        return (bool) $this->model->newQuery()->updateOrInsert(
-            ['id_user' => $userId, 'id_business' => $businessId],
-            ['is_favorite' => $isFavorite]
-        );
-    } 
+        $exists = $user->businesses()
+            ->wherePivot('businesses_id', $businessId)
+            ->exists();
+
+
+        $user->businesses()->syncWithoutDetaching([
+            $businessId => ['is_favorite' => $isFavorite],
+        ]);
+
+        return $exists;
+    }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Repositories\Laravel;
 
-use App\Models\Services;
+use App\Models\Amenity;
 use App\Repositories\Contracts\AmenitiesRepositoryInterface;
 
 class AmenitiesRepository extends BaseRepository implements AmenitiesRepositoryInterface
 {
-    public function __construct(Services $model)
+    public function __construct(Amenity $model)
     {
         $this->model = $model;     
     }
