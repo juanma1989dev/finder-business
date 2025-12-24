@@ -20,7 +20,7 @@ class SetFavoriteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_business' => ['required', 'string', 'exists:businesses,id'],
+            'id_business' => ['required'],
             'favorite' => ['required', 'boolean'],
         ];
     }
