@@ -183,7 +183,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                         <div className="lg:col-span-8 xl:col-span-8">
                             <Tabs defaultValue="products" className="w-full">
                                 {/* Contenedor de la lista con fondo suave y bordes muy redondeados */}
-                                <TabsList className="mb-8 inline-flex w-full items-center justify-start gap-2 rounded-[1.2rem] border-none bg-gray-100/50 p-1.5 sm:w-auto">
+                                <TabsList className="inline-flex w-full items-center justify-start gap-2 rounded-[1.2rem] border-none bg-gray-100/50 p-1.5 sm:w-auto">
                                     <TabsTrigger
                                         value="products"
                                         className="flex items-center gap-2 rounded-[1rem] px-6 py-2 text-xs font-black tracking-wider uppercase transition-all duration-300 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:bg-gray-200/50"
