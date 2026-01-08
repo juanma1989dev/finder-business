@@ -60,7 +60,7 @@ class GoogleAuthService
             'email'     => $googleUser->getEmail(),
             'google_id' => $googleUser->getId(),
             'password'              => bcrypt(Str::random(16)),
-            'accepted_privacy'      => true,
+            'privacy_accepted'      => true,
             'privacy_version'       => config('privacy.version'),
             'privacy_accepted_at'   => now(),
         ]);
