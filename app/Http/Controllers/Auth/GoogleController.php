@@ -12,7 +12,8 @@ class GoogleController extends Controller
 {
     public function __construct(
         private GoogleAuthService $googleAuthService
-    ) {}
+    ) {
+    }
 
     /**
      * Redirige al usuario a Google para login
@@ -50,9 +51,9 @@ class GoogleController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
             $action = $this->googleAuthService->getAndForgetAuthAction();
-            
-            $result = $this->googleAuthService->handleGoogleAuthentication($googleUser, $action);
 
+            $result = $this->googleAuthService->handleGoogleAuthentication($googleUser, $action);
+            
             if (!$result['success']) {
                 return redirect()
                     ->route($result['redirect'])
@@ -68,6 +69,9 @@ class GoogleController extends Controller
             return $redirect;
 
         } catch (Throwable $e) {
+
+            // dd( $e->getMessage(), $e->getTrace() );
+
             $this->googleAuthService->clearAuthAction();
             
             return redirect()
