@@ -19,9 +19,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('type')->default('client');
+
             $table->string('google_id')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->boolean('accepted_privacy')->default(false);
+            $table->boolean('privacy_accepted')->default(false);
             $table->string('privacy_version')->nullable();
             $table->timestamp('privacy_accepted_at')->nullable();
             $table->string('password');
