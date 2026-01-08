@@ -29,16 +29,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
             <Header />
 
-            <div className="relative z-10 w-full max-w-6xl p-1 pb-32 md:mx-auto md:max-w-7xl md:p-6">
+            <div className="relative z-10 w-full max-w-6xl p-1 md:mx-auto md:max-w-7xl">
                 {children}
             </div>
 
             {user && (
                 <>
-                    {/* CONTENEDOR DE POSICIÓN:
-                        - En móvil (default): bottom-24 (96px del suelo) lo sube por encima del menú.
-                        - En escritorio (md): bottom-8 (32px del suelo) vuelve a su sitio.
-                    */}
                     <div className="fixed right-4 bottom-24 z-[40] transition-all duration-300 ease-out md:right-8 md:bottom-8">
                         <CartFloatButton
                             totalItems={totalItems}

@@ -1,55 +1,54 @@
 import { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Home, ShieldCheck } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {
     title?: string;
+    subTitle?: string;
     description?: string;
+    bannerImage: string;
 }
 
 export default function AuthLayout({
     children,
     title,
+    subTitle,
     description,
+    bannerImage,
 }: PropsWithChildren<AuthLayoutProps>) {
     const pageData = usePage<SharedData>();
     const { name: nameApp } = pageData.props;
 
     return (
-        <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-100 via-white to-gray-100">
-            {/* Background decoration */}
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.04),transparent_60%)]" />
-
-            <div className="relative z-10 mx-auto flex w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-xl">
-                {/* Left column */}
+        <div className="relative mt-10 flex flex-col items-center justify-center space-y-10 p-5">
+            <h1 className="text-2xl font-semibold text-gray-700">{title}</h1>
+            <div className="relative z-10 mx-auto flex w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-xl">
                 <div className="relative hidden w-1/2 flex-col justify-between justify-center bg-gradient-to-br from-orange-600 to-orange-500 p-10 text-white md:flex">
-                    <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10" />
+                    <div className="absolute inset-0 opacity-10" />
 
                     <div className="relative">
                         <img
-                            src="/logo.webp"
+                            src={bannerImage}
                             alt="Logo"
                             className="mb-10 h-60 w-full object-cover"
                         />
 
                         <h2 className="mb-3 text-2xl leading-tight font-semibold">
-                            Bienvenido a nuestra plataforma
+                            Bienvenido
                         </h2>
                         <p className="max-w-sm text-sm text-orange-100">
-                            Gestiona tus pedidos, negocios y servicios de forma
-                            segura y sencilla desde un solo lugar.
+                            {description}
                         </p>
                     </div>
 
                     <div className="relative mt-5 flex items-center gap-2 text-xs text-orange-100">
-                        <ShieldCheck className="h-4 w-4" />
+                        {/* <ShieldCheck className="h-4 w-4" /> */}
                         {/* Tus datos están protegidos conforme a la ley */}
                     </div>
                 </div>
 
-                {/* Right column */}
-                <div className="flex w-full flex-col justify-center px-6 py-10 sm:px-10 md:w-1/2">
+                <div className="flex w-full flex-col justify-center px-6 py-10 md:w-1/2 md:px-10">
                     <div className="mx-auto w-full max-w-sm">
                         <Link
                             href="/"
@@ -60,11 +59,10 @@ export default function AuthLayout({
                         </Link>
 
                         <div className="mb-8 space-y-2">
-                            <h1 className="text-2xl font-semibold text-gray-900">
-                                {title}
-                            </h1>
-                            {description && (
-                                <p className="text-gray-500">{description}</p>
+                            {subTitle && (
+                                <h3 className="text-xl font-semibold text-gray-500">
+                                    {subTitle}
+                                </h3>
                             )}
                         </div>
 
