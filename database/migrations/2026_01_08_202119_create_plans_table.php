@@ -49,7 +49,7 @@ return new class extends Migration
         ];
 
         foreach($categories as $category){
-            DB::table('amenities')->insert($category);
+            DB::table('plans')->insert($category);
         }
     }
 
