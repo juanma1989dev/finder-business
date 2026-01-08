@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
 
             $table->string('name')->unique();
+            $table->string('description')->nullable();
 
             $table->unsignedInteger('max_businesses')->default(1);
 
@@ -32,6 +33,7 @@ return new class extends Migration
         $categories = [
              [
                 'name' => PlanTypeEnum::NORMAL,
+                'description' => 'Plan básico para administrar un negocio.',
                 'max_businesses' => 1,
                 'advanced_stats' => false,
                 'featured' => false,
@@ -40,6 +42,7 @@ return new class extends Migration
             ],
             [
                 'name' => PlanTypeEnum::PREMIUM,
+                'description' => 'Plan premium para administrar múltiples negocios.',
                 'max_businesses' => 5,
                 'advanced_stats' => true,
                 'featured' => true,
