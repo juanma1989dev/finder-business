@@ -7,7 +7,11 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight, Info, ShieldCheck, X } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Register() {
+interface Props {
+    typeUser: string;
+}
+
+export default function Register({ typeUser }: Props) {
     const { flash } = usePage<SharedData>().props;
     const [acceptPrivacy, setAcceptPrivacy] = useState(false);
     const [open, setOpen] = useState(false);
@@ -16,7 +20,7 @@ export default function Register() {
         if (!acceptPrivacy) return;
         router.post(
             '/session/privacy-accept',
-            {},
+            { typeUser },
             {
                 onSuccess: () => {
                     window.location.href = '/auth/google/register';

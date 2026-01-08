@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth\Client;
 
+use App\Enums\UserTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -20,7 +21,9 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('auth/client/register');
+        return inertia('auth/client/register', [
+            'typeUser' => UserTypeEnum::CLIENT,
+        ]);
     }
 
     /**
