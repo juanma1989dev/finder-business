@@ -1,0 +1,69 @@
+import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
+
+import { GoogleButtonRegister } from '@/components/app/GoogleButtonRegsiter';
+import MainLayout from '@/layouts/main-layout';
+import { SharedData } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { AlertCircle, ArrowRight } from 'lucide-react';
+
+export default function Login() {
+    const { flash } = usePage<SharedData>().props;
+
+    return (
+        <MainLayout>
+            <AuthLayoutTemplate
+                title="Ingresar como negocio"
+                subTitle="Inicia sesión para gestionar tu negocio"
+                description="Gestiona tu negocio sencilla desde un solo lugar."
+                bannerImage="/images/banner_negocio.webp"
+            >
+                <Head title="Iniciar sesión" />
+
+                {flash?.error && (
+                    <div className="mb-6 flex items-center gap-3 rounded-2xl border border-red-100 bg-red-50/50 p-4 text-[12px] font-bold text-red-600 animate-in fade-in slide-in-from-top-2">
+                        <AlertCircle size={18} />
+                        <p>{flash.error}</p>
+                    </div>
+                )}
+
+                <div className="flex flex-col">
+                    <div className="group relative">
+                        <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-r from-orange-400 to-purple-500 opacity-20 blur transition duration-1000 group-hover:opacity-40" />
+                        <div className="relative">
+                            <GoogleButtonRegister
+                                label="Continuar con Google"
+                                onClick={() => {
+                                    window.location.href = '/auth/google/login';
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="relative flex items-center py-2">
+                        <div className="flex-grow border-t border-gray-100"></div>
+                        {/* <span className="mx-4 flex-shrink text-[10px] font-black tracking-[0.2em] text-gray-300 uppercase">
+                        O accede con tu cuenta
+                    </span> */}
+                        <div className="flex-grow border-t border-gray-100"></div>
+                    </div>
+
+                    <div className="text-center">
+                        <p className="text-[11px] font-bold tracking-wider text-gray-400 uppercase">
+                            ¿Aún no tienes una cuenta?
+                        </p>
+                        <Link
+                            href="/business/register"
+                            className="group mt-4 inline-flex items-center gap-2 rounded-xl bg-orange-50 px-6 py-3 text-[12px] font-black tracking-tighter text-orange-600 uppercase transition-all hover:bg-orange-100 active:scale-95"
+                        >
+                            Crear cuenta de negocio
+                            <ArrowRight
+                                size={14}
+                                className="transition-transform group-hover:translate-x-1"
+                            />
+                        </Link>
+                    </div>
+                </div>
+            </AuthLayoutTemplate>
+        </MainLayout>
+    );
+}
