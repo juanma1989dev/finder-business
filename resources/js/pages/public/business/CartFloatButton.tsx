@@ -25,7 +25,7 @@ export const CartFloatButton = ({ totalItems, onClick }: Props) => {
                 <span className="text-[10px] font-bold tracking-wider text-gray-800 uppercase">
                     Tu Carrito
                 </span>
-                <span className="text-xs text-gray-800">Ver pedido</span>
+                {/* <span className="text-xs text-gray-800">Ver pedido</span> */}
             </div>
         </button>
     );
