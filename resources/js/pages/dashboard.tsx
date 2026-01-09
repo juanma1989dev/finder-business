@@ -1,6 +1,14 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
-import { Bike, Check, CheckCircle, Clock, Power, Search } from 'lucide-react';
+import {
+    Bike,
+    Check,
+    CheckCircle,
+    Clock,
+    Power,
+    Search,
+    Utensils,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 export default function OrderManagement() {
@@ -63,7 +71,7 @@ export default function OrderManagement() {
         );
     };
 
-    const building = true;
+    const building = true; ////// MANEJA SI SE PUEDE VER LA SECCION
 
     return (
         <AppLayout
@@ -131,10 +139,10 @@ export default function OrderManagement() {
 
                         <div className="flex items-center gap-3">
                             {/* Funcionalidad C: Acceso rápido a inventario */}
-                            {/* <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">
-                            <Utensils className="h-4 w-4" />
-                            <span>Menú</span>
-                        </button> */}
+                            <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">
+                                <Utensils className="h-4 w-4" />
+                                <span>Menú</span>
+                            </button>
 
                             <button
                                 onClick={() =>
