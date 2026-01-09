@@ -10,15 +10,17 @@ use App\Http\Controllers\Dashboard\Business\LocationController;
 use App\Http\Controllers\Dashboard\IndexController; 
 use Illuminate\Support\Facades\Route; 
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [IndexController::class, 'index'])->name('dashboard');  
+});
+
+
+Route::middleware(['auth', 'verified', 'business'])->group(function () {
 
     // Route::get('/dashboard/profile/business', [BusinessController::class, 'index'])->name('dashboard.business');
     // Route::get('/dashboard/business/create', [BusinessController::class, 'create'])->name('dashboard.business.create');
     // Route::post('/dashboard/business/create', [BusinessController::class, 'store'])->name('dashboard.business.store');
 
-    
-    
     Route::post('/dashboard/business/update-cover-image/{idBusiness}', [BusinessController::class, 'updateCoverImage']);
     Route::resource('/dashboard/business', BusinessController ::class);
 
