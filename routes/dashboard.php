@@ -16,11 +16,6 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::middleware(['auth', 'verified', 'business'])->group(function () {
-
-    // Route::get('/dashboard/profile/business', [BusinessController::class, 'index'])->name('dashboard.business');
-    // Route::get('/dashboard/business/create', [BusinessController::class, 'create'])->name('dashboard.business.create');
-    // Route::post('/dashboard/business/create', [BusinessController::class, 'store'])->name('dashboard.business.store');
-
     Route::post('/dashboard/business/update-cover-image/{idBusiness}', [BusinessController::class, 'updateCoverImage']);
     Route::resource('/dashboard/business', BusinessController ::class);
 
