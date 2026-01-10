@@ -1,12 +1,11 @@
-import { Head } from '@inertiajs/react';
-
 import AppearanceTabs from '@/components/appearance-tabs';
 import HeadingSmall from '@/components/heading-small';
-import { type BreadcrumbItem } from '@/types';
-
-import AppLayout from '@/layouts/app-layout';
+import DashboardLayout from '@/layouts/dashboard-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+
 import { edit as editAppearance } from '@/routes/appearance';
+import { type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,7 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Appearance() {
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <DashboardLayout breadcrumbs={breadcrumbs}>
             <Head title="Configuración de apariencia" />
 
             <SettingsLayout>
@@ -29,6 +28,6 @@ export default function Appearance() {
                     <AppearanceTabs />
                 </div>
             </SettingsLayout>
-        </AppLayout>
+        </DashboardLayout>
     );
 }

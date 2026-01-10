@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import AppLayout from '@/layouts/app-layout';
+import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { LoaderCircle, LucideIcon, Save } from 'lucide-react';
@@ -29,7 +29,7 @@ export const LayoutBusinessModules = ({
     children,
 }: Props) => {
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <DashboardLayout breadcrumbs={breadcrumbs}>
             <Head title={titleHead} />
 
             <div className="mx-auto w-full px-4 py-4 sm:px-6 lg:px-8">
@@ -70,6 +70,6 @@ export const LayoutBusinessModules = ({
                     {children}
                 </main>
             </div>
-        </AppLayout>
+        </DashboardLayout>
     );
 };

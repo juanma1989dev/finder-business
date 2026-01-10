@@ -1,4 +1,4 @@
-import AppLayout from '@/layouts/app-layout';
+import DashboardLayout from '@/layouts/dashboard-layout';
 import { dashboard } from '@/routes';
 import { BreadcrumbItem, SharedData } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
@@ -62,7 +62,7 @@ export default function ValidateCode({ success, code }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <DashboardLayout breadcrumbs={breadcrumbs}>
             <ToastContainer />
             <Head title="Dashboard - validar código" />
 
@@ -71,6 +71,6 @@ export default function ValidateCode({ success, code }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border"></div>
             </div>
-        </AppLayout>
+        </DashboardLayout>
     );
 }

@@ -33,12 +33,12 @@ import {
     ChevronRight,
     Edit,
     ExternalLink,
-    Home,
     Loader2,
     MapPin,
     MoreVertical,
     Plus,
     Save,
+    Search,
     Store,
     Trash2,
 } from 'lucide-react';
@@ -149,26 +149,33 @@ export default function Business({ businesses, catalogs }: Props) {
                             className="text-slate-500 hover:bg-orange-50 hover:text-orange-600"
                         >
                             <Link href="/">
-                                <Home className="mr-2 h-4 w-4" />
+                                <Search className="mr-2 h-4 w-4" />
                                 <span className="hidden sm:inline">
                                     Buscador
                                 </span>
                             </Link>
                         </Button>
+
                         {businesses.length < 10 && (
-                            <Button
-                                onClick={openForCreate}
-                                className="rounded-lg bg-orange-600 shadow-md transition-all hover:bg-orange-700 active:scale-95"
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Nuevo negocio
-                            </Button>
+                            <>
+                                <p className="mx-2 text-gray-500">
+                                    |(COLOCAL VALIDACION)
+                                </p>
+
+                                <Button
+                                    onClick={openForCreate}
+                                    className="rounded-lg bg-orange-500 shadow-md transition-all hover:bg-orange-600 active:scale-95"
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Nuevo negocio
+                                </Button>
+                            </>
                         )}
                     </div>
                 </div>
             </header>
 
-            <main className="container mx-auto px-6 py-10">
+            <main className="container mx-auto px-2 py-4">
                 {businesses.length === 0 ? (
                     <div className="flex min-h-[400px] flex-col items-center justify-center rounded-3xl border border-slate-100 bg-white p-12 text-center shadow-sm">
                         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-orange-50">
@@ -189,121 +196,131 @@ export default function Business({ businesses, catalogs }: Props) {
                         </Button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {businesses.map((business: any) => (
-                            <div
-                                key={business.id}
-                                className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-orange-100/50"
+                    <div className="flex flex-col space-y-5">
+                        <p>
+                            <Link
+                                href="/dashboard"
+                                className="rounded-lg bg-orange-500 p-2 text-white shadow-md transition-all hover:bg-orange-600 active:scale-95"
                             >
-                                {/* Imagen con Overlay Suave */}
-                                <div className="relative aspect-[16/9] overflow-hidden">
-                                    <img
-                                        src={
-                                            business.cover_image
-                                                ? `/storage/${business.cover_image}`
-                                                : `/images/${business.category.image}`
-                                        }
-                                        alt={business.name}
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                                    <Badge className="absolute bottom-3 left-3 border-none bg-white/20 text-white backdrop-blur-md">
-                                        {business.category.name}
-                                    </Badge>
+                                Panel de control
+                            </Link>
+                        </p>
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {businesses.map((business: any) => (
+                                <div
+                                    key={business.id}
+                                    className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-orange-100/50"
+                                >
+                                    {/* Imagen con Overlay Suave */}
+                                    <div className="relative aspect-[16/9] overflow-hidden">
+                                        <img
+                                            src={
+                                                business.cover_image
+                                                    ? `/storage/${business.cover_image}`
+                                                    : `/images/${business.category.image}`
+                                            }
+                                            alt={business.name}
+                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                                        <Badge className="absolute bottom-3 left-3 border-none bg-white/20 text-white backdrop-blur-md">
+                                            {business.category.name}
+                                        </Badge>
 
-                                    <div className="absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    size="icon"
-                                                    variant="secondary"
-                                                    className="h-8 w-8 rounded-full shadow-lg"
-                                                >
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem
-                                                    onClick={() =>
-                                                        openForEdit(
-                                                            business.id,
-                                                            business,
-                                                        )
-                                                    }
-                                                >
-                                                    <Edit className="mr-2 h-4 w-4 text-orange-600" />{' '}
-                                                    Editar
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem asChild>
-                                                    <Link
-                                                        href={`/business/detail/${business.id}`}
-                                                        target="_blank"
+                                        <div className="absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        size="icon"
+                                                        variant="secondary"
+                                                        className="h-8 w-8 rounded-full shadow-lg"
                                                     >
-                                                        <ExternalLink className="mr-2 h-4 w-4" />{' '}
-                                                        Público
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onClick={() => {
-                                                        setBusinessToDelete(
-                                                            business.id,
-                                                        );
-                                                        setConfirmDeleteOpen(
-                                                            true,
-                                                        );
-                                                    }}
-                                                    className="text-red-600"
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />{' '}
-                                                    Eliminar
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-1 flex-col p-5">
-                                    <h3 className="text-lg font-bold text-slate-800 transition-colors group-hover:text-orange-600">
-                                        {business.name}
-                                    </h3>
-                                    <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-slate-500">
-                                        {business.slogan}
-                                    </p>
-
-                                    <div className="mt-5 space-y-2 border-t pt-4 text-[13px] text-slate-400">
-                                        <div className="flex items-center gap-2">
-                                            <MapPin
-                                                size={14}
-                                                className="text-orange-500"
-                                            />
-                                            <span className="truncate">
-                                                {business.address}
-                                            </span>
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        onClick={() =>
+                                                            openForEdit(
+                                                                business.id,
+                                                                business,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Edit className="mr-2 h-4 w-4 text-orange-600" />{' '}
+                                                        Editar
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link
+                                                            href={`/business/detail/${business.id}`}
+                                                            target="_blank"
+                                                        >
+                                                            <ExternalLink className="mr-2 h-4 w-4" />{' '}
+                                                            Público
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() => {
+                                                            setBusinessToDelete(
+                                                                business.id,
+                                                            );
+                                                            setConfirmDeleteOpen(
+                                                                true,
+                                                            );
+                                                        }}
+                                                        className="text-red-600"
+                                                    >
+                                                        <Trash2 className="mr-2 h-4 w-4" />{' '}
+                                                        Eliminar
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </div>
                                     </div>
 
-                                    {/* Botón Mejorado: Naranja pero no negro */}
-                                    <Button
-                                        asChild
-                                        className="mt-6 w-full border border-orange-100 bg-orange-50 font-bold text-orange-700 shadow-none transition-all duration-300 hover:bg-orange-600 hover:text-white"
-                                    >
-                                        <Link
-                                            href={`/dashboard/business/${business.id}/info-general`}
-                                        >
-                                            Gestionar Panel
-                                            <ChevronRight className="ml-1 h-4 w-4" />
-                                        </Link>
-                                    </Button>
-                                </div>
+                                    <div className="flex flex-1 flex-col p-5">
+                                        <h3 className="text-lg font-bold text-slate-800 transition-colors group-hover:text-orange-600">
+                                            {business.name}
+                                        </h3>
+                                        <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-slate-500">
+                                            {business.slogan}
+                                        </p>
 
-                                {loadingBusinessId === business.id && (
-                                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-                                        <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+                                        <div className="mt-5 space-y-2 border-t pt-4 text-[13px] text-slate-400">
+                                            <div className="flex items-center gap-2">
+                                                <MapPin
+                                                    size={14}
+                                                    className="text-orange-500"
+                                                />
+                                                <span className="truncate">
+                                                    {business.address}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Botón Mejorado: Naranja pero no negro */}
+                                        <Button
+                                            asChild
+                                            className="mt-6 w-full border border-orange-100 bg-orange-50 font-bold text-orange-700 shadow-none transition-all duration-300 hover:bg-orange-600 hover:text-white"
+                                        >
+                                            <Link
+                                                href={`/dashboard/business/${business.id}/info-general`}
+                                            >
+                                                Gestionar Panel
+                                                <ChevronRight className="ml-1 h-4 w-4" />
+                                            </Link>
+                                        </Button>
                                     </div>
-                                )}
-                            </div>
-                        ))}
+
+                                    {loadingBusinessId === business.id && (
+                                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+                                            <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </main>

@@ -1,6 +1,6 @@
 import GenerateCode from '@/components/app/create-code/generate';
 import CodeValidation from '@/components/app/create-code/validate';
-import AppLayout from '@/layouts/app-layout';
+import DashboardLayout from '@/layouts/dashboard-layout';
 import { dashboard } from '@/routes';
 import { BreadcrumbItem, SharedData } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
@@ -31,7 +31,7 @@ export default function ConfirmCode({ numBusiness }: Props) {
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <DashboardLayout breadcrumbs={breadcrumbs}>
             <ToastContainer />
             <Head title="Dashboard - Nuevo negocio - " />
 
@@ -51,6 +51,6 @@ export default function ConfirmCode({ numBusiness }: Props) {
                     )}
                 </div>
             </div>
-        </AppLayout>
+        </DashboardLayout>
     );
 }

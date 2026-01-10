@@ -1,4 +1,4 @@
-import AppLayout from '@/layouts/app-layout';
+import DashboardLayout from '@/layouts/dashboard-layout';
 import { Head } from '@inertiajs/react';
 import {
     Bike,
@@ -74,13 +74,13 @@ export default function OrderManagement() {
     const building = true; ////// MANEJA SI SE PUEDE VER LA SECCION
 
     return (
-        <AppLayout
+        <DashboardLayout
             breadcrumbs={[{ title: 'Panel de Control', href: '/admin' }]}
         >
             <Head title="Gestión de Pedidos" />
 
             {building ? (
-                <div className="flex min-h-[400px] w-full flex-col items-center justify-center rounded-[2.5rem] border border-slate-100 bg-white p-8 text-center shadow-sm">
+                <div className="m-4 flex min-h-[400px] w-full flex-col items-center justify-center rounded-[2.5rem] border border-slate-100 bg-white p-5 text-center shadow-sm">
                     {/* Icono Animado Minimalista */}
                     <div className="relative mb-6">
                         <div className="absolute inset-0 animate-ping rounded-full bg-orange-100 opacity-75"></div>
@@ -243,7 +243,7 @@ export default function OrderManagement() {
                     </div>
                 </div>
             )}
-        </AppLayout>
+        </DashboardLayout>
     );
 }
 

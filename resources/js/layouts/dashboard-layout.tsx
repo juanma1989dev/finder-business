@@ -6,12 +6,12 @@ import { ToastContainer, toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-interface AppLayoutProps {
+interface DashboardLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
 }
 
-export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
+export default ({ children, breadcrumbs, ...props }: DashboardLayoutProps) => {
     const { flash } = usePage<{ flash: { error?: string; success?: string } }>()
         .props;
 
