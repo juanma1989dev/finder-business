@@ -12,10 +12,10 @@ export function UserInfo({
     const getInitials = useInitials();
 
     const user2 = {
-        avatar : '',
-        name : 'Juan',
-        email : ''
-    }
+        avatar: '',
+        name: 'Juan',
+        email: '',
+    };
 
     return (
         <>
@@ -29,7 +29,7 @@ export function UserInfo({
                 <span className="truncate font-medium">{user2.name}</span>
                 {showEmail && (
                     <span className="truncate text-xs text-muted-foreground">
-                        {user2.email}aaaaaaaa
+                        {user2.email}
                     </span>
                 )}
             </div>
