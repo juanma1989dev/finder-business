@@ -16,8 +16,7 @@ class EnsureBusinessUser
     {
         $user = $request->user();
 
-        // Verificamos si no hay usuario o si el tipo no es BUSINESS
-        if (!$user || $user->type !== UserTypeEnum::BUSINESS) {
+        if (!$user || $user->type !== UserTypeEnum::BUSINESS->value) {
             return redirect()->route('dashboard')->with('error', 'No tienes permiso para acceder a esta sección.'); 
         }
 
