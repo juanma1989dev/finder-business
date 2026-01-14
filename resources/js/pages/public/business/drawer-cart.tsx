@@ -193,7 +193,7 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                                     className="group flex w-full items-center justify-between rounded-xl bg-orange-500 p-1.5 pl-6 shadow-lg shadow-orange-100 transition-all hover:bg-orange-600 active:scale-[0.98]"
                                 >
                                     <span className="text-[12px] font-black tracking-wider text-white uppercase">
-                                        Finalizar Compra
+                                        Finalizar orden
                                     </span>
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20 text-white transition-transform group-hover:translate-x-0.5">
                                         <ArrowRight size={18} />
