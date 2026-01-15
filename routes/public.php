@@ -13,4 +13,5 @@ Route::get('/business/detail/{id}', [BusinessController::class, 'details'])->nam
 Route::prefix('/shopping-cart')->group(function() {
     Route::get('/details', [ShoppingCartController::class, 'index'])->name('shopping.cart.details'); // change for show
     Route::post('/', [ShoppingCartController::class, 'create'])->name('shopping.cart.create');
+    Route::get('/{id}', [ShoppingCartController::class, 'show'])->name('shopping.cart.show');
 });
