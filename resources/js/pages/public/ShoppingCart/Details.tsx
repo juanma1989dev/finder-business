@@ -1,14 +1,13 @@
 import MainLayout from '@/layouts/main-layout';
 import { useCartStore } from '@/store/cart.store';
 import { CartItem } from '@/types';
-import { router } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import {
     ArrowLeft,
     ChevronRight,
     MessageSquare,
     Minus,
     Plus,
-    ShieldCheck,
     ShoppingBag,
     Trash2,
 } from 'lucide-react';
@@ -17,6 +16,11 @@ export default function Details() {
     const { items, updateNotes, updateQuantity, removeItem, getTotalPrice } =
         useCartStore();
     const totalPrice = getTotalPrice();
+
+    const { post, processing, transform } = useForm({
+        total: 0,
+        items: [] as CartItem[],
+    });
 
     const getItemUnitPrice = (item: CartItem) => {
         const basePrice = Number(item.price) || 0;
@@ -29,6 +33,23 @@ export default function Details() {
             0,
         );
         return basePrice + extrasTotal + variationsTotal;
+    };
+
+    const handleConfirmOrder = () => {
+        if (items.length === 0) return;
+
+        transform((data) => ({
+            ...data,
+            items: items,
+            total: getTotalPrice(),
+        }));
+
+        post('/shopping-cart', {
+            preserveScroll: true,
+            onSuccess: (res) => {
+                console.log({ res });
+            },
+        });
     };
 
     return (
@@ -69,7 +90,6 @@ export default function Details() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                        {/* LISTA DE PRODUCTOS - Card con rounded-2xl */}
                         <div className="space-y-3 lg:col-span-2">
                             {items.map((item) => {
                                 const unitPrice = getItemUnitPrice(item);
@@ -231,13 +251,17 @@ export default function Details() {
                                                 Envío
                                             </span>
                                             <span className="text-orange-500">
-                                                Gratis
+                                                Gratis ************
                                             </span>
                                         </div>
                                     </div>
 
                                     {/* Botón Acción - Menos inflado */}
-                                    <button className="mt-6 flex w-full items-center justify-between rounded-xl bg-orange-500 p-1.5 pl-5 transition-all hover:bg-orange-600 active:scale-[0.98]">
+                                    <button
+                                        disabled={processing}
+                                        className="mt-6 flex w-full items-center justify-between rounded-xl bg-orange-500 p-1.5 pl-5 transition-all hover:bg-orange-600 active:scale-[0.98]"
+                                        onClick={handleConfirmOrder}
+                                    >
                                         <span className="text-[12px] font-black tracking-wider text-white uppercase">
                                             Confirmar Orden
                                         </span>
@@ -246,7 +270,7 @@ export default function Details() {
                                         </div>
                                     </button>
 
-                                    <div className="mt-4 flex items-center justify-center gap-2">
+                                    {/* <div className="mt-4 flex items-center justify-center gap-2">
                                         <ShieldCheck
                                             size={12}
                                             className="text-green-500"
@@ -254,7 +278,7 @@ export default function Details() {
                                         <span className="text-[9px] font-black tracking-widest text-gray-300 uppercase">
                                             Seguro
                                         </span>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>
