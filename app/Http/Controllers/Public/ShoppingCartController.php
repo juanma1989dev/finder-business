@@ -11,7 +11,7 @@ class ShoppingCartController extends Controller
 {
     public function index()
     {
-        return inertia('public/ShoppingCart/Details');
+        return inertia('public/ShoppingCart/DetailsPage');
     }
 
     public function create(Request $request, CreateOrderAction $action)

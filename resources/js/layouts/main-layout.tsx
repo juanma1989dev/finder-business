@@ -1,4 +1,3 @@
-import { useCartStore } from '@/store/cart.store';
 import { usePage } from '@inertiajs/react';
 import { ReactNode, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
@@ -7,16 +6,18 @@ import BottomMenu from '@/components/app/BottomMenu';
 import Header from '@/components/app/Header';
 import { CartFloatButton } from '@/pages/public/business/CartFloatButton';
 import { CartDrawer } from '@/pages/public/business/drawer-cart';
+import { SharedData } from '@/types';
 
 interface MainLayoutProps {
     children: ReactNode;
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-    const { auth } = usePage().props as any;
-    const user = auth?.user;
     const [isCartOpen, setIsCartOpen] = useState(false);
-    const items = useCartStore((state) => state.items);
+
+    const { cart, auth } = usePage<SharedData>().props;
+    const items = Object.values(cart);
+    const user = auth?.user;
     const totalItems = items.length;
 
     return (

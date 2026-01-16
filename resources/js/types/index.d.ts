@@ -35,6 +35,7 @@ export interface SharedData {
     auth: Auth;
     sidebarOpen: boolean;
     flash?: FlashData;
+    cart: Record<string, CartItem>;
     [key: string]: unknown;
 }
 

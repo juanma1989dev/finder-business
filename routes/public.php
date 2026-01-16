@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Public\BusinessController;
 use App\Http\Controllers\Public\ShoppingCartController;
+use App\Http\Controllers\CartController;
 
 Route::get('/', [BusinessController::class, 'index'])->name('public.home');
 Route::get('/favorites', [BusinessController::class, 'favorites'])->name('public.favorites');
@@ -15,3 +16,7 @@ Route::prefix('/shopping-cart')->group(function() {
     Route::post('/', [ShoppingCartController::class, 'create'])->name('shopping.cart.create');
     Route::get('/{id}', [ShoppingCartController::class, 'show'])->name('shopping.cart.show');
 });
+
+Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+Route::patch('/cart/{key}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{key}', [CartController::class, 'destroy'])->name('cart.destroy');
