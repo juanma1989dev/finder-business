@@ -79,6 +79,8 @@ class CreateOrderAction
 
             $this->orderRepository->updateTotals($order, $subtotal);
 
+            session()->pull('cart', []);
+
             return $order;
         });
     }

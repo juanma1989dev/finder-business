@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use App\Models\BusinessProduct;
 
 class CartController extends Controller
 {
@@ -89,10 +88,15 @@ class CartController extends Controller
     {
         $extras = $item['extras'] ?? [];
         $variations = $item['variations'] ?? [];
-        // Sort to ensure key is consistent
-        if ($extras) ksort($extras);
-        if ($variations) ksort($variations);
 
-        return $item['id'] . '-' . json_encode($extras) . '-' . json_encode($variations);
+        ksort($extras);
+        ksort($variations);
+
+        return sha1(
+            $item['id'] .
+            json_encode($extras) .
+            json_encode($variations)
+        );
     }
+
 }

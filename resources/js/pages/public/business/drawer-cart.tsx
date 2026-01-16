@@ -1,7 +1,3 @@
-import {
-    removeItem,
-    updateItem,
-} from '@/actions/App/Http/Controllers/CartController';
 import { router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -35,11 +31,25 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
     }, [items]);
 
     const increment = (item: any) => {
-        updateItem(item.key, { quantity: item.quantity + 1 });
+        router.patch(
+            `/cart/${item.key}`,
+            { quantity: item.quantity + 1 },
+            { preserveScroll: true },
+        );
     };
 
     const decrement = (item: any) => {
-        updateItem(item.key, { quantity: item.quantity - 1 });
+        router.patch(
+            `/cart/${item.key}`,
+            { quantity: item.quantity - 1 },
+            { preserveScroll: true },
+        );
+    };
+
+    const removeItem = (key: string) => {
+        router.delete(`/cart/${key}`, {
+            preserveScroll: true,
+        });
     };
 
     const [mounted, setMounted] = useState(false);
@@ -106,7 +116,6 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                             </button>
                         </header>
 
-                        {/* LISTA DE PRODUCTOS */}
                         <div className="scrollbar-hide flex-1 space-y-3 overflow-y-auto px-4 py-4">
                             {items.length === 0 ? (
                                 <div className="flex h-full flex-col items-center justify-center text-center">
