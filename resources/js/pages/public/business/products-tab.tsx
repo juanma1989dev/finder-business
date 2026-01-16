@@ -1,6 +1,5 @@
-import { useCartStore } from '@/store/cart.store';
 import { Business, ServicesAndProducts, SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { PackageSearch, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { ProductConfigModal } from './ProductConfigModal';
@@ -10,13 +9,14 @@ interface Props {
 }
 
 export const ProductsBussinessTab = ({ business }: Props) => {
-    const addItem = useCartStore((s) => s.addItem);
-    const cartItems = useCartStore((s) => s.items);
+    const { auth, cart } = usePage<SharedData>().props;
+    const user = auth.user;
+
     const [selectedProduct, setSelectedProduct] =
         useState<ServicesAndProducts | null>(null);
 
     const getQuantity = (productId: string | number) => {
-        return cartItems
+        return Object.values(cart)
             .filter((item) => item.id === productId)
             .reduce((sum, item) => sum + item.quantity, 0);
     };
@@ -25,7 +25,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
         product: ServicesAndProducts,
         config: { extras: any[]; variations: any[]; notes: string },
     ) => {
-        addItem({
+        const itemData = {
             id: product.id!,
             name: product.name,
             price: product.price,
@@ -33,11 +33,12 @@ export const ProductsBussinessTab = ({ business }: Props) => {
             variations: config.variations,
             notes: config.notes,
             quantity: 1,
+        };
+
+        router.post('/cart', itemData, {
+            preserveScroll: true,
         });
     };
-
-    const { auth } = usePage<SharedData>().props;
-    const user = auth.user;
 
     return (
         <div className="w-full py-2">

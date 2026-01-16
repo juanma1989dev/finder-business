@@ -30,8 +30,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
 
-    // console.log(business.schedules);
-
     const LEGENDS = {
         payments: business.payments.map((p) => p.name).join(' | '),
         schedul: 'Abierto • Cierra 8pm *******',
@@ -179,10 +177,8 @@ export default function BusinessDetail({ business, favorite }: Props) {
                             </div>
                         </div>
 
-                        {/*   PRODUCTOS */}
                         <div className="lg:col-span-8 xl:col-span-8">
                             <Tabs defaultValue="products" className="w-full">
-                                {/* Contenedor de la lista con fondo suave y bordes muy redondeados */}
                                 <TabsList className="inline-flex w-full items-center justify-start gap-2 rounded-[1.2rem] border-none bg-gray-100/50 p-1.5 sm:w-auto">
                                     <TabsTrigger
                                         value="products"

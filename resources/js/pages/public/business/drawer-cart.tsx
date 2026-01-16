@@ -1,5 +1,8 @@
-import { useCartStore } from '@/store/cart.store';
-import { router } from '@inertiajs/react';
+import {
+    removeItem,
+    updateItem,
+} from '@/actions/App/Http/Controllers/CartController';
+import { router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     ArrowRight,
@@ -9,7 +12,7 @@ import {
     Trash2,
     X,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 interface Props {
@@ -18,9 +21,27 @@ interface Props {
 }
 
 export const CartDrawer = ({ isOpen, onClose }: Props) => {
-    const { items, increment, decrement, removeItem, getTotalPrice } =
-        useCartStore();
-    const totalPrice = getTotalPrice();
+    const { cart } = usePage().props;
+
+    const items = useMemo(() => {
+        return Object.values(cart || {});
+    }, [cart]);
+
+    const totalPrice = useMemo(() => {
+        return items.reduce(
+            (acc, item) => acc + Number(item.price) * item.quantity,
+            0,
+        );
+    }, [items]);
+
+    const increment = (item: any) => {
+        updateItem(item.key, { quantity: item.quantity + 1 });
+    };
+
+    const decrement = (item: any) => {
+        updateItem(item.key, { quantity: item.quantity - 1 });
+    };
+
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -41,7 +62,6 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* OVERLAY */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -144,7 +164,7 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                                             <div className="flex items-center gap-1 rounded-lg border border-gray-100 bg-gray-50 p-1">
                                                 <button
                                                     onClick={() =>
-                                                        decrement(item.key)
+                                                        decrement(item)
                                                     }
                                                     className="flex h-6 w-6 items-center justify-center rounded-md bg-white shadow-sm transition-all hover:text-orange-500 active:scale-90"
                                                 >
@@ -155,7 +175,7 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                                                 </span>
                                                 <button
                                                     onClick={() =>
-                                                        increment(item.key)
+                                                        increment(item)
                                                     }
                                                     className="flex h-6 w-6 items-center justify-center rounded-md bg-white shadow-sm transition-all hover:text-orange-500 active:scale-90"
                                                 >

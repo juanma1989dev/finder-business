@@ -1,7 +1,6 @@
 import MainLayout from '@/layouts/main-layout';
-import { useCartStore } from '@/store/cart.store';
-import { CartItem } from '@/types';
-import { router, useForm } from '@inertiajs/react';
+import { CartItem, SharedData } from '@/types';
+import { router, useForm, usePage } from '@inertiajs/react';
 import {
     ArrowLeft,
     ChevronRight,
@@ -11,11 +10,25 @@ import {
     ShoppingBag,
     Trash2,
 } from 'lucide-react';
+import { useCallback } from 'react';
 
-export default function Details() {
-    const { items, updateNotes, updateQuantity, removeItem, getTotalPrice } =
-        useCartStore();
-    const totalPrice = getTotalPrice();
+function debounce<T extends (...args: any[]) => void>(
+    fn: T,
+    delay = 300,
+): (...args: Parameters<T>) => void {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    return (...args: Parameters<T>) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            fn(...args);
+        }, delay);
+    };
+}
+
+export default function DetailsPage() {
+    const { cart } = usePage<SharedData>().props;
+    const items = Object.values(cart);
 
     const { post, processing, transform } = useForm({
         total: 0,
@@ -35,13 +48,51 @@ export default function Details() {
         return basePrice + extrasTotal + variationsTotal;
     };
 
+    const totalPrice = items.reduce(
+        (total, item) => total + getItemUnitPrice(item) * item.quantity,
+        0,
+    );
+
+    const handleUpdateQuantity = (item: CartItem, quantity: number) => {
+        router.patch(
+            `/cart/${item.key}`,
+            { quantity },
+            {
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const handleRemoveItem = (item: CartItem) => {
+        router.delete(`/cart/${item.key}`, {
+            preserveScroll: true,
+        });
+    };
+
+    const debouncedUpdateNotes = useCallback(
+        debounce((key: string, notes: string) => {
+            router.patch(
+                `/cart/${key}`,
+                { notes },
+                {
+                    preserveScroll: true,
+                },
+            );
+        }, 300),
+        [],
+    );
+
+    const handleUpdateNotes = (item: CartItem, notes: string) => {
+        debouncedUpdateNotes(item.key, notes);
+    };
+
     const handleConfirmOrder = () => {
         if (items.length === 0) return;
 
         transform((data) => ({
             ...data,
             items: items,
-            total: getTotalPrice(),
+            total: totalPrice,
         }));
 
         post('/shopping-cart', {
@@ -55,7 +106,6 @@ export default function Details() {
     return (
         <MainLayout>
             <div className="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
-                {/* HEADER - Limpio y directo */}
                 <header className="mb-8 flex items-center gap-4">
                     <button
                         onClick={() => window.history.back()}
@@ -159,8 +209,8 @@ export default function Details() {
                                                     <div className="flex items-center gap-1 rounded-xl border border-gray-100 bg-gray-50 p-1">
                                                         <button
                                                             onClick={() =>
-                                                                updateQuantity(
-                                                                    item.key,
+                                                                handleUpdateQuantity(
+                                                                    item,
                                                                     Math.max(
                                                                         1,
                                                                         item.quantity -
@@ -177,8 +227,8 @@ export default function Details() {
                                                         </span>
                                                         <button
                                                             onClick={() =>
-                                                                updateQuantity(
-                                                                    item.key,
+                                                                handleUpdateQuantity(
+                                                                    item,
                                                                     item.quantity +
                                                                         1,
                                                                 )
@@ -191,7 +241,9 @@ export default function Details() {
 
                                                     <button
                                                         onClick={() =>
-                                                            removeItem(item.key)
+                                                            handleRemoveItem(
+                                                                item,
+                                                            )
                                                         }
                                                         className="text-gray-300 transition-colors hover:text-red-500"
                                                     >
@@ -208,10 +260,10 @@ export default function Details() {
                                                 className="text-orange-400"
                                             />
                                             <input
-                                                value={item.notes ?? ''}
+                                                defaultValue={item.notes ?? ''}
                                                 onChange={(e) =>
-                                                    updateNotes(
-                                                        item.key,
+                                                    handleUpdateNotes(
+                                                        item,
                                                         e.target.value,
                                                     )
                                                 }
