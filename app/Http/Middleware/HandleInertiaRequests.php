@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\OrderStatusEnum;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -50,6 +51,11 @@ class HandleInertiaRequests extends Middleware
                 'info'    => $request->session()->get('info'),
                 'meta'    => $request->session()->get('meta', []),  
             ],
+            'orderStatus' => [
+                'values' => OrderStatusEnum::values(),
+                'labels' => OrderStatusEnum::labels(),
+                'flow' => OrderStatusEnum::flow(),
+            ]
         ];
     }
 }
