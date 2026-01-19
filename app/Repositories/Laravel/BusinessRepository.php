@@ -146,6 +146,8 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
             $query->orderBy('name', 'asc');
         }
 
+        $query->where('is_open', true);
+
         return $query->get();
     }
 

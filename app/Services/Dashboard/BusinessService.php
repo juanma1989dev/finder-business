@@ -4,6 +4,7 @@ namespace App\Services\Dashboard;
 
 use App\DTOs\BusinessDTO;
 use App\DTOs\CoverImageBusinessDTO;
+use App\Models\Businesses;
 use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
@@ -68,4 +69,11 @@ class BusinessService
         return true;
     }
 
+    public function manageOpening(array $data)
+    {
+        $model = Businesses::query();
+        
+        $business = $model->findOrFail($data['id']);
+        $business->update(['is_open' => $data['status']]);
+    }
 }
