@@ -39,6 +39,11 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export enum TypeUser {
+    CLIENT = 'client',
+    BUSINESS = 'business',
+}
+
 export interface User {
     id: number;
     name: string;
@@ -48,6 +53,7 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
+    type: TypeUser;
     [key: string]: unknown;
 }
 
@@ -148,6 +154,7 @@ export interface Business {
     payments: Payments[];
     schedules: Schedules[];
     images?: GalleryImage[];
+    is_open: boolean;
     products?: ServicesAndProducts[];
     cords?: {
         type: 'Point';
@@ -176,4 +183,43 @@ export interface CartItem {
     extras: CartExtra[];
     variations: CartVariation[];
     notes?: string;
+}
+
+/******** Orders ******** */
+export interface OrderExtra {
+    id: number;
+    extra_name: string;
+    price: string;
+}
+
+export interface OrderVariation {
+    id: number;
+    variation_name: string;
+    price: string;
+}
+
+export interface OrderItem {
+    id: number;
+    product_name: string;
+    unit_price: string;
+    quantity: number;
+    total_price: string;
+    notes?: string;
+    extras: OrderExtra[];
+    variations: OrderVariation[];
+}
+
+export interface Order {
+    id: number;
+    status: string;
+    subtotal: string;
+    shipping: string;
+    total: string;
+    created_at: string;
+    items: OrderItem[];
+    user: User;
+}
+
+interface Props {
+    order: Order;
 }
