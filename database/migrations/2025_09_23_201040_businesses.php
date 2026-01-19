@@ -30,6 +30,8 @@ return new class extends Migration
             $table->boolean('use_whatsapp')->default(false);
             $table->string('cover_image', 250)->nullable();
             $table->string('tags', 250)->nullable();
+            $table->boolean('is_open')->default(false);
+            $table->boolean('status')->default(true);
             
             $table->string('location', 60);
             $table->string('address', 250);

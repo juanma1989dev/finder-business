@@ -19,6 +19,12 @@ return new class extends Migration
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
+            
+            $table->foreignId('business_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
 
             $table->string('status')->default(OrderStatusEnum::PENDING->value);
             // pending | confirmed | paid | cancelled | delivered
@@ -28,6 +34,7 @@ return new class extends Migration
             $table->decimal('total', 10, 2);
 
             $table->text('notes')->nullable();
+
 
             $table->timestamps();
         });
