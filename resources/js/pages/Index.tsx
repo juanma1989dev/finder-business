@@ -51,6 +51,37 @@ export default function Index({
     products,
     meta,
 }: Props) {
+    // const [route, setRoute] = useState<[number, number][]>([]);
+
+    // const origin = [-97.219956, 17.4568381]; // 1 ,
+    // // const waypoint = [-97.2284531, 17.4624704]; // 2
+    // const destination = [-97.2208918, 17.4595263]; // 3
+    // useEffect(() => {
+    //     const getRoute = async () => {
+    //         try {
+    //             // La URL ahora lleva los 3 puntos separados por punto y coma (;)
+    //             const url = `https://router.project-osrm.org/route/v1/driving/${origin[0]},${origin[1]};${destination[0]},${destination[1]}?overview=full&geometries=geojson`;
+    //             // const url = `https://router.project-osrm.org/route/v1/driving/${origin[0]},${origin[1]};${waypoint[0]},${waypoint[1]};${destination[0]},${destination[1]}?overview=full&geometries=geojson`;
+
+    //             // http://router.project-osrm.org/route/v1/driving/13.388860,52.517037;13.397634,52.529407;13.428555,52.523219?overview=false
+
+    //             const query = await fetch(url);
+    //             const data = await query.json();
+
+    //             if (data.routes && data.routes[0]) {
+    //                 setRoute(data.routes[0].geometry.coordinates);
+    //             }
+    //         } catch (error) {
+    //             console.error(
+    //                 'Error al calcular la ruta por Soledad Etla:',
+    //                 error,
+    //             );
+    //         }
+    //     };
+
+    //     getRoute();
+    // }, []);
+
     const [loading, setLoading] = useState(false);
     const [filtersUser, setFiltersUser] = useState<Filters>({
         query: filters.q || '',
@@ -186,7 +217,6 @@ export default function Index({
                                 )}
                             </div>
                         </div>
-
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {businesses.map((business: any) => (
                                 <BusinessCard
@@ -221,6 +251,23 @@ export default function Index({
                     </div>
                 )}
             </div>
+            {/* <Card className="h-[500px] w-[800px] overflow-hidden bg-red-700 p-0">
+                <Map center={[-97.2275336, 17.4606859]} zoom={14} theme="light">
+                    <MapRoute
+                        coordinates={route}
+                        color="#3b82f6"
+                        width={4}
+                        opacity={0.8}
+                    />
+
+                    <MapControls
+                        position="bottom-right"
+                        showZoom
+                        showLocate
+                        showFullscreen
+                    />
+                </Map>
+            </Card> */}
         </MainLayout>
     );
 }

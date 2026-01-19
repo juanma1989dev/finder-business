@@ -1,43 +1,7 @@
 import MainLayout from '@/layouts/main-layout';
+import { Order } from '@/types';
 import { Head } from '@inertiajs/react';
 import { CheckCircle } from 'lucide-react';
-
-/* =======================
-   TYPES
-======================= */
-
-export interface OrderExtra {
-    id: number;
-    extra_name: string;
-    price: string;
-}
-
-export interface OrderVariation {
-    id: number;
-    variation_name: string;
-    price: string;
-}
-
-export interface OrderItem {
-    id: number;
-    product_name: string;
-    unit_price: string;
-    quantity: number;
-    total_price: string;
-    notes?: string;
-    extras: OrderExtra[];
-    variations: OrderVariation[];
-}
-
-export interface Order {
-    id: number;
-    status: string;
-    subtotal: string;
-    shipping: string;
-    total: string;
-    created_at: string;
-    items: OrderItem[];
-}
 
 interface Props {
     order: Order;
