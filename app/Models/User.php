@@ -59,6 +59,11 @@ class User extends Authenticatable
             ->withPivot('is_favorite');
     }
 
+    public function businesses2()
+    {
+        return $this->hasMany(Businesses::class);
+    }
+
     public function businesses()
     {
         return $this->belongsToMany(Businesses::class)

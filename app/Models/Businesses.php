@@ -24,7 +24,8 @@ class Businesses extends Model
         'tags',
         'location',
         'address',
-        'cords'
+        'cords',
+        'is_open'
     ];
 
     protected $casts = [
