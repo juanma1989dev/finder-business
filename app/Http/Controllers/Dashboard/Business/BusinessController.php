@@ -6,6 +6,9 @@ use App\DTOs\BusinessDTO;
 use App\DTOs\CoverImageBusinessDTO;
 use App\Http\Controllers\Controller;
 use App\Services\Dashboard\BusinessService;
+use Error;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use \Throwable;
 
@@ -73,5 +76,18 @@ class BusinessController extends Controller
         );
 
         return redirect()->back()->with('error', 'Error al procesar la imagen.');
+    }
+
+    public function manageOpening(Request $request)
+    {
+        $data = $request->all();
+
+        try {
+            $this->businessService->manageOpening($data);
+
+            return redirect()->back()->with('success', 'Horario actualizado correctamente.');
+        } catch(Exception $e) {
+            return back()->withErrors(['general' => $e->getMessage()]);
+        }
     }
 }
