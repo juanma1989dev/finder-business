@@ -1,17 +1,18 @@
 import MainLayout from '@/layouts/main-layout';
+import { AccountTypeMap } from '@/types';
 import { Link } from '@inertiajs/react';
 
-const Card = ({
+const CardUser = ({
     title,
     imageSrc,
-    link,
+    type,
 }: {
     title: string;
     imageSrc: string;
-    link: string;
+    type: string;
 }) => (
     <Link
-        href={link}
+        href={`/login?type=${type}`}
         className="group flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-blue-50/50 hover:shadow-md"
     >
         <h2 className="mb-4 text-center text-lg font-bold text-slate-800 transition-colors group-hover:text-orange-600">
@@ -27,24 +28,27 @@ const Card = ({
     </Link>
 );
 
-export default function AccountPage() {
+interface Props {
+    accountTypes: AccountTypeMap;
+}
+
+export default function AccountPage({ accountTypes }: Props) {
     return (
         <MainLayout>
             <div className="p-4">
                 <h1 className="mb-4 text-center text-2xl font-bold text-gray-600">
                     Elige el tipo de cuenta quieres crear
                 </h1>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <Card
-                        title="Cliente"
-                        imageSrc="/images/banner_cliente.webp"
-                        link="/client/login"
-                    />
-                    <Card
-                        title="Negocio"
-                        imageSrc="/images/banner_negocio.webp"
-                        link="/business/login"
-                    />
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    {Object.entries(accountTypes).map(([key, value]) => (
+                        <CardUser
+                            key={key}
+                            title={value.label}
+                            imageSrc={value.banner}
+                            type={key}
+                        />
+                    ))}
                 </div>
 
                 <footer className="bottom-0 mt-8 w-full text-center text-sm text-gray-500">

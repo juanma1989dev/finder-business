@@ -30,7 +30,12 @@ export default function DetailsPage() {
     const { cart } = usePage<SharedData>().props;
     const items = Object.values(cart);
 
-    const { post, processing, transform } = useForm({
+    const {
+        post,
+        processing,
+        transform,
+        data: dataOrder,
+    } = useForm({
         total: 0,
         items: [] as CartItem[],
     });
@@ -94,6 +99,8 @@ export default function DetailsPage() {
             items: items,
             total: totalPrice,
         }));
+
+        console.log({ dataOrder });
 
         post('/shopping-cart', {
             preserveScroll: true,

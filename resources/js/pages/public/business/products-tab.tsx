@@ -25,10 +25,9 @@ export const ProductsBussinessTab = ({ business }: Props) => {
         product: ServicesAndProducts,
         config: { extras: any[]; variations: any[]; notes: string },
     ) => {
-        console.log(config);
-
         const itemData = {
             id: product.id!,
+            businesses_id: product.businesses_id,
             name: product.name,
             price: product.price,
             extras: config.extras,

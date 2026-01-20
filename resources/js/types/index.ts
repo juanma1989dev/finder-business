@@ -81,7 +81,7 @@ export interface ProductVariations {
 
 export interface ServicesAndProducts {
     id?: string;
-    business_id: string;
+    businesses_id: string;
     name: string;
     description: string;
     price: number;
@@ -220,6 +220,21 @@ export interface Order {
     user: User;
 }
 
-interface Props {
-    order: Order;
+export type UserType = 'client' | 'business' | 'delivery';
+
+interface AccountType {
+    type: UserType;
+    label: string;
+    banner: string;
+    title: string;
+    subTitle: string;
+}
+
+export type AccountTypeMap = Record<UserType, AccountType>;
+
+export interface LoginConfig {
+    type: string;
+    banner: string;
+    title: string;
+    subTitle: string;
 }
