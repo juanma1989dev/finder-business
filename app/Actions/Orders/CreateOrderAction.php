@@ -25,7 +25,7 @@ class CreateOrderAction
     public function execute(array $items, ?int $userId = null)
     {   
         return DB::transaction(function () use ($items, $userId) {
-            
+
             $order = $this->orderRepository->create([
                 'user_id' => $userId,
                 'status' => OrderStatusEnum::PENDING,
@@ -71,6 +71,7 @@ class CreateOrderAction
                     'quantity' => $item['quantity'],
                     'total_price' => $totalPrice,
                     'notes' => $data['notes'] ?? null,
+                    'business_id' => $item['businesses_id'],
                 ]);
 
                 $this->orderItemRepository->createExtras($orderItem, $extras);

@@ -22,6 +22,10 @@ return new class extends Migration
                 ->constrained('business_products')
                 ->restrictOnDelete();
 
+            $table->foreignId('business_id')
+                ->constrained('businesses')
+                ->restrictOnDelete();
+
             $table->string('product_name'); // snapshot
             $table->decimal('unit_price', 10, 2); // base + extras + variaciones
             $table->integer('quantity');

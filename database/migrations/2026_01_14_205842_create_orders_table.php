@@ -19,22 +19,14 @@ return new class extends Migration
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
-            
-            $table->foreignId('business_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
-
 
             $table->string('status')->default(OrderStatusEnum::PENDING->value);
-            // pending | confirmed | paid | cancelled | delivered
 
             $table->decimal('subtotal', 10, 2);
             $table->decimal('shipping', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
 
             $table->text('notes')->nullable();
-
 
             $table->timestamps();
         });
