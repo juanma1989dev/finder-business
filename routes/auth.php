@@ -7,11 +7,15 @@ use App\Http\Controllers\Auth\Business\RegisterController;
 use App\Http\Controllers\Auth\Client\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\Client\RegisteredUserController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\LoginController as AuthLoginController; ///
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/accounts', [AccountsController::class, 'index'])->name('accounts');
 
+Route::middleware('guest')->prefix('/login')->group(function () {
+    Route::resource('', AuthLoginController::class) ;
+});
 # Rutas del cliente
 Route::middleware('guest')->prefix('client')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('client.register');
