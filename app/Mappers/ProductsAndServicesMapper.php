@@ -3,7 +3,6 @@
 namespace App\Mappers;
 
 use App\Models\BusinessProduct;
-use App\Models\ServicesAndProductsByBusiness;
 use Illuminate\Support\Collection;
 
 class ProductsAndServicesMapper 
@@ -15,7 +14,7 @@ class ProductsAndServicesMapper
 
             return [
                 "id" => $product->id,
-                "business_id" => $product->business_id,
+                "businesses_id" => $product->businesses_id,
                 "category" => $product->product_category_id,
                 "name" =>  $product->name,
                 "description" =>  $product->description,
