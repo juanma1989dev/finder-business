@@ -13,6 +13,7 @@ class CartController extends Controller
 
         $itemData = $request->validate([
             'id' => 'required|integer',
+            'businesses_id' => 'required|integer',
             'name' => 'required|string',
             'price' => 'required|numeric',
             'extras' => 'sometimes|array',
@@ -26,16 +27,8 @@ class CartController extends Controller
         if (isset($cart[$key])) {
             $cart[$key]['quantity'] += $itemData['quantity'];
         } else {
-            $cart[$key] = [
-                'key' => $key,
-                'id' => $itemData['id'],
-                'name' => $itemData['name'],
-                'price' => $itemData['price'],
-                'extras' => $itemData['extras'] ?? [],
-                'variations' => $itemData['variations'] ?? [],
-                'notes' => $itemData['notes'] ?? '',
-                'quantity' => $itemData['quantity'],
-            ];
+            $itemData['key'] = $key;
+            $cart[$key] =  $itemData;
         }
 
         $request->session()->put('cart', $cart);
