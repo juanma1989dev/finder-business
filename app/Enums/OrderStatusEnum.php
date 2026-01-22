@@ -41,30 +41,4 @@ enum OrderStatusEnum: string
             self::REJECTED->value         => 'Rechazado',
         ];
     }
-
-
-    public static function flow(): array
-    {
-        return [
-            self::PENDING->value    => [self::REJECTED->value, self::CONFIRMED->value],
-            self::CONFIRMED->value  => [self::CANCELLED->value, self::READY_FOR_PICKUP->value],
-            
-            self::ON_THE_WAY->value => [self::DELIVERED->value],
-        ];
-    }
-
-    public static function fromValue(string $value): ?string
-    {
-        return match ($value) {
-            self::PENDING->value            => self::PENDING->value,
-            self::CONFIRMED->value          => self::CONFIRMED->value,
-            self::ON_THE_WAY->value         => self::ON_THE_WAY->value,
-            self::READY_FOR_PICKUP->value   => self::READY_FOR_PICKUP->value,
-            self::PICKED_UP->value          => self::PICKED_UP->value,
-            self::DELIVERED->value          => self::DELIVERED->value,
-            self::CANCELLED->value          => self::CANCELLED->value,
-            self::REJECTED->value           => self::REJECTED->value,
-            default                         => null,
-        };
-    }
 }
