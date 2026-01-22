@@ -140,7 +140,7 @@ function DeliveryOrderCard({
 
     return (
         <div
-            className={`flex flex-col rounded-2xl border bg-white border-slate-200`}
+            className={`flex flex-col rounded-2xl border border-slate-200 bg-white`}
         >
             {/* HEADER */}
             <div className="p-4">
@@ -191,7 +191,9 @@ function DeliveryOrderCard({
 function EmptyState() {
     return (
         <div className="col-span-full rounded-3xl border-2 border-dashed bg-white p-16 text-center">
-            <p className="font-bold text-slate-500">No hay pedidos disponibles</p>
+            <p className="font-bold text-slate-500">
+                No hay pedidos disponibles
+            </p>
         </div>
     );
 }
