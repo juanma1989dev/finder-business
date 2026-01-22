@@ -1,23 +1,32 @@
 <?php 
 
 namespace App\Http\Controllers\Auth;
-
-use App\Enums\UserTypeEnum;
+ 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
-    public function index(Request $request)
+    public function index(SessionManagement $sessionManagement, Request $request)
     {
-        $loginConfig = config('login');
-        $loginType = $request->get('type');
-        $loginTypeConfig = $loginConfig[$loginType];
+        $typeAccount = $request->get('type');
+
+        $conf = $sessionManagement->validateTypeAccount($typeAccount);
 
         $data = [
-            "loginConfig" => $loginTypeConfig
+            "loginConfig" => $conf
         ];
 
         return inertia('auth/LoginPage', $data);
     }
+
+    // public function destroy(Request $request): RedirectResponse
+    // {
+    //     Auth::guard('web')->logout();
+
+    //     $request->session()->invalidate();
+    //     $request->session()->regenerateToken();
+
+    //     return redirect('/');
+    // }
 }

@@ -70,12 +70,11 @@ class GoogleController extends Controller
 
         } catch (Throwable $e) {
 
-            // dd( $e->getMessage(), $e->getTrace() );
+            // dd(79, $e->getMessage() );
 
             $this->googleAuthService->clearAuthAction();
             
-            return redirect()
-                ->route('login')
+            return redirect()->back()
                 ->with('error', 'Error al autenticar con Google. Por favor intenta nuevamente.');
         }
     }
