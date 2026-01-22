@@ -56,7 +56,7 @@ class GoogleAuthService
      */
     public function createUserFromGoogle(SocialiteUser $googleUser): User
     {
-        return User::create([
+            return User::create([
             'name'                => $googleUser->getName(),
             'email'               => $googleUser->getEmail(),
             'type'                => Session::get('type_user', UserTypeEnum::CLIENT), 
@@ -94,18 +94,16 @@ class GoogleAuthService
     public function handleGoogleAuthentication(SocialiteUser $googleUser, string $action): array
     {
         $existingUser = $this->findExistingUser($googleUser);
-        
+
         # Caso 1: Intentando registrarse pero ya existe
         if ($action === self::ACTION_REGISTER && $existingUser) {
             return [
                 'success' => false,
                 'user' => null,
                 'error' => 'Ya existe una cuenta con este correo. Por favor inicia sesión.',
-                'redirect' => 'business.login' //// DINAMICO
+                'redirect' => 'login.index'  
             ];
         }
-
-      
 
         # Caso 2: Intentando login pero no existe
         if ($action === self::ACTION_LOGIN && !$existingUser) {
@@ -113,11 +111,11 @@ class GoogleAuthService
                 'success' => false,
                 'user' => null,
                 'error' => 'No existe una cuenta con este correo. Por favor regístrate primero.',
-                'redirect' => 'business.login' //// DINAMICO
+                'redirect' => 'login.index' 
             ];
         }
 
-        // Caso 3: Registro exitoso
+        # Caso 3: Registro exitoso
         if ($action === self::ACTION_REGISTER && !$existingUser) {
             $user = $this->createUserFromGoogle($googleUser);
             
@@ -132,7 +130,7 @@ class GoogleAuthService
             ];
         } 
 
-        // Caso 4: Login exitoso
+        # Caso 4: Login exitoso
         $this->syncGoogleId($existingUser, $googleUser->getId());
         $this->loginUser($existingUser);
 
