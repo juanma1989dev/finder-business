@@ -10,11 +10,13 @@ class Order extends Model
 {
     protected $fillable = [
         'user_id',
+        'delivery_id',
         'status',
         'subtotal',
         'shipping',
         'total',
         'notes',
+        'ready_for_pickup_at'
     ];
 
     protected $casts = [
