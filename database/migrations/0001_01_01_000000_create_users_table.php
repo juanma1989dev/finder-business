@@ -21,6 +21,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('type')->default('client');
 
+            $table->boolean('is_available')->default(false);
+            $table->timestamp('last_available_at')->nullable();
+
             $table->string('google_id')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('privacy_accepted')->default(false);
