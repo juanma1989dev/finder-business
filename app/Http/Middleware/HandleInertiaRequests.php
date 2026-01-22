@@ -3,8 +3,14 @@
 namespace App\Http\Middleware;
 
 use App\Enums\OrderStatusEnum;
+use App\Enums\UserTypeEnum;
+use App\Flows\BusinessFlow;
+use App\Flows\ClientFlow;
+use App\Flows\DeliveryFlow;
+use App\Flows\OrderFlow;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -51,11 +57,22 @@ class HandleInertiaRequests extends Middleware
                 'info'    => $request->session()->get('info'),
                 'meta'    => $request->session()->get('meta', []),  
             ],
-            'orderStatus' => [
-                'values' => OrderStatusEnum::values(),
-                'labels' => OrderStatusEnum::labels(),
-                'flow' => OrderStatusEnum::flow(),
-            ]
+            'orderStatus' => $this->getFlow()
         ];
+    }
+
+    /**
+     * 
+     */
+    private function getFlow()
+    {
+        $typeUser = Auth::user()->type;
+
+        $data = [
+            'flow' => OrderFlow::flow()[$typeUser] ?? [12],
+            'labels' => OrderFlow::labels(),
+        ];
+
+        return $data;
     }
 }
