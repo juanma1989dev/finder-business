@@ -2,13 +2,9 @@ import { useOrderStatus } from '@/hooks/useOrderStatus';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Business, Order } from '@/types';
 import { router } from '@inertiajs/react';
-import { Bike, Check, Clock, Power, Search } from 'lucide-react';
+import { Bike, Clock, Power, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-
-/* =======================
-   MAIN COMPONENT
-======================= */
 
 export default function DashboardBusiness({
     breadcrumbs,
@@ -29,10 +25,6 @@ export default function DashboardBusiness({
 
     const { labels } = useOrderStatus();
 
-    /* =======================
-       HANDLERS
-    ======================= */
-
     const toggleBusiness = () => {
         const old = isBusinessOpen;
 
@@ -50,23 +42,11 @@ export default function DashboardBusiness({
         );
     };
 
-    const avanzarEstado = (orderId: number) => {
-        router.patch(
-            `/dashboard/orders/${orderId}/status`,
-            {},
-            {
-                preserveScroll: true,
-                onSuccess: () => toast.success('Pedido actualizado'),
-                onError: () => toast.error('Error al actualizar pedido'),
-            },
-        );
-    };
-
-    const cancelarPedido = (orderId: number, rejected = false) => {
+    const avanzarEstado = (orderId: number, status?: string) => {
         router.patch(
             `/dashboard/orders/${orderId}/status`,
             {
-                status: rejected ? 'rejected' : 'cancelled',
+                status,
             },
             {
                 preserveScroll: true,
@@ -77,8 +57,8 @@ export default function DashboardBusiness({
     };
 
     /* =======================
-       FILTERS
-    ======================= */
+        FILTERS
+        ======================= */
 
     const filteredOrders = useMemo(() => {
         return orders.filter((order: any) => {
@@ -100,8 +80,8 @@ export default function DashboardBusiness({
     }, [orders, searchTerm, activeTab]);
 
     /* =======================
-       RENDER
-    ======================= */
+        RENDER
+        ======================= */
 
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
@@ -169,7 +149,6 @@ export default function DashboardBusiness({
                                 key={order.id}
                                 pedido={order}
                                 avanzarEstado={avanzarEstado}
-                                cancelarPedido={cancelarPedido}
                             />
                         ))
                     )}
@@ -180,47 +159,23 @@ export default function DashboardBusiness({
 }
 
 /* =======================
-   ORDER CARD
-======================= */
+    ORDER CARD
+    ======================= */
 
 function BusinessOrderCard({
     pedido,
     avanzarEstado,
-    cancelarPedido,
 }: {
     pedido: any;
-    avanzarEstado: (id: number) => void;
-    cancelarPedido: (id: number, rejected?: boolean) => void;
+    avanzarEstado: (id: number, status?: string) => void;
 }) {
-    const { labels, flow } = useOrderStatus();
+    const { flow, labels } = useOrderStatus();
 
-    const status = pedido.status;
-    const nextStatuses: string[] = flow[status] ?? [];
+    const statusOrder = pedido.status;
 
-    // =====================
-    // BUSINESS RULES
-    // =====================
+    const isLate = statusOrder === 'pending' && pedido.minutes_waiting > 10;
 
-    console.log(nextStatuses);
-
-    const canAccept = nextStatuses.includes('confirmed');
-    const canReject = nextStatuses.includes('rejected');
-    const canCancel = nextStatuses.includes('cancelled');
-
-    const nextMainStatus =
-        nextStatuses.find((s) => s !== 'cancelled' && s !== 'rejected') ?? null;
-
-    const canAdvance = Boolean(nextMainStatus);
-
-    const advanceLabelMap: Record<string, string> = {
-        confirmed: 'Aceptar',
-        on_the_way: 'En camino',
-        delivered: 'Entregado',
-    };
-
-    const advanceLabel = nextMainStatus ? advanceLabelMap[nextMainStatus] : '';
-
-    const isLate = status === 'pending' && pedido.minutes_waiting > 10;
+    const flowActions = flow[statusOrder] ?? [];
 
     return (
         <div
@@ -247,8 +202,8 @@ function BusinessOrderCard({
                         </div>
                     </div>
 
-                    <span className="rounded-full bg-orange-50 px-3 py-1 text-[10px] font-black text-orange-600 uppercase">
-                        {labels[status]}
+                    <span className="rounded-full bg-orange-50 px-2 py-1 text-[10px] font-black text-orange-600 uppercase">
+                        {labels[statusOrder]}
                     </span>
                 </div>
 
@@ -263,40 +218,23 @@ function BusinessOrderCard({
 
             {/* ACTIONS */}
             <div className="mt-auto flex gap-2 border-t p-2">
-                {canReject && (
+                {flowActions.map((action: string) => (
                     <button
-                        onClick={() => cancelarPedido(pedido.id, true)}
+                        key={action}
+                        onClick={() => avanzarEstado(pedido.id, action)}
                         className="flex-1 rounded-xl bg-rose-600 py-2 text-xs font-bold text-white"
                     >
-                        Rechazar
+                        {labels[action]}
                     </button>
-                )}
-
-                {canCancel && (
-                    <button
-                        onClick={() => cancelarPedido(pedido.id)}
-                        className="flex-1 rounded-xl bg-rose-600 py-2 text-xs font-bold text-white"
-                    >
-                        Cancelar
-                    </button>
-                )}
-
-                {(canAccept || canAdvance) && (
-                    <button
-                        onClick={() => avanzarEstado(pedido.id)}
-                        className="flex-1 rounded-xl bg-emerald-600 py-2 text-xs font-bold text-white"
-                    >
-                        <Check className="inline h-3.5 w-3.5" /> {advanceLabel}
-                    </button>
-                )}
+                ))}
             </div>
         </div>
     );
 }
 
 /* =======================
-   EMPTY
-======================= */
+    EMPTY
+    ======================= */
 
 function EmptyState() {
     return (
