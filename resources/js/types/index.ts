@@ -49,11 +49,11 @@ export interface User {
     name: string;
     email: string;
     avatar?: string;
-    email_verified_at: string | null;
-    two_factor_enabled?: boolean;
-    created_at: string;
-    updated_at: string;
     type: TypeUser;
+    is_available: boolean;
+
+    // email_verified_at: string | null;
+    // two_factor_enabled?: boolean;
     [key: string]: unknown;
 }
 
@@ -222,7 +222,7 @@ export interface Order {
 
 export type UserType = 'client' | 'business' | 'delivery';
 
-interface AccountType {
+export interface AccountType {
     type: UserType;
     label: string;
     banner: string;

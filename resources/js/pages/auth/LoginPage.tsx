@@ -53,7 +53,7 @@ export default function LoginPage({ loginConfig }: Props) {
                         ¿Aún no eres parte de la comunidad?
                     </p>
                     <Link
-                        href="/client/register"
+                        href={`/register?type=${loginConfig.type}`}
                         className="group mt-4 inline-flex items-center gap-2 rounded-xl bg-orange-50 px-6 py-3 text-[12px] font-black tracking-tighter text-orange-600 uppercase transition-all hover:bg-orange-100 active:scale-95"
                     >
                         Crear cuenta nueva

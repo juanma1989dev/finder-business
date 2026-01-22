@@ -46,6 +46,20 @@ export function AppSidebar() {
         return `/images/${business.category?.image ?? 'default.png'}`;
     }, [business]);
 
+    const deliveryNavItems: NavItem[] = useMemo(
+        () =>
+            props.auth.user.type === 'repartidor'
+                ? [
+                      {
+                          title: 'Dashboard',
+                          href: `/delivery`,
+                          icon: Home,
+                      },
+                  ]
+                : [],
+        [props.auth.user.type],
+    );
+
     // Items de navegación centralizados
     const mainNavItems: NavItem[] = useMemo(
         () =>
@@ -188,6 +202,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <SidebarGroup>
+                    <NavMain items={deliveryNavItems} />
                     <NavMain items={mainNavItems} />
                 </SidebarGroup>
             </SidebarContent>
