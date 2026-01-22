@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'business' =>  EnsureBusinessUser::class,
+            'delivery' => \App\Http\Middleware\EnsureDeliveryUser::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
