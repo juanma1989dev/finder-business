@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Public\BusinessController;
 use App\Http\Controllers\Public\ShoppingCartController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\Public\Client\OrderStatusController;
 use App\Http\Controllers\Public\DeliveryContoller;
 
 Route::get('/', [BusinessController::class, 'index'])->name('public.home');
@@ -25,3 +26,7 @@ Route::patch('/cart/{key}', [CartController::class, 'update'])->name('cart.updat
 Route::delete('/cart/{key}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 Route::patch('/delivery/availability', [DeliveryContoller::class, 'availability'])->name('delivery.availability');
+
+
+/****** */
+Route::get('/orders/{order}/status', [OrderStatusController::class, 'show'])->middleware('auth');
