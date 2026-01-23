@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\BusinessSearchRequest;
 use App\Http\Requests\Public\SetFavoriteRequest;
+use App\Models\User;
 use App\Services\Public\SearchService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Response;
@@ -25,12 +26,13 @@ final class BusinessController extends Controller
 
         $data = $this->searchService->getData($filters, $geoData);
 
-        $isDeliveryUser = false; //Auth::check() && Auth::user()->type === 'repartidor';
-
+        $user = Auth::user()->id ?? null;
+        $user = User::find($user);
+        
         return inertia('Index', [
             ...$data,
             'filters' => $filters,
-            'isDeliveryUser' => $isDeliveryUser,
+            'activeOrder' => $user->activeOrder ?? []
         ]);
     }
 
