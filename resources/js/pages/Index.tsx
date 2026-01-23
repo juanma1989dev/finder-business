@@ -1,9 +1,18 @@
 import BusinessCard from '@/components/app/BusinessCard';
 import MainFilters from '@/components/app/MainFilters';
+import { Card, CardContent } from '@/components/ui/card';
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
 import { router } from '@inertiajs/react';
-import { AlertCircle, MapPin, Search } from 'lucide-react';
+import {
+    AlertCircle,
+    CheckCircle,
+    ChevronDown,
+    ChevronUp,
+    Circle,
+    Search,
+    Truck,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Filters {
@@ -29,20 +38,34 @@ interface Props {
         hasGeolocation: boolean;
         appliedFilters: string[];
     };
+    activeOrder?: any;
 }
 
 const DEFAULT_DISTANCE = 5;
 
-const GridOverlayLoader = () => (
-    <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm">
-        <div className="flex flex-col items-center gap-3">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-purple-600" />
-            <span className="text-sm font-medium text-gray-600">
-                Actualizando resultados...
-            </span>
-        </div>
-    </div>
-);
+const STEPS = [
+    { key: 'pending', label: 'Creado' },
+    { key: 'confirmed', label: 'Confirmado' },
+    { key: 'ready_for_pickup', label: 'Listo para recoger' },
+    { key: 'picked_up', label: 'Recogido' },
+    { key: 'on_the_way', label: 'En camino' },
+    { key: 'delivered', label: 'Entregado' },
+];
+
+const STATUS_VIBRATION: Record<string, number | number[]> = {
+    pending: 100,
+    confirmed: [100, 50, 100],
+    ready_for_pickup: [150, 50, 150],
+    picked_up: [200, 50, 200],
+    on_the_way: [300],
+    delivered: [100, 50, 100, 50, 300],
+};
+
+const vibrate = (pattern: number | number[]) => {
+    if ('vibrate' in navigator) {
+        navigator.vibrate(pattern);
+    }
+};
 
 export default function Index({
     businesses,
@@ -50,8 +73,11 @@ export default function Index({
     filters,
     products,
     meta,
+    activeOrder,
 }: Props) {
     const [loading, setLoading] = useState(false);
+    const [collapsed, setCollapsed] = useState(false);
+
     const [filtersUser, setFiltersUser] = useState<Filters>({
         query: filters.q || '',
         category: filters.category || null,
@@ -100,143 +126,175 @@ export default function Index({
             isFirstRender.current = false;
             return;
         }
-
         if (loadingLocation) return;
-
         handleSearch();
     }, [filtersUser]);
 
-    const updateFilters = (newFilters: Filters) => {
-        setLoading(true);
-        setFiltersUser(newFilters);
-    };
+    const lastStatusRef = useRef<string | null>(null);
 
-    const handleClearFilters = () => {
-        updateFilters({
-            query: '',
-            category: null,
-            distance: DEFAULT_DISTANCE,
-            foodType: null,
-        });
-    };
+    useEffect(() => {
+        if (!activeOrder?.status) return;
 
-    const hasActiveFilters =
-        filtersUser.query || filtersUser.category || filtersUser.distance;
+        if (
+            lastStatusRef.current &&
+            lastStatusRef.current !== activeOrder.status
+        ) {
+            vibrate(STATUS_VIBRATION[activeOrder.status] ?? 100);
+        }
 
-    if (loadingLocation && !loading) {
-        return <GridOverlayLoader />;
-    }
+        lastStatusRef.current = activeOrder.status;
+    }, [activeOrder?.status]);
+
+    /* 🔄 POLLING DEL PEDIDO */
+    useEffect(() => {
+        if (!activeOrder?.id) return;
+
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['activeOrder'],
+                preserveScroll: true,
+                replace: true,
+            });
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, [activeOrder?.id]);
 
     return (
         <MainLayout>
             {geoError && (
-                <div className="mb-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
-                    <AlertCircle className="h-5 w-5 flex-shrink-0 text-amber-600" />
-                    <div>
-                        <h4 className="font-semibold text-amber-800">
-                            No pudimos obtener tu ubicación
-                        </h4>
-                        <p className="mt-1 text-sm text-amber-700">
-                            {businesses.length > 0
-                                ? 'Mostrando negocios disponibles. Habilita la ubicación para ver los más cercanos.'
-                                : 'Habilita la ubicación para ver negocios cercanos.'}
+                <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                    <div className="flex items-start gap-2">
+                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                        <p className="text-sm text-amber-700">
+                            Habilita tu ubicación para mejores resultados.
                         </p>
                     </div>
                 </div>
             )}
 
-            {/* Filtros principales */}
-            <MainFilters
-                categories={categories}
-                filters={filtersUser}
-                onFiltersChange={updateFilters}
-                foodTypes={products.categories}
-            />
-
-            {/* Categorías de productos */}
-
-            {/* Grid de negocios */}
-            <div className="min-h-[400px]">
-                {loading && <GridOverlayLoader />}
-                {businesses.length > 0 ? (
-                    <>
-                        <div className="mb-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <p className="text-sm text-gray-600">
-                                    <span className="font-semibold text-gray-900">
-                                        {meta.total}
-                                    </span>{' '}
-                                    {businesses.length === 1
-                                        ? 'negocio encontrado'
-                                        : 'negocios encontrados'}
+            {activeOrder?.id && (
+                <div className="sticky top-14 z-40 mb-3">
+                    <Card className="border-purple-200 bg-purple-50 p-0 shadow-sm">
+                        <CardContent className="space-y-2 p-3">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-semibold text-purple-800">
+                                    Pedido #{activeOrder.id}
                                 </p>
-                                {latitude && longitude && (
-                                    <span className="flex items-center gap-1 rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
-                                        <MapPin className="h-3 w-3" />
-                                        Cerca de ti
-                                    </span>
-                                )}
-                                {hasActiveFilters && (
-                                    <button
-                                        onClick={handleClearFilters}
-                                        className="ml-12 cursor-pointer text-sm text-gray-600 text-purple-500 transition-colors duration-200 hover:text-gray-900 hover:text-purple-700"
-                                    >
-                                        Limpiar filtros
-                                    </button>
-                                )}
+
+                                <button
+                                    onClick={() => setCollapsed((v) => !v)}
+                                    className="text-purple-700"
+                                >
+                                    {collapsed ? (
+                                        <ChevronDown size={18} />
+                                    ) : (
+                                        <ChevronUp size={18} />
+                                    )}
+                                </button>
                             </div>
-                        </div>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {businesses.map((business: any) => (
-                                <BusinessCard
-                                    key={business.id}
-                                    business={business}
-                                    modeEdit={false}
-                                />
-                            ))}
-                        </div>
-                    </>
+
+                            {!collapsed && (
+                                <>
+                                    <OrderTimeline
+                                        status={activeOrder.status}
+                                    />
+
+                                    <button
+                                        onClick={() =>
+                                            router.get(
+                                                `/orders/${activeOrder.id}`,
+                                            )
+                                        }
+                                        className="w-full rounded-lg bg-purple-600 py-2 text-sm font-semibold text-white active:scale-95"
+                                    >
+                                        Ver seguimiento
+                                    </button>
+                                </>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
+
+            {/* ================= FILTROS ================= */}
+            <div className="mb-4">
+                <MainFilters
+                    categories={categories}
+                    filters={filtersUser}
+                    onFiltersChange={setFiltersUser}
+                    foodTypes={products.categories}
+                />
+            </div>
+
+            {/* ================= LISTADO ================= */}
+            <div className="relative min-h-[300px]">
+                {loading && (
+                    <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm" />
+                )}
+
+                {businesses.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {businesses.map((business: any) => (
+                            <BusinessCard
+                                key={business.id}
+                                business={business}
+                                modeEdit={false}
+                            />
+                        ))}
+                    </div>
                 ) : (
-                    <div className="flex flex-col items-center py-16 text-center">
-                        <Search className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-                        <h3 className="mb-2 text-lg font-semibold text-gray-700">
+                    <div className="flex flex-col items-center py-14 text-center">
+                        <Search className="mb-3 h-10 w-10 text-gray-300" />
+                        <h3 className="text-base font-semibold text-gray-700">
                             No hay resultados
                         </h3>
-                        <p className="mb-4 text-gray-500">
-                            {hasActiveFilters
-                                ? 'Intenta ajustar tus filtros de búsqueda.'
-                                : geoError
-                                  ? 'Habilita tu ubicación para ver negocios cercanos.'
-                                  : 'No hay negocios disponibles.'}
+                        <p className="text-sm text-gray-500">
+                            Intenta ajustar tus filtros.
                         </p>
-                        {hasActiveFilters && (
-                            <button
-                                onClick={handleClearFilters}
-                                className="rounded-lg bg-purple-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-purple-700"
-                            >
-                                Limpiar filtros
-                            </button>
-                        )}
                     </div>
                 )}
             </div>
-            {/* <Card className="h-[500px] w-[800px] overflow-hidden bg-red-700 p-0">
-        <Map center={[-97.2275336, 17.4606859]} zoom={14} theme="light">
-            <MapRoute
-                coordinates={route}
-                color="#3b82f6"
-                width={4}
-                opacity={0.8}
-            />
-
-            <MapControls
-                position="bottom-right"
-                showZoom
-                showLocate
-                showFullscreen
-            />
-        </Map>
-    </Card> */}
         </MainLayout>
+    );
+}
+
+const STATUS_INDEX: Record<string, number> = {
+    pending: 0,
+    confirmed: 1,
+    ready_for_pickup: 2,
+    picked_up: 3,
+    on_the_way: 4,
+    delivered: 5,
+};
+
+function OrderTimeline({ status }: { status: string }) {
+    const current = STATUS_INDEX[status] ?? 0;
+
+    return (
+        <div className="flex items-center justify-between gap-1">
+            {STEPS.map((step, index) => {
+                const completed = index < current;
+                const active = index === current;
+
+                return (
+                    <div
+                        key={step.key}
+                        className="flex flex-col items-center gap-1 text-center"
+                    >
+                        {completed ? (
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                        ) : active ? (
+                            <Truck className="h-4 w-4 animate-pulse text-purple-700" />
+                        ) : (
+                            <Circle className="h-4 w-4 text-gray-300" />
+                        )}
+                        <span className="text-[10px] leading-tight text-gray-600">
+                            {step.label}
+                        </span>
+                    </div>
+                );
+            })}
+        </div>
     );
 }
