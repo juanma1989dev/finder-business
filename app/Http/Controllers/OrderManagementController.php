@@ -25,9 +25,6 @@ class OrderManagementController extends Controller
             'status' => $nextStatus,
         ]);
 
-
-        dd( $nextStatus,  OrderStatusEnum::READY_FOR_PICKUP->value );
-
         if ($nextStatus === OrderStatusEnum::READY_FOR_PICKUP->value) {
             $this->onReadyForPickup($order);
         }

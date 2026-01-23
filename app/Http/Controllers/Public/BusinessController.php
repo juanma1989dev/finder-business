@@ -25,7 +25,7 @@ final class BusinessController extends Controller
 
         $data = $this->searchService->getData($filters, $geoData);
 
-        $isDeliveryUser = Auth::check() && Auth::user()->type === 'repartidor';
+        $isDeliveryUser = false; //Auth::check() && Auth::user()->type === 'repartidor';
 
         return inertia('Index', [
             ...$data,
