@@ -66,7 +66,7 @@ class HandleInertiaRequests extends Middleware
      */
     private function getFlow()
     {
-        $typeUser = Auth::user()->type;
+        $typeUser = Auth::user()->type ?? null;
 
         $data = [
             'flow' => OrderFlow::flow()[$typeUser] ?? [12],
