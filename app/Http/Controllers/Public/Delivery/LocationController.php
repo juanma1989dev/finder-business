@@ -43,12 +43,6 @@ class LocationController extends Controller
             now()->addMinutes(2)
         );
 
-        dd([
-            'lat' => $data['lat'],
-            'lng' => $data['lng'],
-            'updated_at' => now()->toISOString(),
-        ]);
-
         return response()->json([ 
             'ok' => true,
             'message' => 'Ubicación actualizada',
