@@ -14,6 +14,7 @@ class OrderManagementController extends Controller
     {
         $current    = strtolower( $order->status );
         $nextStatus = strtolower( $request->input('status', null) ); // validate is required
+        $note = $request->input('note', null);
 
         $canTransition = $this->canTransition($current, $nextStatus);
         
@@ -23,6 +24,7 @@ class OrderManagementController extends Controller
 
         $order->update([
             'status' => $nextStatus,
+            'notes' => $note,
         ]);
 
         if ($nextStatus === OrderStatusEnum::READY_FOR_PICKUP->value) {

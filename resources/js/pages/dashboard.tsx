@@ -1,29 +1,48 @@
 import { useOrderStatus } from '@/hooks/useOrderStatus';
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { BreadcrumbItem, Business, Order } from '@/types';
+import { BreadcrumbItem, Business, Order, OrderStatus } from '@/types';
 import { router } from '@inertiajs/react';
 import { Bike, Clock, Power, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
+// const tabs = ['Todos', 'Pendiente', 'Confirmado', 'Entregado'];
+
+enum Tabs {
+    Todos = 'Todos',
+    Pendiente = 'Pendiente',
+    Confirmado = 'Confirmado',
+    Entregado = 'Entregado',
+}
+
+const tabs = Object.values(Tabs);
+
+interface Props {
+    breadcrumbs: BreadcrumbItem[];
+    orders: Order[];
+    business: Business;
+}
+
+const STATUSES_WITH_REASON = [OrderStatus.CANCELLED, OrderStatus.REJECTED];
+
 export default function DashboardBusiness({
     breadcrumbs,
     orders,
     business,
-}: {
-    breadcrumbs: BreadcrumbItem[];
-    orders: Order[];
-    business: Business;
-}) {
+}: Props) {
     const [isBusinessOpen, setIsBusinessOpen] = useState(
         Boolean(business?.is_open),
     );
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState<
-        'Todos' | 'Pendiente' | 'Confirmado'
-    >('Todos');
+    const [activeTab, setActiveTab] = useState<Tabs>(Tabs.Todos);
 
-    const { labels } = useOrderStatus();
+    const [reasonDialog, setReasonDialog] = useState<{
+        open: boolean;
+        orderId?: number;
+        status?: string;
+    }>({ open: false });
+
+    const [noteText, setNoteText] = useState('');
 
     const toggleBusiness = () => {
         const old = isBusinessOpen;
@@ -42,25 +61,40 @@ export default function DashboardBusiness({
         );
     };
 
-    const avanzarEstado = (orderId: number, status?: string) => {
+    const changeStatusOrder = (orderId: number, status?: OrderStatus) => {
+        if (status && STATUSES_WITH_REASON.includes(status)) {
+            setReasonDialog({
+                open: true,
+                orderId,
+                status,
+            });
+            return;
+        }
+
+        sendStatus(orderId, status);
+    };
+
+    const sendStatus = (orderId: number, status?: string, note?: string) => {
         router.patch(
             `/dashboard/orders/${orderId}/status`,
             {
                 status,
+                note,
             },
             {
                 preserveScroll: true,
-                onSuccess: () => toast.success('Pedido actualizado'),
+                onSuccess: () => {
+                    toast.success('Pedido actualizado');
+                    setReasonDialog({ open: false });
+                    setNoteText('');
+                },
                 onError: () => toast.error('Error al actualizar pedido'),
             },
         );
     };
 
-    /* =======================
-        FILTERS
-        ======================= */
-
     const filteredOrders = useMemo(() => {
+        ///////
         return orders.filter((order: any) => {
             if (searchTerm) {
                 const q = searchTerm.toLowerCase();
@@ -74,14 +108,11 @@ export default function DashboardBusiness({
 
             if (activeTab === 'Pendiente') return order.status === 'pending';
             if (activeTab === 'Confirmado') return order.status === 'confirmed';
+            if (activeTab === 'Entregado') return order.status === 'delivered';
 
             return true;
         });
     }, [orders, searchTerm, activeTab]);
-
-    /* =======================
-        RENDER
-        ======================= */
 
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
@@ -123,7 +154,7 @@ export default function DashboardBusiness({
                     </div>
 
                     <div className="flex gap-1">
-                        {['Todos', 'Pendiente', 'Confirmado'].map((tab) => (
+                        {tabs.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab as any)}
@@ -148,32 +179,71 @@ export default function DashboardBusiness({
                             <BusinessOrderCard
                                 key={order.id}
                                 pedido={order}
-                                avanzarEstado={avanzarEstado}
+                                changeStatusOrder={changeStatusOrder}
                             />
                         ))
                     )}
                 </div>
             </div>
+            {reasonDialog.open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                        <h2 className="text-lg font-black text-slate-900">
+                            Motivo del rechazo / cancelación
+                        </h2>
+
+                        <textarea
+                            className="mt-4 w-full rounded-xl border bg-slate-100 p-3 text-sm focus:ring-2 focus:ring-rose-500"
+                            rows={4}
+                            placeholder="Escribe el motivo…"
+                            value={noteText}
+                            onChange={(e) => setNoteText(e.target.value)}
+                        />
+
+                        <div className="mt-4 flex justify-end gap-2">
+                            <button
+                                onClick={() => {
+                                    setReasonDialog({ open: false });
+                                    setNoteText('');
+                                }}
+                                className="rounded-xl px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100"
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                disabled={!noteText.trim()}
+                                onClick={() =>
+                                    sendStatus(
+                                        reasonDialog.orderId!,
+                                        reasonDialog.status,
+                                        noteText,
+                                    )
+                                }
+                                className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                            >
+                                Confirmar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 }
 
-/* =======================
-    ORDER CARD
-    ======================= */
-
-function BusinessOrderCard({
-    pedido,
-    avanzarEstado,
-}: {
+interface PropsOrderCard {
     pedido: any;
-    avanzarEstado: (id: number, status?: string) => void;
-}) {
+    changeStatusOrder: (id: number, status?: OrderStatus) => void;
+}
+
+function BusinessOrderCard({ pedido, changeStatusOrder }: PropsOrderCard) {
     const { flow, labels } = useOrderStatus();
 
     const statusOrder = pedido.status;
 
-    const isLate = statusOrder === 'pending' && pedido.minutes_waiting > 10;
+    const isLate =
+        statusOrder === OrderStatus.PENDING && pedido.minutes_waiting > 10;
 
     const flowActions = flow[statusOrder] ?? [];
 
@@ -185,7 +255,6 @@ function BusinessOrderCard({
                     : 'border-slate-200'
             }`}
         >
-            {/* HEADER */}
             <div className="p-4">
                 <div className="flex justify-between">
                     <div className="flex gap-3">
@@ -202,7 +271,7 @@ function BusinessOrderCard({
                         </div>
                     </div>
 
-                    <span className="rounded-full bg-orange-50 px-2 py-1 text-[10px] font-black text-orange-600 uppercase">
+                    <span className="flex items-center justify-center rounded-lg bg-orange-50 p-1 text-xs font-black text-orange-600 uppercase">
                         {labels[statusOrder]}
                     </span>
                 </div>
@@ -217,17 +286,19 @@ function BusinessOrderCard({
             </div>
 
             {/* ACTIONS */}
-            <div className="mt-auto flex gap-2 border-t p-2">
-                {flowActions.map((action: string) => (
-                    <button
-                        key={action}
-                        onClick={() => avanzarEstado(pedido.id, action)}
-                        className="flex-1 rounded-xl bg-rose-600 py-2 text-xs font-bold text-white"
-                    >
-                        {labels[action]}
-                    </button>
-                ))}
-            </div>
+            {flowActions.length > 0 && (
+                <div className="mt-auto flex gap-2 border-t p-2">
+                    {flowActions.map((action: OrderStatus) => (
+                        <button
+                            key={action}
+                            onClick={() => changeStatusOrder(pedido.id, action)}
+                            className="flex-1 rounded-xl bg-rose-600 py-2 text-xs font-bold text-white"
+                        >
+                            {labels[action]}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
