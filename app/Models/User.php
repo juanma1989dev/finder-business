@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\OrderStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -66,10 +68,22 @@ class User extends Authenticatable
         return $this->hasMany(Businesses::class);
     }
 
-    public function businesses()
+    public function businesses() //// Esto deberian ser solo los favoritos
     {
         return $this->belongsToMany(Businesses::class)
             ->using(BusinessUser::class)
             ->withPivot('is_favorite');
     }
+
+    public function activeOrder()
+    {
+        return $this->hasOne(Order::class)
+            ->whereNotIn('status', [
+                OrderStatusEnum::DELIVERED->value,
+                OrderStatusEnum::CANCELLED->value,
+                OrderStatusEnum::REJECTED->value,
+            ])
+            ->latest();
+    }
+
 }
