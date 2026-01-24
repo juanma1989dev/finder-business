@@ -90,7 +90,7 @@ export default function EditBusiness({
 
     const handleSubmit = () => {
         transform((d) => ({ ...d, tags: tags.join(',') }));
-        put(`/dashboard/business/${business.id}/info-general/x`, {
+        put(`/dashboard/business/${business.id}/info-general/`, {
             preserveScroll: true,
             onSuccess: () => toast.success('Módulo actualizado'),
             onError: () => toast.error('Error al guardar'),

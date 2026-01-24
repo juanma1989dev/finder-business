@@ -37,13 +37,13 @@ export default function SocialNetworks({ business }: Props) {
         tiktok: '',
     };
 
-    const { data, post, processing, setData } = useForm({
+    const { data, put, processing, setData } = useForm({
         ...initialSocialLinks,
         ...(business.social_networks ?? {}),
     });
 
     const handleSubmit = () => {
-        post(`/dashboard/business/${business.id}/social-networks`, {
+        put(`/dashboard/business/${business.id}/social-networks`, {
             preserveScroll: true,
             onSuccess: () =>
                 toast.success('Enlaces actualizados correctamente'),

@@ -39,7 +39,7 @@ export default function Location({ business }: Props) {
     const [mapReady, setMapReady] = useState(false);
     const mapRef = useRef<any>(null);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, put, processing, errors } = useForm({
         location: business.location,
         address: business.address,
         cords: {
@@ -54,7 +54,7 @@ export default function Location({ business }: Props) {
     }, []);
 
     const handleSave = () => {
-        post(`/dashboard/business/${business.id}/location`, {
+        put(`/dashboard/business/${business.id}/location`, {
             preserveScroll: true,
             onSuccess: () =>
                 toast.success('Ubicación actualizada correctamente'),
