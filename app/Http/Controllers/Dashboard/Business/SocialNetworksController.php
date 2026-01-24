@@ -13,14 +13,14 @@ class SocialNetworksController extends Controller
     {
     }
 
-    public function index($idBusiness)
+    public function edit($idBusiness)
     {
         $data = $this->networksService->getData($idBusiness);
 
         return inertia('admin/Business/SocialNetworks', $data);
     }
 
-    public function store(Request $request, $id)
+    public function update(Request $request, $id)
     {
         $networks = NetworksDTO::fromRequest($request);
         

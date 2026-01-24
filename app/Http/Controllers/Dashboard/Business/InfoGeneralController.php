@@ -15,7 +15,7 @@ class InfoGeneralController extends Controller {
     {
     }
 
-    public function index ($idBusiness)
+    public function edit ($idBusiness)
     {
         $data = $this->generalInfoService->getInfo($idBusiness);
 
