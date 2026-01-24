@@ -53,7 +53,8 @@ use Illuminate\Support\Facades\Route;
             Route::get('location', [LocationController::class, 'edit'])->name('location.edit');
             Route::put('location', [LocationController::class, 'update'])->name('location.update');
 
-            Route::resource('services', ProductsController::class);
+            Route::resource('services', ProductsController::class)->only(['index', 'store', 'destroy']);
+            Route::post('services/{service}', [ProductsController::class, 'update'])->name('services.update-post');
 
             Route::resource('gallery', GalleryController::class)->only(['index', 'store', 'destroy']);
 
