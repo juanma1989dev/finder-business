@@ -21,6 +21,6 @@ class IndexController extends Controller
            'business' => $businesses,
         ];
 
-        return inertia('dashboard', $data);
+        return inertia('dashboard/business/Index', $data);
     }
 }
