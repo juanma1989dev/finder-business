@@ -1,10 +1,11 @@
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Business, Order, OrderStatus } from '@/types';
 import { router } from '@inertiajs/react';
-import { AlertTriangle, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import GridOrders from './GridOrders';
+import NotesDialog from './NotesDialog';
 import Stat from './Stat';
 
 enum Tabs {
@@ -32,7 +33,7 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
 
     const [reasonDialog, setReasonDialog] = useState<{
         open: boolean;
-        orderId?: number;
+        orderId?: number | null;
         status?: OrderStatus;
     }>({ open: false });
 
@@ -58,7 +59,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
         return () => window.removeEventListener('keydown', handler);
     }, [reasonDialog, noteText]);
 
-    /* ================= ACTIONS ================= */
     const toggleBusiness = () => {
         const old = isBusinessOpen;
         setIsBusinessOpen(!old);
@@ -128,7 +128,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
         });
     }, [orders, search, activeTab]);
 
-    /* ================= STATS ================= */
     const pendingCount = orders.filter(
         (o) => o.status === OrderStatus.PENDING,
     ).length;
@@ -141,7 +140,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
             <div className="flex min-h-screen flex-col gap-4 bg-slate-50 p-3 sm:p-4 lg:p-6">
-                {/* ===== HEADER (STICKY MOBILE) ===== */}
                 <div className="sticky top-0 z-30 rounded-2xl bg-white p-3 shadow-sm sm:static">
                     <div className="flex items-center justify-between">
                         <div>
@@ -163,7 +161,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                         </button>
                     </div>
 
-                    {/* ===== STATS ===== */}
                     <div className="mt-3 grid grid-cols-3 gap-2">
                         <Stat label="Pendientes" value={pendingCount} />
                         <Stat label="Retrasados" value={lateCount} danger />
@@ -171,7 +168,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                     </div>
                 </div>
 
-                {/* ===== SEARCH ===== */}
                 <div className="relative">
                     <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <input
@@ -182,7 +178,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                     />
                 </div>
 
-                {/* ===== TABS (SCROLL MOBILE) ===== */}
                 <div className="flex gap-2 overflow-x-auto pb-1">
                     {Object.values(Tabs).map((tab) => (
                         <button
@@ -199,22 +194,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                     ))}
                 </div>
 
-                {/* ===== GRID ===== */}
-                {/* <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {filteredOrders.length === 0 ? (
-                        <EmptyState />
-                    ) : (
-                        filteredOrders.map((order: any) => (
-                            <BusinessOrderCard
-                                key={order.id}
-                                pedido={order}
-                                loading={loadingOrderId === order.id}
-                                changeStatusOrder={changeStatusOrder}
-                            />
-                        ))
-                    )}
-                </div> */}
-
                 <GridOrders
                     orders={filteredOrders}
                     loadingOrderId={loadingOrderId}
@@ -222,114 +201,25 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                 />
             </div>
 
-            {/* ===== MODAL ===== */}
-            {reasonDialog.open && (
-                <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
-                    <div className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-xl sm:rounded-3xl">
-                        <h2 className="flex items-center gap-2 text-lg font-black">
-                            <AlertTriangle className="text-rose-600" />
-                            Motivo
-                        </h2>
-
-                        <textarea
-                            autoFocus
-                            className="mt-4 w-full rounded-xl bg-slate-100 p-3 text-sm"
-                            rows={4}
-                            placeholder="Escribe el motivo…"
-                            value={noteText}
-                            onChange={(e) => setNoteText(e.target.value)}
-                        />
-
-                        <p className="mt-2 text-xs text-slate-400">
-                            Enter para confirmar · Esc para cancelar
-                        </p>
-
-                        <button
-                            disabled={!noteText.trim()}
-                            onClick={() =>
-                                sendStatus(
-                                    reasonDialog.orderId!,
-                                    reasonDialog.status,
-                                    noteText,
-                                )
-                            }
-                            className="mt-4 w-full rounded-xl bg-rose-600 py-3 text-sm font-black text-white disabled:opacity-50"
-                        >
-                            Confirmar
-                        </button>
-                    </div>
-                </div>
-            )}
+            <NotesDialog
+                open={reasonDialog.open}
+                value={noteText}
+                onChange={setNoteText}
+                onClose={() =>
+                    setReasonDialog({
+                        open: false,
+                        orderId: null,
+                        status: undefined,
+                    })
+                }
+                onConfirm={() =>
+                    sendStatus(
+                        reasonDialog.orderId!,
+                        reasonDialog.status,
+                        noteText,
+                    )
+                }
+            />
         </DashboardLayout>
     );
 }
-
-// function BusinessOrderCard({
-//     pedido,
-//     loading,
-//     changeStatusOrder,
-// }: {
-//     pedido: any;
-//     loading: boolean;
-//     changeStatusOrder: (id: number, status?: OrderStatus) => void;
-// }) {
-//     const { flow, labels } = useOrderStatus();
-//     const statusOrder = pedido.status;
-//     const isLate =
-//         statusOrder === OrderStatus.PENDING && pedido.minutes_waiting > 10;
-
-//     return (
-//         <div className="rounded-2xl bg-white p-4 shadow-sm">
-//             <div className="flex justify-between">
-//                 <div>
-//                     <p className="text-xs font-black text-slate-400">
-//                         #{pedido.id}
-//                     </p>
-//                     <p className="font-bold">
-//                         {pedido.user?.name ?? 'Cliente'}
-//                     </p>
-//                 </div>
-//                 <span className="rounded-lg bg-orange-50 px-2 py-1 text-xs font-black text-orange-600">
-//                     {labels[statusOrder]}
-//                 </span>
-//             </div>
-
-//             <div className="mt-3 flex justify-between text-xs text-slate-500">
-//                 <span className="flex items-center gap-1">
-//                     <Clock className="h-4 w-4" />
-//                     {pedido.minutes_waiting} min
-//                     {isLate && (
-//                         <span className="ml-1 font-bold text-rose-600">!</span>
-//                     )}
-//                 </span>
-//                 <span className="text-base font-black">${pedido.total}</span>
-//             </div>
-
-//             <div className="mt-3 flex gap-2">
-//                 {(flow[statusOrder] ?? []).map((action: OrderStatus) => (
-//                     <button
-//                         key={action}
-//                         disabled={loading}
-//                         onClick={() => changeStatusOrder(pedido.id, action)}
-//                         className={`flex-1 rounded-xl py-3 text-xs font-black text-white ${
-//                             action === OrderStatus.CANCELLED ||
-//                             action === OrderStatus.REJECTED
-//                                 ? 'bg-rose-600'
-//                                 : 'bg-emerald-600'
-//                         }`}
-//                     >
-//                         {labels[action]}
-//                     </button>
-//                 ))}
-//             </div>
-//         </div>
-//     );
-// }
-
-// function EmptyState() {
-//     return (
-//         <div className="col-span-full rounded-3xl border-2 border-dashed bg-white p-12 text-center">
-//             <p className="font-bold text-slate-500">No hay pedidos activos</p>
-//         </div>
-//     );
-// }
