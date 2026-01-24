@@ -1,10 +1,11 @@
-import { useOrderStatus } from '@/hooks/useOrderStatus';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Business, Order, OrderStatus } from '@/types';
 import { router } from '@inertiajs/react';
-import { AlertTriangle, Clock, Search, Zap } from 'lucide-react';
+import { AlertTriangle, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+import GridOrders from './GridOrders';
+import Stat from './Stat';
 
 enum Tabs {
     Todos = 'Todos',
@@ -21,11 +22,7 @@ interface Props {
     business: Business;
 }
 
-export default function DashboardBusiness({
-    breadcrumbs,
-    orders,
-    business,
-}: Props) {
+export default function Index({ breadcrumbs, orders, business }: Props) {
     const [isBusinessOpen, setIsBusinessOpen] = useState(
         Boolean(business?.is_open),
     );
@@ -41,7 +38,6 @@ export default function DashboardBusiness({
 
     const [noteText, setNoteText] = useState('');
 
-    /* ================= SHORTCUTS ================= */
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -110,7 +106,6 @@ export default function DashboardBusiness({
         );
     };
 
-    /* ================= FILTER ================= */
     const filteredOrders = useMemo(() => {
         return orders.filter((order: any) => {
             if (search) {
@@ -138,9 +133,10 @@ export default function DashboardBusiness({
         (o) => o.status === OrderStatus.PENDING,
     ).length;
 
-    const lateCount = orders.filter(
-        (o) => o.status === OrderStatus.PENDING && o.minutes_waiting > 10,
-    ).length;
+    const lateCount = orders.filter((o) => {
+        return o.status === OrderStatus.PENDING;
+        // return o.status === OrderStatus.PENDING && (o.minutes_waiting ?? 0) > 10
+    }).length;
 
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
@@ -219,7 +215,7 @@ export default function DashboardBusiness({
                     )}
                 </div> */}
 
-                <OrderQueueGrid
+                <GridOrders
                     orders={filteredOrders}
                     loadingOrderId={loadingOrderId}
                     onChangeStatus={changeStatusOrder}
@@ -268,241 +264,72 @@ export default function DashboardBusiness({
     );
 }
 
-/* ================= COMPONENTS ================= */
+// function BusinessOrderCard({
+//     pedido,
+//     loading,
+//     changeStatusOrder,
+// }: {
+//     pedido: any;
+//     loading: boolean;
+//     changeStatusOrder: (id: number, status?: OrderStatus) => void;
+// }) {
+//     const { flow, labels } = useOrderStatus();
+//     const statusOrder = pedido.status;
+//     const isLate =
+//         statusOrder === OrderStatus.PENDING && pedido.minutes_waiting > 10;
 
-function Stat({
-    label,
-    value,
-    danger,
-}: {
-    label: string;
-    value: number;
-    danger?: boolean;
-}) {
-    return (
-        <div
-            className={`rounded-xl p-3 text-center ${
-                danger ? 'bg-rose-50' : 'bg-slate-100'
-            }`}
-        >
-            <p className="text-xs font-bold text-slate-500">{label}</p>
-            <p
-                className={`text-lg font-black ${
-                    danger ? 'text-rose-600' : ''
-                }`}
-            >
-                {value}
-            </p>
-        </div>
-    );
-}
+//     return (
+//         <div className="rounded-2xl bg-white p-4 shadow-sm">
+//             <div className="flex justify-between">
+//                 <div>
+//                     <p className="text-xs font-black text-slate-400">
+//                         #{pedido.id}
+//                     </p>
+//                     <p className="font-bold">
+//                         {pedido.user?.name ?? 'Cliente'}
+//                     </p>
+//                 </div>
+//                 <span className="rounded-lg bg-orange-50 px-2 py-1 text-xs font-black text-orange-600">
+//                     {labels[statusOrder]}
+//                 </span>
+//             </div>
 
-function BusinessOrderCard({
-    pedido,
-    loading,
-    changeStatusOrder,
-}: {
-    pedido: any;
-    loading: boolean;
-    changeStatusOrder: (id: number, status?: OrderStatus) => void;
-}) {
-    const { flow, labels } = useOrderStatus();
-    const statusOrder = pedido.status;
-    const isLate =
-        statusOrder === OrderStatus.PENDING && pedido.minutes_waiting > 10;
+//             <div className="mt-3 flex justify-between text-xs text-slate-500">
+//                 <span className="flex items-center gap-1">
+//                     <Clock className="h-4 w-4" />
+//                     {pedido.minutes_waiting} min
+//                     {isLate && (
+//                         <span className="ml-1 font-bold text-rose-600">!</span>
+//                     )}
+//                 </span>
+//                 <span className="text-base font-black">${pedido.total}</span>
+//             </div>
 
-    return (
-        <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <div className="flex justify-between">
-                <div>
-                    <p className="text-xs font-black text-slate-400">
-                        #{pedido.id}
-                    </p>
-                    <p className="font-bold">
-                        {pedido.user?.name ?? 'Cliente'}
-                    </p>
-                </div>
-                <span className="rounded-lg bg-orange-50 px-2 py-1 text-xs font-black text-orange-600">
-                    {labels[statusOrder]}
-                </span>
-            </div>
+//             <div className="mt-3 flex gap-2">
+//                 {(flow[statusOrder] ?? []).map((action: OrderStatus) => (
+//                     <button
+//                         key={action}
+//                         disabled={loading}
+//                         onClick={() => changeStatusOrder(pedido.id, action)}
+//                         className={`flex-1 rounded-xl py-3 text-xs font-black text-white ${
+//                             action === OrderStatus.CANCELLED ||
+//                             action === OrderStatus.REJECTED
+//                                 ? 'bg-rose-600'
+//                                 : 'bg-emerald-600'
+//                         }`}
+//                     >
+//                         {labels[action]}
+//                     </button>
+//                 ))}
+//             </div>
+//         </div>
+//     );
+// }
 
-            <div className="mt-3 flex justify-between text-xs text-slate-500">
-                <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {pedido.minutes_waiting} min
-                    {isLate && (
-                        <span className="ml-1 font-bold text-rose-600">!</span>
-                    )}
-                </span>
-                <span className="text-base font-black">${pedido.total}</span>
-            </div>
-
-            <div className="mt-3 flex gap-2">
-                {(flow[statusOrder] ?? []).map((action: OrderStatus) => (
-                    <button
-                        key={action}
-                        disabled={loading}
-                        onClick={() => changeStatusOrder(pedido.id, action)}
-                        className={`flex-1 rounded-xl py-3 text-xs font-black text-white ${
-                            action === OrderStatus.CANCELLED ||
-                            action === OrderStatus.REJECTED
-                                ? 'bg-rose-600'
-                                : 'bg-emerald-600'
-                        }`}
-                    >
-                        {labels[action]}
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-function EmptyState() {
-    return (
-        <div className="col-span-full rounded-3xl border-2 border-dashed bg-white p-12 text-center">
-            <p className="font-bold text-slate-500">No hay pedidos activos</p>
-        </div>
-    );
-}
-
-interface Props2 {
-    orders: any[];
-    loadingOrderId?: number | null;
-    onChangeStatus: (orderId: number, status: OrderStatus) => void;
-}
-
-function OrderQueueGrid({ orders, loadingOrderId, onChangeStatus }: Props2) {
-    const { flow } = useOrderStatus();
-
-    const sortedOrders = [...orders].sort((a, b) => {
-        // Pendientes primero
-        if (
-            a.status === OrderStatus.PENDING &&
-            b.status !== OrderStatus.PENDING
-        )
-            return -1;
-        if (
-            a.status !== OrderStatus.PENDING &&
-            b.status === OrderStatus.PENDING
-        )
-            return 1;
-
-        // Más tiempo esperando primero
-        return (b.minutes_waiting ?? 0) - (a.minutes_waiting ?? 0);
-    });
-
-    if (sortedOrders.length === 0) {
-        return (
-            <div className="col-span-full rounded-3xl border-2 border-dashed bg-white p-12 text-center">
-                <p className="font-bold text-slate-500">
-                    No hay pedidos en cola
-                </p>
-            </div>
-        );
-    }
-
-    return (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sortedOrders.map((order, index) => (
-                <OrderCard
-                    key={order.id}
-                    order={order}
-                    priority={index === 0}
-                    loading={loadingOrderId === order.id}
-                    onChangeStatus={onChangeStatus}
-                />
-            ))}
-        </div>
-    );
-}
-
-/* ================= CARD ================= */
-
-function OrderCard({
-    order,
-    priority,
-    loading,
-    onChangeStatus,
-}: {
-    order: any;
-    priority?: boolean;
-    loading?: boolean;
-    onChangeStatus: (orderId: number, status: OrderStatus) => void;
-}) {
-    const { flow, labels } = useOrderStatus();
-    const status = order.status;
-    const actions = flow[status] ?? [];
-    const primaryAction = actions[0];
-
-    const isLate = status === OrderStatus.PENDING && order.minutes_waiting > 10;
-
-    return (
-        <div
-            className={`relative flex flex-col rounded-2xl bg-white p-4 shadow-sm transition ${
-                priority ? 'ring-2 ring-indigo-500' : 'border border-slate-200'
-            }`}
-        >
-            {/* ===== PRIORITY BADGE ===== */}
-            {priority && (
-                <span className="absolute -top-2 -right-2 flex items-center gap-1 rounded-full bg-indigo-600 px-3 py-1 text-xs font-black text-white shadow">
-                    <Zap className="h-3 w-3" />
-                    Siguiente
-                </span>
-            )}
-
-            {/* ===== HEADER ===== */}
-            <div className="flex justify-between">
-                <div>
-                    <p className="text-xs font-black text-slate-400">
-                        #{order.id}
-                    </p>
-                    <p className="font-bold text-slate-900">
-                        {order.user?.name ?? 'Cliente'}
-                    </p>
-                </div>
-
-                <span className="rounded-lg bg-orange-50 px-2 py-1 text-xs font-black text-orange-600 uppercase">
-                    {labels[status]}
-                </span>
-            </div>
-
-            {/* ===== INFO ===== */}
-            <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {order.minutes_waiting ?? 0} min
-                    {isLate && (
-                        <span className="ml-1 flex items-center gap-1 font-bold text-rose-600">
-                            <AlertTriangle className="h-3 w-3" />
-                            Retrasado
-                        </span>
-                    )}
-                </span>
-
-                <span className="text-lg font-black text-slate-900">
-                    ${order.total}
-                </span>
-            </div>
-
-            {/* ===== ACTION ===== */}
-            {primaryAction && (
-                <button
-                    disabled={loading}
-                    onClick={() => onChangeStatus(order.id, primaryAction)}
-                    className={`mt-4 rounded-xl py-3 text-sm font-black text-white transition ${
-                        loading
-                            ? 'bg-slate-400'
-                            : primaryAction === OrderStatus.CANCELLED ||
-                                primaryAction === OrderStatus.REJECTED
-                              ? 'bg-rose-600 hover:bg-rose-700'
-                              : 'bg-emerald-600 hover:bg-emerald-700'
-                    }`}
-                >
-                    {labels[primaryAction]}
-                </button>
-            )}
-        </div>
-    );
-}
+// function EmptyState() {
+//     return (
+//         <div className="col-span-full rounded-3xl border-2 border-dashed bg-white p-12 text-center">
+//             <p className="font-bold text-slate-500">No hay pedidos activos</p>
+//         </div>
+//     );
+// }
