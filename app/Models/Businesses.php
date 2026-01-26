@@ -80,5 +80,10 @@ class Businesses extends Model
     {
         return $this->hasMany(BusinessImage::class);
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }
  
