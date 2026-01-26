@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Businesses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class IndexController extends Controller
 {   
@@ -14,22 +15,24 @@ class IndexController extends Controller
     {
         $user = Auth::user();
 
-        $business = Businesses::where('user_id', 1)
-        ->with([
-            'orders' => function ($query) {
-                $query->whereNotIn(
-                    'status', 
-                    [ OrderStatusEnum::CANCELLED, OrderStatusEnum::REJECTED, OrderStatusEnum::DELIVERED ]
-                ); 
-            },
-            'orders.items'
-        ])
-        ->first();
 
+        $business = Businesses::where('user_id', 1)
+            ->whereHas('orders', function ($query) {
+                $query->whereNotIn('status', OrderStatusEnum::finalStatuses());
+            })
+            ->with([
+                'orders' => function ($query) {
+                    $query->whereNotIn('status', OrderStatusEnum::finalStatuses())
+                    ->latest();  
+                },
+                'orders.items',
+                'orders.user',
+            ])
+            ->first();
 
         $data = [
-           'orders' => $business->orders,
-           'business' => $business,
+            'orders' => $business->orders,
+            'business' => $business,
         ];
 
         return inertia('dashboard/business/Index', $data);

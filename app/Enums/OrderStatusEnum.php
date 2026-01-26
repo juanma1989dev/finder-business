@@ -41,4 +41,12 @@ enum OrderStatusEnum: string
             self::REJECTED->value         => 'Rechazado',
         ];
     }
+
+    public static function finalStatuses(): array
+    {
+        return array_map(
+            fn ($status) => $status->value,
+            [self::CANCELLED, self::REJECTED, self::DELIVERED]
+        );
+    }
 }
