@@ -1,7 +1,7 @@
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Business, Order, OrderStatus } from '@/types';
 import { router } from '@inertiajs/react';
-import { Search } from 'lucide-react';
+import { Power, PowerOff, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import GridOrders from './GridOrders';
@@ -24,6 +24,9 @@ interface Props {
 }
 
 export default function Index({ breadcrumbs, orders, business }: Props) {
+    console.log({ business });
+    console.log('-------------------------------------------------');
+
     const [isBusinessOpen, setIsBusinessOpen] = useState(
         Boolean(business?.is_open),
     );
@@ -63,8 +66,10 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
         const old = isBusinessOpen;
         setIsBusinessOpen(!old);
 
-        router.post(
-            '/dashboard/business/manage-opening',
+        console.log({ business });
+
+        router.patch(
+            `/dashboard/business/${business.id}/opening-hours`,
             { id: business.id, status: !old },
             {
                 onError: () => {
@@ -144,20 +149,30 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-lg font-black">Pedidos</h1>
-                            <p className="text-xs text-slate-500">
+                            {/* <p className="text-xs text-slate-500">
                                 En tiempo real
-                            </p>
+                            </p> */}
                         </div>
 
                         <button
                             onClick={toggleBusiness}
-                            className={`rounded-xl px-4 py-2 text-xs font-black ${
+                            className={`flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-xs font-black ${
                                 isBusinessOpen
                                     ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-rose-100 text-rose-700'
                             }`}
                         >
-                            {isBusinessOpen ? 'Abierto' : 'Cerrado'}
+                            {isBusinessOpen ? (
+                                <>
+                                    Abierto
+                                    <Power className="h-4 w-4" />
+                                </>
+                            ) : (
+                                <>
+                                    Cerrado
+                                    <PowerOff className="h-4 w-4" />
+                                </>
+                            )}
                         </button>
                     </div>
 
