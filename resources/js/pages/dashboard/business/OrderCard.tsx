@@ -1,6 +1,6 @@
 import { useOrderStatus } from '@/hooks/useOrderStatus';
 import { OrderStatus } from '@/types';
-import { AlertTriangle, Clock } from 'lucide-react';
+import { AlertTriangle, Clock, Package } from 'lucide-react';
 
 export default function OrderCard({
     order,
@@ -17,9 +17,9 @@ export default function OrderCard({
     const status = order.status;
     const actions = flow[status] ?? [];
 
-    console.log(status, actions, flow);
-
     const isLate = status === OrderStatus.PENDING && order.minutes_waiting > 10;
+
+    // console.log({ status });
 
     return (
         <div
@@ -42,11 +42,11 @@ export default function OrderCard({
                         #{order.id}
                     </p>
                     <p className="font-bold text-slate-900">
-                        {order.user?.name ?? 'Cliente'}
+                        {order.user?.name ?? ''}
                     </p>
                 </div>
 
-                <span className="rounded-lg bg-orange-50 px-2 py-1 text-xs font-black text-orange-600 uppercase">
+                <span className="item-center flex items-center gap-1 rounded-lg bg-orange-50 px-2 py-1 text-xs font-black text-orange-600 uppercase">
                     {labels[status]}
                 </span>
             </div>
@@ -69,7 +69,6 @@ export default function OrderCard({
                 </span>
             </div>
 
-            {/* ===== ACTION ===== */}
             {actions.length > 0 && (
                 <div className="mt-3 flex flex-wrap justify-between gap-2">
                     {actions.map((action: OrderStatus) => (
@@ -84,9 +83,22 @@ export default function OrderCard({
                                     : 'bg-emerald-600'
                             }`}
                         >
-                            {labels[action]}
+                            {labels[action]}c
                         </button>
                     ))}
+                </div>
+            )}
+
+            {status === OrderStatus.READY_FOR_PICKUP && (
+                <div className="mt-4 flex flex-col items-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-center">
+                    <div className="flex items-center gap-2 text-xs font-bold text-blue-700">
+                        <Package className="h-4 w-4" />
+                        <span>Pedido pendiente para recoger</span>
+                    </div>
+
+                    <div className="rounded-lg bg-white px-3 py-1 text-sm font-black text-blue-800 shadow-sm">
+                        Código: <span className="tracking-widest">111111</span>
+                    </div>
                 </div>
             )}
         </div>

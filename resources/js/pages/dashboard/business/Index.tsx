@@ -24,9 +24,6 @@ interface Props {
 }
 
 export default function Index({ breadcrumbs, orders, business }: Props) {
-    console.log({ business });
-    console.log('-------------------------------------------------');
-
     const [isBusinessOpen, setIsBusinessOpen] = useState(
         Boolean(business?.is_open),
     );
