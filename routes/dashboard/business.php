@@ -7,6 +7,7 @@ use App\Http\Controllers\Dashboard\Business\SocialNetworksController;
 use App\Http\Controllers\OrderManagementController;  
 
 use App\Http\Controllers\Dashboard\Business\BusinessController;
+use App\Http\Controllers\Dashboard\Business\BusinessOpeningController;
 use App\Http\Controllers\Dashboard\Business\LocationController;
 use App\Http\Controllers\Dashboard\IndexController; 
 use Illuminate\Support\Facades\Route; 
@@ -23,22 +24,48 @@ use Illuminate\Support\Facades\Route;
     */
     Route::middleware('business')->group(function () {
 
-        /*
-        | Business base
-        */
+    //    Route::patch(
+    //         'business/{business}/cover',
+    //         [BusinessController::class, 'updateCoverImage']
+    //     )->name('business.cover');
+
+    //     Route::patch(
+    //         'business/{business}/opening',
+    //         [BusinessController::class, 'manageOpening']
+    //     )->name('business.opening');
+
+    //     /*
+    //     | Business base
+    //     */
+    //     Route::resource('business', BusinessController::class)->only([
+    //         'index',
+    //         'store',
+    //         'update',
+    //     ]);
+
+        Route::prefix('business/{business}')
+        ->as('business.')
+        ->group(function () {
+
+            Route::patch(
+                'opening-hours',
+                [BusinessOpeningController::class, 'update']
+            )->name('opening.update');
+
+            // Route::patch(
+            //     'cover-image',
+            //     [BusinessCoverController::class, 'update']
+            // )->name('cover.update');
+        });
+
         Route::resource('business', BusinessController::class)->only([
-            'index', 'store', 'update'
+            'index',
+            'store',
+            'update',
         ]);
 
-        Route::post(
-            'business/{business}/cover',
-            [BusinessController::class, 'updateCoverImage']
-        )->name('business.cover');
 
-        Route::post(
-            'business/{business}/opening',
-            [BusinessController::class, 'manageOpening']
-        )->name('business.opening');
+       
 
         /*
         |--------------------------------------------------------------------------
