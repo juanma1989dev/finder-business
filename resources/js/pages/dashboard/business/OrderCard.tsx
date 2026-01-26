@@ -1,6 +1,6 @@
 import { useOrderStatus } from '@/hooks/useOrderStatus';
 import { OrderStatus } from '@/types';
-import { AlertTriangle, Clock, Zap } from 'lucide-react';
+import { AlertTriangle, Clock } from 'lucide-react';
 
 export default function OrderCard({
     order,
@@ -16,11 +16,10 @@ export default function OrderCard({
     const { flow, labels } = useOrderStatus();
     const status = order.status;
     const actions = flow[status] ?? [];
-    const primaryAction = actions[0];
+
+    console.log(status, actions, flow);
 
     const isLate = status === OrderStatus.PENDING && order.minutes_waiting > 10;
-
-    console.log(flow, status, actions);
 
     return (
         <div
@@ -29,12 +28,12 @@ export default function OrderCard({
             }`}
         >
             {/* ===== PRIORITY BADGE ===== */}
-            {priority && (
+            {/* {priority && (
                 <span className="absolute -top-2 -right-2 flex items-center gap-1 rounded-full bg-indigo-600 px-3 py-1 text-xs font-black text-white shadow">
                     <Zap className="h-3 w-3" />
                     Siguiente
                 </span>
-            )}
+            )} */}
 
             {/* ===== HEADER ===== */}
             <div className="flex justify-between">
