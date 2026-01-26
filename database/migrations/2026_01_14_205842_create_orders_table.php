@@ -20,7 +20,10 @@ return new class extends Migration
                 ->constrained()
                 ->nullOnDelete();
 
-           
+            $table->foreignId('businesses_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
 
 
             $table->string('status')->default(OrderStatusEnum::PENDING->value);
