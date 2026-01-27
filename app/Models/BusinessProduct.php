@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class BusinessProduct extends Model
 {
-
-    // protected $table = 'business_products'; // ?
-    
     use HasFactory;
 
     protected $fillable = [
@@ -24,9 +21,6 @@ class BusinessProduct extends Model
         'is_active',
         'image_url'
     ];
-
-    public $incrementing = false;
-    protected $keyType = 'string';
 
     public function business()
     {
