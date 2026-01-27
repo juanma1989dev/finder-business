@@ -139,6 +139,7 @@ export interface BusinessCategories {
 export interface Business {
     id?: string;
     name: string;
+    slug: string;
     phone: string;
     location?: string;
     use_whatsapp: boolean;
