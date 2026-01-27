@@ -6,7 +6,7 @@ interface Props {
     product: any;
     onConfirm: (data: {
         extras: CartExtra[];
-        variations: CartVariation[]; // Propiedad original respetada
+        variations: CartVariation[];
         notes: string;
     }) => void;
     onClose: () => void;
@@ -35,30 +35,34 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
 
     return (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm">
-            <div className="relative w-full max-w-[420px] overflow-hidden rounded-2xl bg-white shadow-2xl duration-200 animate-in fade-in zoom-in">
-                <div className="flex items-center justify-between border-b border-gray-50 px-6 py-5">
+            {/* ESTRUCTURA Y SOMBRA DE TARJETA */}
+            <div className="relative w-full max-w-[420px] overflow-hidden rounded-lg bg-white shadow-2xl duration-200 animate-in fade-in zoom-in">
+                {/* HEADER - Paleta Gris para títulos neutros */}
+                <div className="flex items-center justify-between border-b border-purple-50 px-6 py-5">
                     <div>
-                        <h2 className="py-1 text-base font-black text-gray-400 uppercase">
+                        <h2 className="text-sm font-semibold text-gray-700 uppercase">
                             Personalizar pedido
                         </h2>
-                        <p className="text-sm font-black text-orange-500 uppercase">
+                        <p className="text-sm font-semibold text-purple-800">
                             {product.name}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="rounded-xl bg-gray-50 p-2 text-gray-400 transition-colors hover:bg-orange-50 hover:text-orange-500"
+                        className="rounded-lg bg-gray-50 p-2 text-gray-500 transition-colors hover:bg-purple-50 hover:text-purple-700"
                     >
                         <X size={18} />
                     </button>
                 </div>
 
-                <div className="scrollbar-hide max-h-[60vh] overflow-y-auto px-6 py-4">
+                {/* CUERPO - Padding p-3 (usado aquí en el contenedor de scroll) */}
+                <div className="scrollbar-hide max-h-[60vh] space-y-4 overflow-y-auto px-6 py-4">
+                    {/* VARIACIONES - Paleta Púrpura */}
                     {hasVariations && (
-                        <div className="mb-6">
-                            <p className="mb-3 text-xs font-black tracking-widest text-gray-900 uppercase">
+                        <div className="mb-4">
+                            <p className="mb-3 text-[10px] font-semibold tracking-widest text-gray-700 uppercase">
                                 Selecciona una opción
-                                <span className="text-orange-500">*</span>
+                                <span className="ml-1 text-purple-600">*</span>
                             </p>
                             <div className="grid grid-cols-1 gap-2">
                                 {product.variations.map((v: CartVariation) => {
@@ -68,16 +72,16 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                                             key={v.id}
                                             type="button"
                                             onClick={() => setVariation(v)}
-                                            className={`flex items-center justify-between rounded-xl border-2 px-4 py-3 transition-all active:scale-[0.98] ${
+                                            className={`flex items-center justify-between rounded-lg border-2 px-4 py-3 transition-all active:scale-95 ${
                                                 selected
-                                                    ? 'border-purple-600 bg-purple-50 text-purple-700'
-                                                    : 'border-gray-50 bg-gray-50/50 text-gray-500 hover:border-gray-100'
+                                                    ? 'border-purple-600 bg-purple-50 text-purple-800'
+                                                    : 'border-purple-50 bg-white text-gray-600 hover:border-purple-100'
                                             }`}
                                         >
-                                            <span className="text-[11px] font-black uppercase">
+                                            <span className="text-sm font-semibold">
                                                 {v.name}
                                             </span>
-                                            <span className="text-[10px] font-bold">
+                                            <span className="text-sm font-normal">
                                                 {Number(v.price) > 0
                                                     ? `+ $${v.price}`
                                                     : 'Incluido'}
@@ -86,18 +90,21 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                                     );
                                 })}
                             </div>
+                            {/* ALERTA - Paleta Amber */}
                             {isInvalid && (
-                                <p className="mt-2 text-xs font-bold tracking-tighter text-red-500 uppercase">
-                                    Por favor, selecciona una opción para
-                                    continuar
-                                </p>
+                                <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-2">
+                                    <p className="text-center text-[10px] leading-tight font-semibold text-amber-700 uppercase">
+                                        Selecciona una opción para continuar
+                                    </p>
+                                </div>
                             )}
                         </div>
                     )}
 
+                    {/* EXTRAS - Paleta Púrpura (Secundarios) */}
                     {product.extras?.length > 0 && (
-                        <div className="mb-6">
-                            <p className="mb-3 text-xs font-black tracking-widest text-gray-900 uppercase">
+                        <div className="mb-4">
+                            <p className="mb-3 text-[10px] font-semibold tracking-widest text-gray-700 uppercase">
                                 ¿Deseas agregar extras?
                             </p>
                             <div className="flex flex-col gap-2">
@@ -110,16 +117,16 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                                             key={e.id}
                                             type="button"
                                             onClick={() => toggleExtra(e)}
-                                            className={`flex items-center justify-between rounded-xl border-2 px-4 py-3 transition-all ${
+                                            className={`flex items-center justify-between rounded-lg border px-4 py-3 transition-all ${
                                                 isSelected
-                                                    ? 'border-orange-200 bg-orange-50 text-orange-700'
-                                                    : 'border-gray-50 bg-gray-50/50 text-gray-600 hover:border-gray-100'
+                                                    ? 'border-purple-600 bg-purple-50 text-purple-700'
+                                                    : 'border-purple-200 bg-white text-gray-600 hover:bg-purple-50/50'
                                             }`}
                                         >
-                                            <span className="text-[11px] font-black uppercase">
+                                            <span className="text-sm font-normal">
                                                 {e.name}
                                             </span>
-                                            <span className="text-[10px] font-bold">
+                                            <span className="text-sm font-semibold">
                                                 + ${e.price}
                                             </span>
                                         </button>
@@ -131,35 +138,24 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
 
                     {/* NOTAS */}
                     <div className="mb-1">
-                        <p className="mb-1 text-xs font-black tracking-widest text-gray-900 uppercase">
+                        <p className="mb-1 text-[10px] font-semibold tracking-widest text-gray-700 uppercase">
                             Notas adicionales
                         </p>
                         <textarea
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="Ej: Sin aderezos, cambiar por..."
-                            className="h-20 w-full resize-none rounded-xl border-2 border-gray-50 bg-gray-50/50 p-4 text-[12px] font-medium text-gray-700 transition-colors focus:border-purple-300 focus:outline-none"
+                            className="h-20 w-full resize-none rounded-lg border border-purple-200 bg-white p-3 text-sm font-normal text-gray-600 transition-colors focus:border-purple-600 focus:outline-none"
                         />
                     </div>
                 </div>
 
-                {/* FOOTER - PRECIO TOTAL Y CONFIRMACIÓN */}
-                <div className="border-t border-gray-50 bg-white px-6 py-6">
-                    <div className="mb-4 flex items-end justify-between">
-                        <div className="flex flex-col">
-                            {/* <span className="text-[9px] leading-none font-black tracking-widest text-gray-400 uppercase">
-                                Subtotal
-                            </span> */}
-                            {/* <span className="mt-1 text-2xl leading-none font-black text-gray-900">
-                                ${currentTotal.toFixed(2)}
-                            </span> */}
-                        </div>
-                    </div>
-
+                {/* FOOTER - Paleta Púrpura para botones */}
+                <div className="border-t border-purple-50 bg-white p-3">
                     <div className="flex gap-3">
                         <button
                             onClick={onClose}
-                            className="flex-1 rounded-xl px-4 py-3 text-xs font-black tracking-wider text-gray-400 uppercase transition-colors hover:bg-gray-50"
+                            className="flex-1 rounded-lg px-4 py-3 text-sm font-semibold text-gray-500 transition-all hover:bg-gray-50 active:scale-95"
                         >
                             Volver
                         </button>
@@ -173,13 +169,13 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                                     notes,
                                 })
                             }
-                            className={`flex-[2] rounded-xl py-3 text-xs font-black tracking-wider text-white uppercase shadow-lg transition-all active:scale-95 ${
+                            className={`flex-[2] rounded-lg py-3 text-sm font-semibold text-white shadow-sm transition-all active:scale-95 ${
                                 isInvalid
-                                    ? 'cursor-not-allowed bg-gray-200 text-gray-400 shadow-none'
-                                    : 'bg-orange-500 shadow-orange-100 hover:bg-orange-600 hover:shadow-orange-200'
+                                    ? 'cursor-not-allowed bg-gray-300'
+                                    : 'bg-purple-600 hover:bg-purple-700'
                             }`}
                         >
-                            Confirmar
+                            Confirmar — ${currentTotal.toFixed(2)}
                         </button>
                     </div>
                 </div>

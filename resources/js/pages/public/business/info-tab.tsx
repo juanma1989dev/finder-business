@@ -1,6 +1,6 @@
 import { formatTime, IconDynamic } from '@/lib/utils';
 import { Business } from '@/types';
-import { Clock, CreditCard, Globe, Share2, Sparkles, Star } from 'lucide-react';
+import { Clock, CreditCard, Globe, Share2, Sparkles } from 'lucide-react';
 
 interface Props {
     business: Business;
@@ -8,43 +8,45 @@ interface Props {
 
 export const InfoBusinessTab = ({ business }: Props) => {
     return (
-        <div className="flex flex-col gap-8 lg:flex-row">
-            <div className="flex-1 space-y-8">
-                <div>
-                    <h3 className="mb-3 text-sm font-black tracking-widest text-gray-400 uppercase">
+        <div className="flex flex-col gap-4 lg:flex-row">
+            {/* COLUMNA IZQUIERDA - Información Principal */}
+            <div className="flex-1 space-y-4">
+                <div className="p-3">
+                    <h3 className="mb-3 text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
                         Sobre nosotros
                     </h3>
-                    <p className="text-sm leading-relaxed text-gray-600 lg:text-base">
+                    <p className="text-sm leading-relaxed font-normal text-gray-600">
                         {business.description ||
                             'Este establecimiento no ha proporcionado una descripción detallada aún.'}
                     </p>
                 </div>
 
-                {(business?.tags ?? []).length > 0 && (
-                    <div className="flex flex-wrap gap-2">
+                {/* Etiquetas/Tags  */}
+                {/* {(business?.tags ?? []).length > 0 && (
+                    <div className="flex flex-wrap gap-2 px-3">
                         {(business?.tags ?? []).map((tag: string) => (
                             <span
                                 key={tag}
-                                className="flex items-center gap-1.5 rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-[11px] font-bold text-orange-600 uppercase"
+                                className="flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3 py-1 text-[10px] font-semibold text-purple-700 uppercase"
                             >
                                 <Star className="h-3 w-3 fill-current" />
                                 {tag}
                             </span>
                         ))}
                     </div>
-                )}
+                )} */}
 
                 {/* Galería de Imágenes */}
                 {business.images && business.images.length > 0 && (
-                    <div className="space-y-4">
-                        <h3 className="text-sm font-black tracking-widest text-gray-400 uppercase">
+                    <div className="space-y-3 p-3">
+                        <h3 className="text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
                             Galería
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                             {business.images.map((img, index: number) => (
                                 <div
                                     key={index}
-                                    className="group relative aspect-square overflow-hidden rounded-[1.5rem] border border-gray-100 bg-gray-50 shadow-sm"
+                                    className="group relative aspect-square overflow-hidden rounded-lg border border-purple-100 bg-purple-50 shadow-sm"
                                 >
                                     <img
                                         src={`/storage/${img.url}`}
@@ -58,30 +60,31 @@ export const InfoBusinessTab = ({ business }: Props) => {
                 )}
             </div>
 
+            {/* COLUMNA DERECHA - Sidecards */}
             <div className="w-full space-y-4 lg:w-[320px]">
                 {/* Horarios */}
-                <div className="overflow-hidden rounded-[1.5rem] border border-gray-100 bg-white p-5 shadow-sm">
-                    <div className="mb-4 flex items-center gap-2 text-gray-900">
-                        <Clock className="h-4 w-4 text-purple-600" />
-                        <h3 className="text-sm font-black tracking-wider uppercase">
+                <div className="overflow-hidden rounded-lg border border-purple-200 bg-white p-4 shadow-sm">
+                    <div className="mb-4 flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-purple-700" />
+                        <h3 className="text-sm font-semibold tracking-wider text-purple-800 uppercase">
                             Horarios
                         </h3>
                     </div>
                     {business?.schedules && business?.schedules.length > 0 ? (
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             {business?.schedules.map((day: any) => {
                                 const open = formatTime(day?.open);
                                 const close = formatTime(day?.close);
                                 return (
                                     <div
                                         key={day?.label}
-                                        className="flex items-center justify-between text-xs"
+                                        className="flex items-center justify-between text-[11px]"
                                     >
-                                        <span className="font-bold text-gray-500 capitalize">
+                                        <span className="font-semibold text-gray-500 capitalize">
                                             {day?.label}
                                         </span>
                                         <span
-                                            className={`font-medium ${day?.isOpen ? 'text-gray-700' : 'text-red-400 italic'}`}
+                                            className={`font-normal ${day?.isOpen ? 'text-gray-700' : 'text-amber-600 italic'}`}
                                         >
                                             {day?.isOpen
                                                 ? `${open} - ${close}`
@@ -92,20 +95,20 @@ export const InfoBusinessTab = ({ business }: Props) => {
                             })}
                         </div>
                     ) : (
-                        <p className="text-xs text-gray-400 italic">
+                        <p className="text-[11px] text-gray-400 italic">
                             No disponibles
                         </p>
                     )}
                 </div>
 
                 {/* Amenidades y Pagos combinados */}
-                <div className="space-y-6 rounded-[1.5rem] border border-gray-100 bg-white p-5 shadow-sm">
+                <div className="space-y-6 rounded-lg border border-purple-200 bg-white p-4 shadow-sm">
                     {/* Amenidades */}
                     {business?.amenities && business?.amenities.length > 0 && (
                         <div>
-                            <div className="mb-3 flex items-center gap-2 text-gray-900">
-                                <Sparkles className="h-4 w-4 text-purple-600" />
-                                <h3 className="text-sm text-[11px] font-black tracking-wider uppercase">
+                            <div className="mb-3 flex items-center gap-2">
+                                <Sparkles className="h-4 w-4 text-purple-700" />
+                                <h3 className="text-[11px] font-semibold tracking-wider text-purple-800 uppercase">
                                     Amenidades
                                 </h3>
                             </div>
@@ -113,13 +116,15 @@ export const InfoBusinessTab = ({ business }: Props) => {
                                 {business?.amenities.map((service: any) => (
                                     <div
                                         key={service.id}
-                                        className="flex items-center gap-2 text-xs text-gray-600"
+                                        className="flex items-center gap-2 text-[11px] text-gray-600"
                                     >
                                         <IconDynamic
                                             iconName={service.icon}
-                                            className="h-3.5 w-3.5 text-gray-400"
+                                            className="h-3.5 w-3.5 text-purple-700"
                                         />
-                                        <span>{service.name}</span>
+                                        <span className="font-normal">
+                                            {service.name}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
@@ -128,10 +133,10 @@ export const InfoBusinessTab = ({ business }: Props) => {
 
                     {/* Métodos de Pago */}
                     {business?.payments && business?.payments.length > 0 && (
-                        <div>
-                            <div className="mb-3 flex items-center gap-2 border-t border-gray-50 pt-4 text-gray-900">
-                                <CreditCard className="h-4 w-4 text-purple-600" />
-                                <h3 className="text-sm text-[11px] font-black tracking-wider uppercase">
+                        <div className="border-t border-purple-50 pt-4">
+                            <div className="mb-3 flex items-center gap-2">
+                                <CreditCard className="h-4 w-4 text-purple-700" />
+                                <h3 className="text-[11px] font-semibold tracking-wider text-purple-800 uppercase">
                                     Pagos
                                 </h3>
                             </div>
@@ -139,13 +144,15 @@ export const InfoBusinessTab = ({ business }: Props) => {
                                 {business?.payments.map((payment: any) => (
                                     <div
                                         key={payment.id}
-                                        className="flex items-center gap-2 text-xs text-gray-600"
+                                        className="flex items-center gap-2 text-[11px] text-gray-600"
                                     >
                                         <IconDynamic
                                             iconName={payment.icon}
-                                            className="h-3.5 w-3.5 text-gray-400"
+                                            className="h-3.5 w-3.5 text-purple-700"
                                         />
-                                        <span>{payment.name}</span>
+                                        <span className="font-normal">
+                                            {payment.name}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
@@ -153,12 +160,12 @@ export const InfoBusinessTab = ({ business }: Props) => {
                     )}
                 </div>
 
-                {/* Redes Sociales */}
+                {/* Redes Sociales - Botones con efecto activo */}
                 {Object.entries(business?.social_networks ?? {}).length > 0 && (
-                    <div className="rounded-[1.5rem] border border-gray-100 bg-white p-5 shadow-sm">
-                        <div className="mb-4 flex items-center gap-2 text-gray-900">
-                            <Share2 className="h-4 w-4 text-purple-600" />
-                            <h3 className="text-sm text-[11px] font-black tracking-wider uppercase">
+                    <div className="rounded-lg border border-purple-200 bg-white p-4 shadow-sm">
+                        <div className="mb-4 flex items-center gap-2">
+                            <Share2 className="h-4 w-4 text-purple-700" />
+                            <h3 className="text-[11px] font-semibold tracking-wider text-purple-800 uppercase">
                                 Síguenos
                             </h3>
                         </div>
@@ -170,7 +177,7 @@ export const InfoBusinessTab = ({ business }: Props) => {
                                         href={url as string}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-1.5 text-[11px] font-bold text-gray-700 transition-all hover:bg-purple-50 hover:text-purple-600"
+                                        className="flex items-center gap-2 rounded-lg bg-purple-50 px-3 py-1.5 text-[10px] font-semibold text-purple-700 transition-all hover:bg-purple-600 hover:text-white active:scale-95"
                                     >
                                         <Globe className="h-3 w-3" />
                                         <span className="capitalize">
