@@ -15,11 +15,10 @@ class IndexController extends Controller
     {
         $user = Auth::user();
 
-
         $business = Businesses::where('user_id', 1)
-            ->whereHas('orders', function ($query) {
-                $query->whereNotIn('status', OrderStatusEnum::finalStatuses());
-            })
+            // ->whereHas('orders', function ($query) {
+            //     $query->whereNotIn('status', OrderStatusEnum::finalStatuses());
+            // })
             ->with([
                 'orders' => function ($query) {
                     $query->whereNotIn('status', OrderStatusEnum::finalStatuses())
