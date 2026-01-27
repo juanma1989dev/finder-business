@@ -1,5 +1,6 @@
 import { useOrderStatus } from '@/hooks/useOrderStatus';
 import { OrderStatus } from '@/types';
+import { PackageSearch } from 'lucide-react';
 import OrderCard from './OrderCard';
 
 interface Props {
@@ -34,21 +35,31 @@ export default function GridOrders({
 
     if (sortedOrders.length === 0) {
         return (
-            <div className="col-span-full rounded-3xl border-2 border-dashed bg-white p-12 text-center">
-                <p className="font-bold text-slate-500">
+            /* PALETA GRIS Y ESTRUCTURA DE ESTADO VACÍO */
+            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-100 bg-white py-20 text-center">
+                <div className="mb-4 rounded-lg bg-purple-50 p-4 text-gray-300 shadow-sm">
+                    <PackageSearch size={40} />
+                </div>
+                <h3 className="text-base font-semibold text-gray-700 uppercase">
                     No hay pedidos en cola
+                </h3>
+                <p className="mt-1 text-[10px] font-normal tracking-widest text-gray-500 uppercase">
+                    Los nuevos pedidos aparecerán automáticamente aquí
                 </p>
             </div>
         );
     }
 
     return (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        /* CONFIGURACIÓN DE GRILLA RESPONSIVA Y GAP-4 */
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {sortedOrders.map((order, index) => (
                 <OrderCard
                     key={order.id}
                     order={order}
-                    priority={index === 0}
+                    priority={
+                        index === 0 && order.status === OrderStatus.PENDING
+                    }
                     loading={loadingOrderId === order.id}
                     onChangeStatus={onChangeStatus}
                 />

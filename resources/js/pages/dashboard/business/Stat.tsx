@@ -9,14 +9,23 @@ export default function Stat({
 }) {
     return (
         <div
-            className={`rounded-xl p-3 text-center ${
-                danger ? 'bg-rose-50' : 'bg-slate-100'
+            className={`rounded-lg border p-3 text-center transition-colors ${
+                danger
+                    ? 'border-amber-200 bg-amber-50'
+                    : 'border-purple-100 bg-purple-50'
             }`}
         >
-            <p className="text-xs font-bold text-slate-500">{label}</p>
             <p
-                className={`text-lg font-black ${
-                    danger ? 'text-rose-600' : ''
+                className={`text-[10px] leading-tight font-semibold tracking-widest uppercase ${
+                    danger ? 'text-amber-700' : 'text-purple-700'
+                }`}
+            >
+                {label}
+            </p>
+
+            <p
+                className={`mt-0.5 text-base font-semibold ${
+                    danger ? 'text-amber-600' : 'text-purple-800'
                 }`}
             >
                 {value}
