@@ -7,38 +7,31 @@ use Illuminate\Http\Request;
 final class ProductsDTO
 {
     public function __construct(
-        // 📦 Dominio principal
         public readonly string $name,
-        public readonly string $description,
+        public readonly ?string $description,
         public readonly float $price,
         public readonly ?string $duration,
         public readonly int $product_category_id,
         public readonly bool $isActive,
 
-        // 🖼️ Recursos
         public readonly ?ImageDTO $image,
         public readonly ?string $image_url,
 
-        // 🧩 Agregados
         public readonly array $extras,
         public readonly array $variations,
     ) {}
 
-    /**
-     * Traduce Request (UI) → Dominio
-     */
     public static function fromRequest(Request $request): self
     {
         $data = $request->validate([
             'name'        => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'string|max:300|nullable',
             'price'       => 'required|numeric|gt:0',
             'duration'    => 'nullable|string|max:255',
             'category'    => 'required|integer|exists:product_categories,id',
             'isActive'    => 'required|boolean',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'image_url'   => 'nullable|string',
-
 
             'extras'              => 'sometimes|array',
             'extras.*.name'       => 'required_with:extras|string|max:255',
@@ -47,7 +40,6 @@ final class ProductsDTO
             'variations'          => 'sometimes|array',
             'variations.*.name'   => 'required_with:variations|string|max:255',
         ]);
-
 
         $imageFile = $request->file('image');
 
@@ -65,7 +57,6 @@ final class ProductsDTO
             price: (float) $data['price'],
             duration: $data['duration'] ?? null,
 
-            // 🔑 Traducción UI → dominio
             product_category_id: (int) $data['category'],
 
             isActive: (bool) $data['isActive'],
@@ -78,9 +69,6 @@ final class ProductsDTO
         );
     }
 
-    /**
-     * Datos EXCLUSIVOS para la tabla products/services
-     */
     public function toPersistenceArray(): array
     {
         return [
