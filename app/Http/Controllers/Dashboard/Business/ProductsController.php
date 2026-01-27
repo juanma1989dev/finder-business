@@ -22,10 +22,10 @@ class ProductsController extends Controller
         return inertia('admin/Business/Products', $data);
     }
 
-    public function store(Request $request, string $idBusiness): RedirectResponse
+    public function store(Request $request, string $idBusiness, string $slug): RedirectResponse
     {
         $product = ProductsDTO::fromRequest($request);
-
+        
         try {
             $this->productsService->create($idBusiness, $product);
 
@@ -35,20 +35,19 @@ class ProductsController extends Controller
         }
     }
 
-    public function update(Request $request, string $idBusiness, string $id): RedirectResponse
+    public function update(Request $request, string $idBusiness, string $slug, string $id): RedirectResponse
     {
         $product = ProductsDTO::fromRequest($request);
 
         try {            
             $this->productsService->update( $idBusiness, $id, $product );
-
             return back()->with('success', 'Servicio actualizado correctamente');
         } catch (Throwable $e) {
             return back()->with('error', $e->getMessage());
         }
     }
 
-    public function destroy(string $idBusiness, string $id): RedirectResponse
+    public function destroy(string $idBusiness, string $slug,  string $id): RedirectResponse
     {
         try {
             $this->productsService->delete($idBusiness, $id);

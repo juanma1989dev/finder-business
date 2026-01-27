@@ -30,7 +30,7 @@ class IndexController extends Controller
             ->first();
 
         $data = [
-            'orders' => $business->orders,
+            'orders' => [], //$business->orders,
             'business' => $business,
         ];
 

@@ -20,7 +20,7 @@ class SocialNetworksController extends Controller
         return inertia('admin/Business/SocialNetworks', $data);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, string $slug)
     {
         $networks = NetworksDTO::fromRequest($request);
         
