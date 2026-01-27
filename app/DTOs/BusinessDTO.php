@@ -4,6 +4,7 @@ namespace App\DTOs;
 
 use App\DTOs\Traits\ArrayableDTO;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use MatanYadaev\EloquentSpatial\Objects\Point;
  
 
@@ -15,6 +16,7 @@ class BusinessDTO
         public readonly int $category_id,
         public readonly ?int $user_id,
         public readonly string $name,
+        public readonly string $slug, 
         public readonly string $slogan,    
         public readonly string $description,    
         public readonly string $phone,    
@@ -43,6 +45,7 @@ class BusinessDTO
             (int)$data['category_id'],
             (int)$request->user()->id,
             $data['name'],
+            Str::slug( $data['name'] ),
             $data['slogan'],
             $data['description'] ?? '',
             $data['phone'],
@@ -67,6 +70,7 @@ class BusinessDTO
             'category_id'   => $this->category_id,
             'user_id'       => $this->user_id,
             'name'          => $this->name,
+            'slug'          => $this->slug,
             'slogan'        => $this->slogan,
             'description'   => $this->description,
             'phone'         => $this->phone,
