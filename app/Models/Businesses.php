@@ -16,6 +16,7 @@ class Businesses extends Model
         'category_id',
         'user_id',
         'name',
+        'slug',
         'slogan',
         'description',
         'phone',
