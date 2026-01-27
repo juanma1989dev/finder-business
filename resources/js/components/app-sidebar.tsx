@@ -66,32 +66,32 @@ export function AppSidebar() {
                 ? [
                       {
                           title: 'Panel de Control',
-                          href: `/dashboard/business/${business.id}/info-general`,
+                          href: `/dashboard/business/${business.id}-${business.slug}/home`,
                           icon: LayoutDashboard,
                       },
                       {
                           title: 'Información general',
-                          href: `/dashboard/business/${business.id}/info-general`,
+                          href: `/dashboard/business/${business.id}-${business.slug}/info-general`,
                           icon: BookOpenText,
                       },
                       {
                           title: 'Ubicación',
-                          href: `/dashboard/business/${business.id}/location`,
+                          href: `/dashboard/business/${business.id}-${business.slug}/location`,
                           icon: MapPin,
                       },
                       {
                           title: 'Productos',
-                          href: `/dashboard/business/${business.id}/services`,
+                          href: `/dashboard/business/${business.id}-${business.slug}/services`,
                           icon: ShoppingBag,
                       },
                       {
                           title: 'Galería',
-                          href: `/dashboard/business/${business.id}/gallery`,
+                          href: `/dashboard/business/${business.id}-${business.slug}/gallery`,
                           icon: ImageIcon,
                       },
                       {
                           title: 'Redes sociales',
-                          href: `/dashboard/business/${business.id}/social-networks`,
+                          href: `/dashboard/business/${business.id}-${business.slug}/social-networks`,
                           icon: Globe,
                       },
                   ]
@@ -124,16 +124,14 @@ export function AppSidebar() {
             <SidebarHeader className="pt-6">
                 <SidebarMenu>
                     <SidebarMenuItem className="flex flex-col items-center gap-4">
-                        {/* Botón Volver - Paleta Gris a Púrpura */}
                         <Link
                             href="/dashboard/business"
-                            className="flex w-full items-center gap-2 px-2 text-[10px] font-semibold tracking-widest text-gray-500 uppercase transition-colors hover:text-purple-600 active:scale-95"
+                            className="mb-2 flex w-full items-center justify-center gap-2 px-2 text-lg font-semibold tracking-widest text-gray-500 uppercase transition-colors hover:text-purple-600 active:scale-95"
                         >
-                            <Home className="h-4 w-4 text-purple-600" />
+                            <Home className="h-5 w-5 text-purple-600" />
                             {open && <span>Mis negocios</span>}
                         </Link>
 
-                        {/* Contenedor de Avatar - Paleta Púrpura */}
                         <div className="group relative">
                             <TooltipProvider delayDuration={200}>
                                 <Tooltip>
@@ -149,7 +147,6 @@ export function AppSidebar() {
                                                 className="h-full w-full object-cover"
                                             />
 
-                                            {/* Capa de Carga / Overlay */}
                                             {open && (
                                                 <button
                                                     onClick={() =>
@@ -192,7 +189,6 @@ export function AppSidebar() {
                             />
                         </div>
 
-                        {/* Título del Negocio - Tipografía Finder */}
                         {open && (
                             <div className="space-y-1 text-center">
                                 <h5 className="truncate px-2 text-sm leading-tight font-semibold text-purple-800">
