@@ -13,7 +13,6 @@ import {
 } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Coffee, LayoutGrid, ShieldCheck, Wallet } from 'lucide-react';
-import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { LayoutBusinessModules } from './LayoutBusinessModules';
 import {
@@ -23,7 +22,6 @@ import {
     FeatureSection,
     Field,
     SectionHeader,
-    TagsSection,
     useToggleList,
 } from './components';
 
@@ -53,18 +51,16 @@ export default function EditBusiness({
     payments,
     amenities,
 }: Props) {
-    console.log(business);
-
     const breadcrumbs = makeBreadCrumb({
         text: 'Información general',
         url: '#',
     });
 
     const labelStyle =
-        'mb-1 block text-[10px] font-semibold uppercase tracking-widest text-slate-500';
+        'mb-1 block text-[10px] font-semibold uppercase tracking-widest text-gray-500 leading-tight';
 
     const inputStyle =
-        'h-9 rounded-lg border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20';
+        'h-9 w-full rounded-lg border-purple-200 bg-white px-3 text-sm text-gray-700 shadow-sm transition focus:border-purple-600 focus:ring-1 focus:ring-purple-600/20 font-normal';
 
     const form = useForm<BusinessForm>({
         name: business?.name ?? '',
@@ -81,20 +77,23 @@ export default function EditBusiness({
 
     const { data, setData, transform, put, processing } = form;
 
-    const [tagInput, setTagInput] = useState<string>('');
-    const [tags, setTags] = useState<string[]>(
-        typeof business?.tags === 'string'
-            ? business.tags.split(',').filter(Boolean)
-            : [],
-    );
+    // const [tagInput, setTagInput] = useState<string>('');
+    // const [tags, setTags] = useState<string[]>(
+    //     typeof business?.tags === 'string'
+    //         ? business.tags.split(',').filter(Boolean)
+    //         : [],
+    // );
 
     const handleSubmit = () => {
-        transform((d) => ({ ...d, tags: tags.join(',') }));
-        put(`/dashboard/business/${business.id}/info-general/`, {
-            preserveScroll: true,
-            onSuccess: () => toast.success('Módulo actualizado'),
-            onError: () => toast.error('Error al guardar'),
-        });
+        // transform((d) => ({ ...d, tags: tags.join(',') }));
+        put(
+            `/dashboard/business/${business.id}-${business.slug}/info-general/`,
+            {
+                preserveScroll: true,
+                onSuccess: () => toast.success('Módulo actualizado'),
+                onError: () => toast.error('Error al guardar'),
+            },
+        );
     };
 
     const amenitiesUI: FeatureItem[] = (amenities ?? [])
@@ -121,7 +120,7 @@ export default function EditBusiness({
 
     return (
         <LayoutBusinessModules
-            titleHead="System Asset Control"
+            titleHead="Finder Business"
             headerTitle={business?.name || 'Cargando…'}
             headerDescription="Gestión técnica de metadatos y disponibilidad."
             buttonText="Guardar cambios"
@@ -131,17 +130,21 @@ export default function EditBusiness({
             breadcrumbs={breadcrumbs}
         >
             <div className="space-y-6 lg:col-span-8">
-                {/* Identidad */}
-                <section>
+                <section className="mb-4">
                     <SectionHeader
-                        icon={<LayoutGrid size={14} />}
+                        icon={
+                            <LayoutGrid size={14} className="text-purple-700" />
+                        }
                         title="Información general"
+                        // className="mb-3 font-semibold text-purple-800"
                     />
-                    <CardBase>
+                    {/* ESPACIADO Y ESTRUCTURA: p-3, rounded-lg, shadow-sm */}
+                    <CardBase className="rounded-lg border-purple-200 bg-purple-50/10 shadow-sm">
                         <CardContent className="p-3">
+                            {/* Gap de Grilla Responsiva: gap-4 */}
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <Field
-                                    label="Nombre"
+                                    label="Nombre comercial"
                                     value={data.name}
                                     onChange={(v) => setData('name', v)}
                                     labelClass={labelStyle}
@@ -160,7 +163,7 @@ export default function EditBusiness({
                                                 e.target.value,
                                             )
                                         }
-                                        className={`w-full ${inputStyle}`}
+                                        className={`${inputStyle} appearance-none`}
                                     >
                                         <option value="">Seleccionar…</option>
                                         {categories.map((cat) => (
@@ -171,22 +174,23 @@ export default function EditBusiness({
                                     </select>
                                 </div>
 
-                                <Field
-                                    label="Eslogan"
-                                    value={data.slogan}
-                                    onChange={(v) => setData('slogan', v)}
-                                    full
-                                    labelClass={labelStyle}
-                                    inputClass={inputStyle}
-                                />
+                                <div className="sm:col-span-2">
+                                    <Field
+                                        label="Eslogan o frase publicitaria"
+                                        value={data.slogan}
+                                        onChange={(v) => setData('slogan', v)}
+                                        full
+                                        labelClass={labelStyle}
+                                        inputClass={inputStyle}
+                                    />
+                                </div>
 
                                 {/* Teléfono + WhatsApp */}
                                 <div className="sm:col-span-2">
                                     <div className="grid gap-4 sm:grid-cols-2">
-                                        {/* Teléfono */}
                                         <div className="w-full">
                                             <Label className={labelStyle}>
-                                                Teléfono
+                                                Teléfono de contacto
                                             </Label>
                                             <Input
                                                 value={data.phone}
@@ -198,31 +202,24 @@ export default function EditBusiness({
                                                 }
                                                 type="tel"
                                                 maxLength={10}
-                                                pattern="[0-9]{10}"
-                                                placeholder="Ejemplo: 5551234567"
-                                                className="h-9 w-full rounded-lg px-3 text-sm shadow-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
+                                                placeholder="Ej: 5551234567"
+                                                className={inputStyle}
                                             />
                                         </div>
 
-                                        {/* WhatsApp */}
                                         <div className="w-full">
                                             <Label className={labelStyle}>
-                                                Contacto por WhatsApp
+                                                WhatsApp Business
                                             </Label>
-
-                                            <div className="flex h-9 w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 shadow-sm">
+                                            {/* Paleta Púrpura: bg-purple-50, border-purple-200 */}
+                                            <div className="flex h-9 w-full items-center justify-between rounded-lg border border-purple-200 bg-purple-50 px-3 shadow-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-                                                        💬
-                                                    </span>
-
-                                                    <span className="text-xs font-medium text-slate-700">
+                                                    <span className="text-[10px] leading-tight font-semibold tracking-tight text-purple-700 uppercase">
                                                         {data.use_whatsapp
-                                                            ? 'WhatsApp habilitado'
-                                                            : 'WhatsApp deshabilitado'}
+                                                            ? 'Habilitado'
+                                                            : 'Deshabilitado'}
                                                     </span>
                                                 </div>
-
                                                 <Switch
                                                     checked={data.use_whatsapp}
                                                     onCheckedChange={(
@@ -233,7 +230,7 @@ export default function EditBusiness({
                                                             checked,
                                                         )
                                                     }
-                                                    className="scale-90 data-[state=checked]:bg-emerald-600"
+                                                    className="scale-75 transition-transform active:scale-95 data-[state=checked]:bg-purple-600"
                                                 />
                                             </div>
                                         </div>
@@ -252,7 +249,7 @@ export default function EditBusiness({
                                                 e.target.value,
                                             )
                                         }
-                                        className="min-h-[90px] rounded-lg border-slate-200 p-3 text-sm shadow-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
+                                        className="min-h-[100px] rounded-lg border-purple-200 p-3 text-sm font-normal shadow-sm focus:border-purple-600 focus:ring-1 focus:ring-purple-600/20"
                                     />
                                 </div>
                             </div>
@@ -260,19 +257,18 @@ export default function EditBusiness({
                     </CardBase>
                 </section>
 
-                {/* Features */}
                 <div className="grid gap-6 sm:grid-cols-2">
                     <FeatureSection
                         title="Amenidades"
-                        icon={<Coffee size={14} />}
+                        icon={<Coffee size={14} className="text-purple-600" />}
                         items={amenitiesUI}
                         toggle={amenitiesToggle.toggle}
                         isSelected={amenitiesToggle.isSelected}
                     />
 
                     <FeatureSection
-                        title="Métodos de cobro"
-                        icon={<Wallet size={14} />}
+                        title="Cobro"
+                        icon={<Wallet size={14} className="text-purple-700" />}
                         items={paymentsUI}
                         toggle={paymentsToggle.toggle}
                         isSelected={paymentsToggle.isSelected}
@@ -285,13 +281,13 @@ export default function EditBusiness({
                     schedules={data.schedules}
                     setSchedules={(s) => setData('schedules', s)}
                 />
-                <TagsSection
+                {/* <TagsSection
                     tags={tags}
                     tagInput={tagInput}
                     setTagInput={setTagInput}
                     setTags={setTags}
                     inputStyle={inputStyle}
-                />
+                /> */}
             </div>
         </LayoutBusinessModules>
     );

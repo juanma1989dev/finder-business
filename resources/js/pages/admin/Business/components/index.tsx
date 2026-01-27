@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
 import { Schedules } from '@/types';
 import { CalendarDays, Plus, Tag, XIcon } from 'lucide-react';
 
@@ -60,8 +61,8 @@ export function useToggleList<T extends string | number>(
 export function SectionHeader({ icon, title }: SectionHeaderProps) {
     return (
         <div className="relative mb-2 flex items-center gap-2 px-1">
-            <span className="absolute top-1/2 left-0 h-4 w-0.5 -translate-y-1/2 rounded-full bg-orange-500" />
-            <span className="ml-2 flex h-6 w-6 items-center justify-center rounded-md bg-orange-50 text-orange-600 ring-1 ring-orange-100">
+            <span className="absolute top-1/2 left-0 h-4 w-0.5 -translate-y-1/2 rounded-full bg-purple-500" />
+            <span className="ml-2 flex h-6 w-6 items-center justify-center rounded-md bg-orange-50 text-purple-600 ring-1 ring-orange-100">
                 {icon}
             </span>
             <h3 className="text-[10px] font-semibold tracking-widest text-slate-700 uppercase">
@@ -137,35 +138,80 @@ export function AvailabilitySection({
     schedules: Schedules[];
     setSchedules: (s: Schedules[]) => void;
 }) {
+    const updateDay = (idx: number, updates: Partial<Schedules>) => {
+        const newSchedules = [...schedules];
+        newSchedules[idx] = { ...newSchedules[idx], ...updates };
+        setSchedules(newSchedules);
+    };
+
     return (
-        <section>
+        <section className="w-full space-y-2">
             <SectionHeader icon={<CalendarDays size={14} />} title="Horario" />
-            <CardBase>
-                <CardContent className="p-2">
+            <CardBase className="overflow-hidden">
+                <CardContent className="divide-y divide-slate-100 p-0">
                     {schedules.map((day, idx) => (
                         <div
-                            key={idx}
-                            className="flex items-center justify-between rounded-lg px-3 py-2 text-xs"
+                            key={day.label}
+                            className={`flex flex-col gap-1.5 px-3 py-2.5 transition-colors ${
+                                day.isOpen ? 'bg-white' : 'bg-slate-50/50'
+                            }`}
                         >
-                            <span className="font-semibold text-slate-600 uppercase">
-                                {day.label}
-                            </span>
-                            <Switch
-                                checked={day.isOpen}
-                                onCheckedChange={(v) =>
-                                    setSchedules(
-                                        schedules.map((d, i) =>
-                                            i === idx
-                                                ? {
-                                                      ...d,
-                                                      isOpen: v,
-                                                  }
-                                                : d,
-                                        ),
-                                    )
-                                }
-                                className="scale-90 data-[state=checked]:bg-orange-600"
-                            />
+                            {/* Fila Superior: Día y Switch */}
+                            <div className="flex items-center justify-between gap-2">
+                                <span
+                                    className={`text-[11px] font-bold tracking-tight uppercase ${
+                                        day.isOpen
+                                            ? 'text-slate-700'
+                                            : 'text-slate-400'
+                                    }`}
+                                >
+                                    {day.label}
+                                </span>
+                                <Switch
+                                    checked={day.isOpen}
+                                    onCheckedChange={(v) =>
+                                        updateDay(idx, { isOpen: v })
+                                    }
+                                    className="scale-75 data-[state=checked]:bg-purple-600"
+                                />
+                            </div>
+
+                            {/* Fila Inferior: Grid de Inputs */}
+                            {day.isOpen && (
+                                <div className="mt-1 grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-top-1">
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="pl-1 text-[9px] font-semibold text-slate-400">
+                                            INICIO
+                                        </span>
+                                        <Input
+                                            type="time"
+                                            value={day.open}
+                                            onChange={(e) =>
+                                                updateDay(idx, {
+                                                    open: e.target.value,
+                                                })
+                                            }
+                                            className="h-8 w-full border-slate-200 bg-slate-50/50 px-2 text-[11px]"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="pl-1 text-[9px] font-semibold text-slate-400">
+                                            FIN
+                                        </span>
+                                        <Input
+                                            type="time"
+                                            value={day.close}
+                                            onChange={(e) =>
+                                                updateDay(idx, {
+                                                    close: e.target.value,
+                                                })
+                                            }
+                                            className="h-8 w-full border-slate-200 bg-slate-50/50 px-2 text-[11px]"
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </CardContent>
@@ -173,7 +219,6 @@ export function AvailabilitySection({
         </section>
     );
 }
-
 export function FeatureSection({
     title,
     icon,
@@ -187,7 +232,7 @@ export function FeatureSection({
 
             <CardBase>
                 <CardContent className="p-2">
-                    <div className="space-y-1">
+                    <div className="space-y-0">
                         {items.map((item) => (
                             <label
                                 key={item.id}
@@ -203,8 +248,9 @@ export function FeatureSection({
                                     onChange={(e) =>
                                         toggle(item.id, e.target.checked)
                                     }
-                                    className="h-4 w-4 accent-orange-600"
+                                    className="h-4 w-4 accent-purple-600"
                                 />
+                                {/* data-[state=checked]:bg-purple-600 */}
                             </label>
                         ))}
                     </div>
@@ -214,9 +260,20 @@ export function FeatureSection({
     );
 }
 
-export function CardBase({ children }: { children: React.ReactNode }) {
+export function CardBase({
+    children,
+    className = '',
+}: {
+    children: React.ReactNode;
+    className?: string;
+}) {
     return (
-        <Card className="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <Card
+            className={cn(
+                'rounded-xl border border-slate-200 bg-white shadow-sm',
+                className,
+            )}
+        >
             {children}
         </Card>
     );

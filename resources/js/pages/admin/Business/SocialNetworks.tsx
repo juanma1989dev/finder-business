@@ -2,7 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { makeBreadCrumb } from '@/helpers';
-import { Business, SocialLinks } from '@/types';
+import { Business } from '@/types';
 import { useForm } from '@inertiajs/react';
 import {
     Facebook,
@@ -27,7 +27,7 @@ export default function SocialNetworks({ business }: Props) {
         url: '/',
     });
 
-    const initialSocialLinks: SocialLinks = {
+    const initialSocialLinks = {
         web: '',
         facebook: '',
         instagram: '',
@@ -43,11 +43,14 @@ export default function SocialNetworks({ business }: Props) {
     });
 
     const handleSubmit = () => {
-        put(`/dashboard/business/${business.id}/social-networks`, {
-            preserveScroll: true,
-            onSuccess: () =>
-                toast.success('Enlaces actualizados correctamente'),
-        });
+        put(
+            `/dashboard/business/${business.id}${business.slug}/social-networks`,
+            {
+                preserveScroll: true,
+                onSuccess: () =>
+                    toast.success('Enlaces actualizados correctamente'),
+            },
+        );
     };
 
     const socialPlatforms = [
@@ -55,8 +58,8 @@ export default function SocialNetworks({ business }: Props) {
             key: 'web',
             label: 'Sitio Web',
             icon: Globe,
-            color: 'text-blue-600',
-            bg: 'bg-blue-50',
+            color: 'text-purple-700',
+            bg: 'bg-purple-50',
         },
         {
             key: 'facebook',
@@ -76,8 +79,8 @@ export default function SocialNetworks({ business }: Props) {
             key: 'twitter',
             label: 'Twitter / X',
             icon: Twitter,
-            color: 'text-zinc-900',
-            bg: 'bg-zinc-100',
+            color: 'text-gray-700',
+            bg: 'bg-gray-100',
         },
         {
             key: 'youtube',
@@ -90,8 +93,8 @@ export default function SocialNetworks({ business }: Props) {
             key: 'tiktok',
             label: 'TikTok',
             icon: Music2,
-            color: 'text-zinc-800',
-            bg: 'bg-zinc-100',
+            color: 'text-gray-800',
+            bg: 'bg-gray-100',
         },
     ] as const;
 
@@ -106,9 +109,8 @@ export default function SocialNetworks({ business }: Props) {
             processing={processing}
             breadcrumbs={breadcrumbs}
         >
-            {/* Contenedor Principal: Ocupa las 12 columnas del Grid del Layout */}
             <div className="space-y-6 lg:col-span-12">
-                {/* Formulario en Grid */}
+                {/* Formulario en Grid: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 */}
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -120,26 +122,30 @@ export default function SocialNetworks({ business }: Props) {
                         ({ key, label, icon: Icon, color, bg }) => (
                             <Card
                                 key={key}
-                                className="group relative overflow-hidden rounded-2xl border-slate-100 bg-white p-4 shadow-none transition-all duration-200 hover:border-orange-200 hover:shadow-md hover:shadow-orange-500/5"
+                                /* ESTRUCTURA: rounded-lg, border-purple-200, shadow-sm */
+                                className="group relative overflow-hidden rounded-lg border-purple-100 bg-white p-3 shadow-sm transition-all duration-200 hover:border-purple-300 hover:shadow-md active:scale-[0.98]"
                             >
                                 <div className="flex items-center gap-4">
-                                    {/* Icono de Plataforma */}
+                                    {/* Icono de Plataforma: bg-purple-50 y text-purple-700 */}
                                     <div
-                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-110 ${bg} ${color}`}
+                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110 ${bg} ${color}`}
                                     >
                                         <Icon size={20} />
                                     </div>
 
                                     <div className="min-w-0 flex-1">
                                         <div className="mb-1 flex items-center justify-between">
+                                            {/* TIPOGRAFÍA: Tamaño Micro text-[10px] */}
                                             <Label
                                                 htmlFor={key}
-                                                className="text-[10px] font-bold tracking-widest text-slate-400 uppercase"
+                                                className="text-[10px] leading-tight font-semibold tracking-widest text-gray-500 uppercase"
                                             >
                                                 {label}
                                             </Label>
-                                            {data[key as keyof SocialLinks] && (
-                                                <div className="flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[9px] font-bold text-green-600">
+
+                                            {/* Paleta Éxito: text-green-600 */}
+                                            {data[key] && (
+                                                <div className="flex animate-pulse items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[9px] font-bold text-green-600">
                                                     <Link2 size={10} />
                                                     Activo
                                                 </div>
@@ -148,21 +154,16 @@ export default function SocialNetworks({ business }: Props) {
                                         <Input
                                             id={key}
                                             type="url"
-                                            value={
-                                                data[
-                                                    key as keyof SocialLinks
-                                                ] || ''
-                                            }
+                                            value={data[key] || ''}
                                             onChange={(e) =>
-                                                setData(
-                                                    key as keyof SocialLinks,
-                                                    e.target.value,
-                                                )
+                                                setData(key, e.target.value)
                                             }
                                             placeholder={`https://${key}.com/...`}
-                                            className="h-8 border-none bg-transparent px-0 text-xs font-semibold text-slate-700 shadow-none placeholder:text-slate-300 focus-visible:ring-0"
+                                            /* Estilo Micro en Input para URL */
+                                            className="h-8 border-none bg-transparent px-0 text-xs font-normal text-gray-700 shadow-none placeholder:text-gray-300 focus-visible:ring-0"
                                         />
-                                        <div className="h-[1.5px] w-full bg-slate-100 transition-colors group-focus-within:bg-orange-400" />
+                                        {/* Borde dinámico: bg-purple-600 al hacer focus */}
+                                        <div className="h-[1.5px] w-full bg-gray-100 transition-colors group-focus-within:bg-purple-600" />
                                     </div>
                                 </div>
                             </Card>
@@ -170,20 +171,23 @@ export default function SocialNetworks({ business }: Props) {
                     )}
                 </form>
 
-                {/* Info Box Discreta */}
-                <div className="flex items-start gap-3 rounded-2xl border border-blue-50 bg-blue-50/30 p-4">
-                    <div className="mt-0.5 rounded-full bg-blue-100 p-1 text-blue-600">
+                {/* Info Box: Paleta Amber (Alertas/Advertencias) */}
+                <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <div className="mt-0.5 rounded-full bg-amber-100 p-1 text-amber-600">
                         <Globe size={14} />
                     </div>
                     <div>
-                        <h4 className="text-xs font-bold text-blue-900">
+                        <h4 className="text-xs font-semibold text-amber-700">
                             Validación de enlaces
                         </h4>
-                        <p className="mt-1 text-[11px] leading-relaxed text-blue-700/70">
+                        <p className="mt-1 text-[11px] leading-tight font-normal text-amber-700/80">
                             Asegúrate de incluir el protocolo{' '}
-                            <strong>https://</strong> al inicio de cada URL.
-                            Esto permite que los iconos de tu perfil público
-                            dirijan correctamente a tus clientes.
+                            <strong className="font-semibold text-amber-800">
+                                https://
+                            </strong>{' '}
+                            al inicio de cada URL. Esto permite que los iconos
+                            de tu perfil público dirijan correctamente a tus
+                            clientes.
                         </p>
                     </div>
                 </div>

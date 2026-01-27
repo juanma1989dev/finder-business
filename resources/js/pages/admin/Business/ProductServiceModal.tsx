@@ -1,3 +1,17 @@
+import { useForm } from '@inertiajs/react';
+import {
+    Image as ImageIcon,
+    Layers,
+    LoaderCircle,
+    Package,
+    Plus,
+    Save,
+    Sparkles,
+    Trash2,
+} from 'lucide-react';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
+
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -23,20 +37,6 @@ import {
     ProductVariations,
     ServicesAndProducts,
 } from '@/types';
-import { useForm } from '@inertiajs/react';
-
-import {
-    Image as ImageIcon,
-    Layers,
-    LoaderCircle,
-    Package,
-    Plus,
-    Save,
-    Sparkles,
-    Trash2,
-} from 'lucide-react';
-import { useEffect } from 'react';
-import { toast } from 'react-toastify';
 
 interface Props {
     open: boolean;
@@ -50,14 +50,22 @@ interface Props {
 type ProductForm = {
     name: string;
     description: string;
-    price: number;
+    price: string;
     duration: string;
-    category: number | undefined;
+    category: string;
     isActive: boolean;
     image: File | undefined;
     image_url: string;
     extras: ProductExtras[];
     variations: ProductVariations[];
+};
+
+// Estilos compartidos para mantener el JSX limpio
+const STYLES = {
+    label: 'text-[10px] font-semibold tracking-widest text-gray-500 uppercase leading-tight mb-1 block',
+    input: 'rounded-lg border-purple-200 bg-white text-sm shadow-sm transition focus:border-purple-600 focus:ring-1 focus:ring-purple-600/20',
+    tabTrigger:
+        'relative rounded-none border-b-2 border-transparent bg-transparent px-1 text-sm font-semibold text-gray-400 transition-all hover:text-purple-500 data-[state=active]:border-purple-600 data-[state=active]:text-purple-700',
 };
 
 export default function ProductServiceModal({
@@ -71,9 +79,9 @@ export default function ProductServiceModal({
     const form = useForm<ProductForm>({
         name: '',
         description: '',
-        price: 0,
+        price: '',
         duration: '',
-        category: undefined,
+        category: '',
         isActive: true,
         image: undefined,
         image_url: '',
@@ -81,6 +89,7 @@ export default function ProductServiceModal({
         variations: [],
     });
 
+    // Sincronización de datos con Tipado Estricto
     useEffect(() => {
         if (!open) return;
 
@@ -88,10 +97,10 @@ export default function ProductServiceModal({
             form.setData({
                 name: product.name ?? '',
                 description: product.description ?? '',
-                price: product.price ?? 0,
-                duration: product.duration ?? '',
-                category: product.category ?? undefined,
-                isActive: product.isActive ?? true,
+                price: String(product.price ?? ''),
+                duration: String(product.duration ?? ''),
+                category: String(product.category ?? ''),
+                isActive: Boolean(product.isActive ?? true),
                 image: undefined,
                 image_url: product.image_url ?? '',
                 extras: product.extras ?? [],
@@ -106,12 +115,18 @@ export default function ProductServiceModal({
     const handleSubmit = () => {
         const isEdit = Boolean(product);
         const url = isEdit
-            ? `/dashboard/business/${businessId}/services/${product?.id}`
-            : `/dashboard/business/${businessId}/services`;
+            ? `/dashboard/business/${businessId}-null/services/${product?.id}`
+            : `/dashboard/business/${businessId}-null/services`;
+
+        if (isEdit) {
+            form.transform((data) => ({
+                ...data,
+                // _method: 'PUT',
+            }));
+        }
 
         form.post(url, {
             forceFormData: true,
-            data: isEdit ? { ...form.data, _method: 'PUT' } : form.data,
             onSuccess: () => {
                 toast.success(
                     isEdit
@@ -120,107 +135,123 @@ export default function ProductServiceModal({
                 );
                 onClose();
                 onSuccess();
+                form.reset();
             },
-        } as any);
+        });
+    };
+
+    // Helper para renderizar errores de arrays
+    const renderError = (key: string) => {
+        const error = form.errors[key as keyof typeof form.errors];
+        return error ? (
+            <span className="ml-1 text-[10px] font-medium text-red-500">
+                {error}
+            </span>
+        ) : null;
     };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-5xl overflow-hidden rounded-[2rem] border-none bg-gray-50 p-0 shadow-2xl">
-                <div className="bg-white px-4 py-4">
+            <DialogContent className="max-w-4xl overflow-hidden rounded-lg border-none bg-gray-50 p-0 shadow-2xl">
+                {/* Header */}
+                <div className="border-b border-purple-100 bg-white px-6 py-4">
                     <DialogHeader>
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
-                                {product ? <Sparkles /> : <Plus />}
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-50 text-purple-700">
+                                {product ? (
+                                    <Sparkles size={20} />
+                                ) : (
+                                    <Plus size={20} />
+                                )}
                             </div>
                             <div>
-                                <DialogTitle className="text-xl font-black text-gray-900">
+                                <DialogTitle className="text-lg font-semibold text-purple-800">
                                     {product
                                         ? 'Editar Producto'
                                         : 'Nuevo Producto'}
                                 </DialogTitle>
-                                <p className="text-sm font-medium text-gray-500">
-                                    Configura los detalles de tu producto
+                                <p className="text-xs text-gray-500">
+                                    Gestiona las propiedades y variantes de tu
+                                    catálogo.
                                 </p>
                             </div>
                         </div>
                     </DialogHeader>
                 </div>
 
-                <Tabs defaultValue="general">
-                    <TabsList className="flex gap-2 self-center border-b-0 bg-transparent p-2">
-                        {[
-                            {
-                                id: 'general',
-                                label: 'General',
-                                icon: Package,
-                            },
-                            {
-                                id: 'variations',
-                                label: `Variaciones (${form.data.variations.length})`,
-                                icon: Layers,
-                            },
-                            {
-                                id: 'extras',
-                                label: `Extras (${form.data.extras.length})`,
-                                icon: Plus,
-                            },
-                        ].map((tab) => (
+                <Tabs defaultValue="general" className="w-full">
+                    <div className="border-b border-gray-100 bg-white px-6">
+                        <TabsList className="flex justify-start gap-6 bg-transparent p-0">
                             <TabsTrigger
-                                key={tab.id}
-                                value={tab.id}
-                                className="flex cursor-pointer items-center gap-2 border-b-2 border-transparent p-3 text-sm font-bold text-gray-400 hover:text-orange-600 data-[state=active]:border-orange-500 data-[state=active]:text-orange-600"
+                                value="general"
+                                className={STYLES.tabTrigger}
                             >
-                                {tab.label}
+                                <div className="flex items-center gap-2">
+                                    <Package size={12} /> General
+                                </div>
                             </TabsTrigger>
-                        ))}
-                    </TabsList>
-                    <div className="max-h-[60vh] overflow-y-auto px-6 py-6">
-                        <TabsContent value="general" className="space-y-3">
+                            <TabsTrigger
+                                value="variations"
+                                className={STYLES.tabTrigger}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Layers size={12} /> Variaciones (
+                                    {form.data.variations.length})
+                                </div>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="extras"
+                                className={STYLES.tabTrigger}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Plus size={12} /> Extras (
+                                    {form.data.extras.length})
+                                </div>
+                            </TabsTrigger>
+                        </TabsList>
+                    </div>
+
+                    <div className="max-h-[60vh] overflow-y-auto p-6">
+                        {/* Tab: General */}
+                        <TabsContent value="general" className="mt-0 space-y-6">
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <div className="space-y-2">
-                                        <Label className="text-xs font-black tracking-widest text-gray-600 uppercase">
-                                            Categoria
+                                <div className="space-y-4">
+                                    <div className="space-y-1">
+                                        <Label className={STYLES.label}>
+                                            Categoría
                                         </Label>
                                         <Select
                                             value={
-                                                form.data.category !== undefined
+                                                form.data.category
                                                     ? String(form.data.category)
                                                     : undefined
                                             }
-                                            onValueChange={(value) =>
-                                                form.setData(
-                                                    'category',
-                                                    Number(value),
-                                                )
+                                            onValueChange={(v) =>
+                                                form.setData('category', v)
                                             }
                                         >
-                                            <SelectTrigger className="rounded-xl">
+                                            <SelectTrigger
+                                                className={STYLES.input}
+                                            >
                                                 <SelectValue placeholder="Selecciona tipo" />
                                             </SelectTrigger>
-
                                             <SelectContent>
-                                                {productTypes.map((type) => (
+                                                {productTypes.map((t) => (
                                                     <SelectItem
-                                                        key={type.id}
-                                                        value={String(type.id)}
+                                                        key={t.id}
+                                                        value={String(t.id)}
                                                     >
-                                                        {`${type.icon} ${type.name}`}
+                                                        {t.icon} {t.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        {form.errors.category && (
-                                            <span className="mt-1 text-xs text-red-500 animate-in fade-in">
-                                                {form.errors.category}
-                                            </span>
-                                        )}
+                                        {renderError('category')}
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Label className="text-xs font-black tracking-widest text-gray-600 uppercase">
-                                            Nombre
+                                    <div className="space-y-1">
+                                        <Label className={STYLES.label}>
+                                            Nombre del producto
                                         </Label>
                                         <Input
                                             value={form.data.name}
@@ -230,18 +261,14 @@ export default function ProductServiceModal({
                                                     e.target.value,
                                                 )
                                             }
-                                            className="rounded-xl border-gray-200"
+                                            className={STYLES.input}
                                         />
-                                        {form.errors.name && (
-                                            <span className="mt-1 text-xs text-red-500 animate-in fade-in">
-                                                {form.errors.name}
-                                            </span>
-                                        )}
+                                        {renderError('name')}
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Label className="text-xs font-black tracking-widest text-gray-600 uppercase">
-                                            Precio
+                                    <div className="space-y-1">
+                                        <Label className={STYLES.label}>
+                                            Precio base
                                         </Label>
                                         <Input
                                             type="number"
@@ -249,55 +276,62 @@ export default function ProductServiceModal({
                                             onChange={(e) =>
                                                 form.setData(
                                                     'price',
-                                                    Number(e.target.value),
+                                                    e.target.value,
                                                 )
                                             }
-                                            className="rounded-xl border-gray-200"
+                                            className={STYLES.input}
                                         />
-                                        {form.errors.price && (
-                                            <span className="mt-1 text-xs text-red-500 animate-in fade-in">
-                                                {form.errors.price}
-                                            </span>
-                                        )}
+                                        {renderError('price')}
                                     </div>
                                 </div>
 
+                                {/* Image Upload */}
                                 <div
                                     onClick={() =>
                                         document
                                             .getElementById('image-upload')
                                             ?.click()
                                     }
-                                    className="relative flex cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+                                    className="relative flex aspect-square cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-purple-200 bg-white transition hover:border-purple-400 active:scale-95"
                                 >
-                                    {(!!form.data.image ||
-                                        !!form.data.image_url) && (
-                                        <Trash2
-                                            className="absolute top-3 right-3 z-50 h-8 w-8 rounded-full bg-white p-2 text-red-500"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                form.setData(
-                                                    'image',
-                                                    undefined,
-                                                );
-                                                form.setData('image_url', '');
-                                            }}
-                                        />
-                                    )}
-
                                     {form.data.image || form.data.image_url ? (
-                                        <img
-                                            src={
-                                                form.data.image
-                                                    ? URL.createObjectURL(
-                                                          form.data.image,
-                                                      )
-                                                    : form.data.image_url
-                                            }
-                                            className="h-full w-full rounded-xl object-cover p-2"
-                                        />
+                                        <>
+                                            <img
+                                                src={
+                                                    form.data.image
+                                                        ? URL.createObjectURL(
+                                                              form.data.image,
+                                                          )
+                                                        : form.data.image_url
+                                                }
+                                                className="h-full w-full object-cover p-2"
+                                            />
+                                            <Button
+                                                variant="destructive"
+                                                size="icon"
+                                                className="absolute top-3 right-3 h-7 w-7 rounded-full"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    form.setData({
+                                                        ...form.data,
+                                                        image: undefined,
+                                                        image_url: '',
+                                                    });
+                                                }}
+                                            >
+                                                <Trash2 size={14} />
+                                            </Button>
+                                        </>
                                     ) : (
-                                        <ImageIcon className="text-gray-400" />
+                                        <div className="text-center">
+                                            <ImageIcon
+                                                className="mx-auto mb-2 text-gray-300"
+                                                size={32}
+                                            />
+                                            <span className="text-xs font-medium text-gray-400">
+                                                Subir imagen
+                                            </span>
+                                        </div>
                                     )}
                                     <input
                                         id="image-upload"
@@ -310,16 +344,11 @@ export default function ProductServiceModal({
                                             )
                                         }
                                     />
-                                    {form.errors.image && (
-                                        <span className="mt-1 text-xs text-red-500 animate-in fade-in">
-                                            {form.errors.image}
-                                        </span>
-                                    )}
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label className="text-xs font-black tracking-widest text-gray-600 uppercase">
+                            <div className="space-y-1">
+                                <Label className={STYLES.label}>
                                     Descripción
                                 </Label>
                                 <Textarea
@@ -331,72 +360,77 @@ export default function ProductServiceModal({
                                         )
                                     }
                                     className={cn(
-                                        'rounded-xl border-gray-200',
+                                        STYLES.input,
+                                        'min-h-[100px]',
                                         form.errors.description &&
-                                            'border-red-500 focus:ring-red-500',
+                                            'border-red-500',
                                     )}
                                 />
-                                {form.errors.description && (
-                                    <span className="mt-1 text-xs text-red-500 animate-in fade-in">
-                                        {form.errors.description}
-                                    </span>
-                                )}
+                                {renderError('description')}
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="variations" className="space-y-1">
-                            {form.data.variations.map((v, i) => (
-                                <>
-                                    <div
-                                        key={i}
-                                        className="flex items-center gap-1 rounded-2xl bg-white p-2 shadow-sm"
-                                    >
-                                        <Input
-                                            value={v.name}
-                                            className="border-none font-bold"
-                                            onChange={(e) => {
-                                                const arr = [
-                                                    ...form.data.variations,
-                                                ];
-                                                arr[i].name = e.target.value;
-                                                form.setData('variations', arr);
-                                            }}
-                                        />
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-red-400"
-                                            onClick={() => {
-                                                const arr = [
-                                                    ...form.data.variations,
-                                                ];
-                                                arr.splice(i, 1);
-                                                form.setData('variations', arr);
-                                            }}
-                                        >
-                                            <Trash2 size={18} />
-                                        </Button>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex-1">
-                                            {form.errors[
-                                                `variations.${i}.name` as keyof ProductForm
-                                            ] && (
-                                                <span className="mt-1 text-xs text-red-500 animate-in fade-in">
-                                                    {
-                                                        form.errors[
-                                                            `variations.${i}.name` as keyof ProductForm
-                                                        ]
-                                                    }
-                                                </span>
+                        {/* Tab: Variations */}
+                        <TabsContent
+                            value="variations"
+                            className="mt-0 space-y-3"
+                        >
+                            {form.data.variations.map((v, i) => {
+                                const hasErr =
+                                    !!form.errors[
+                                        `variations.${i}.name` as keyof typeof form.errors
+                                    ];
+                                return (
+                                    <div key={i} className="space-y-1">
+                                        <div
+                                            className={cn(
+                                                'flex items-center gap-2 rounded-lg border bg-white p-1 transition-all',
+                                                hasErr
+                                                    ? 'border-red-500 shadow-red-50'
+                                                    : 'border-purple-100',
                                             )}
+                                        >
+                                            <Input
+                                                value={v.name}
+                                                placeholder="Ej: Tamaño Grande"
+                                                className="border-none bg-transparent font-semibold text-purple-800 focus:ring-0"
+                                                onChange={(e) => {
+                                                    const arr = [
+                                                        ...form.data.variations,
+                                                    ];
+                                                    arr[i].name =
+                                                        e.target.value;
+                                                    form.setData(
+                                                        'variations',
+                                                        arr,
+                                                    );
+                                                }}
+                                            />
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-gray-300 hover:text-red-500"
+                                                onClick={() => {
+                                                    const arr = [
+                                                        ...form.data.variations,
+                                                    ];
+                                                    arr.splice(i, 1);
+                                                    form.setData(
+                                                        'variations',
+                                                        arr,
+                                                    );
+                                                }}
+                                            >
+                                                <Trash2 size={16} />
+                                            </Button>
                                         </div>
+                                        {renderError(`variations.${i}.name`)}
                                     </div>
-                                </>
-                            ))}
-
+                                );
+                            })}
                             <Button
-                                className="w-full rounded-2xl bg-orange-600 font-bold text-white hover:bg-orange-700"
+                                variant="outline"
+                                className="w-full border-dashed border-purple-300 text-purple-600"
                                 onClick={() =>
                                     form.setData('variations', [
                                         ...form.data.variations,
@@ -404,22 +438,23 @@ export default function ProductServiceModal({
                                     ])
                                 }
                             >
-                                <Plus size={18} className="mr-2" />
-                                Agregar variación
+                                <Plus size={16} className="mr-2" /> Agregar
+                                variación
                             </Button>
                         </TabsContent>
 
-                        {/* EXTRAS */}
-                        <TabsContent value="extras" className="space-y-1">
+                        {/* Tab: Extras */}
+                        <TabsContent value="extras" className="mt-0 space-y-3">
                             {form.data.extras.map((e, i) => (
-                                <>
-                                    <div
-                                        key={i}
-                                        className="grid grid-cols-[1fr_120px_auto] items-center gap-4 rounded-2xl bg-white p-2 shadow-sm"
-                                    >
+                                <div
+                                    key={i}
+                                    className="grid grid-cols-[1fr_120px_auto] items-start gap-3 rounded-lg border border-purple-100 bg-white p-2 shadow-sm"
+                                >
+                                    <div className="space-y-1">
                                         <Input
                                             value={e.name}
-                                            className="border-none font-bold"
+                                            placeholder="Nombre extra"
+                                            className="border-none bg-transparent font-semibold text-purple-800 focus:ring-0"
                                             onChange={(ev) => {
                                                 const arr = [
                                                     ...form.data.extras,
@@ -428,9 +463,13 @@ export default function ProductServiceModal({
                                                 form.setData('extras', arr);
                                             }}
                                         />
+                                        {renderError(`extras.${i}.name`)}
+                                    </div>
+                                    <div className="space-y-1">
                                         <Input
                                             type="number"
                                             value={e.price}
+                                            className="h-8 border-purple-100 bg-purple-50/50 font-mono text-xs"
                                             onChange={(ev) => {
                                                 const arr = [
                                                     ...form.data.extras,
@@ -441,41 +480,25 @@ export default function ProductServiceModal({
                                                 form.setData('extras', arr);
                                             }}
                                         />
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-red-400"
-                                            onClick={() => {
-                                                const arr = [
-                                                    ...form.data.extras,
-                                                ];
-                                                arr.splice(i, 1);
-                                                form.setData('extras', arr);
-                                            }}
-                                        >
-                                            <Trash2 size={18} />
-                                        </Button>
+                                        {renderError(`extras.${i}.price`)}
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex-1">
-                                            {form.errors[
-                                                `extras.${i}.name` as keyof ProductForm
-                                            ] && (
-                                                <span className="mt-1 text-xs text-red-500 animate-in fade-in">
-                                                    {
-                                                        form.errors[
-                                                            `extras.${i}.name` as keyof ProductForm
-                                                        ]
-                                                    }
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-gray-300 hover:text-red-500"
+                                        onClick={() => {
+                                            const arr = [...form.data.extras];
+                                            arr.splice(i, 1);
+                                            form.setData('extras', arr);
+                                        }}
+                                    >
+                                        <Trash2 size={16} />
+                                    </Button>
+                                </div>
                             ))}
-
                             <Button
-                                className="w-full rounded-2xl bg-orange-600 font-bold text-white hover:bg-orange-700"
+                                variant="outline"
+                                className="w-full border-dashed border-purple-300 text-purple-600"
                                 onClick={() =>
                                     form.setData('extras', [
                                         ...form.data.extras,
@@ -483,26 +506,35 @@ export default function ProductServiceModal({
                                     ])
                                 }
                             >
-                                <Plus size={18} className="mr-2" />
-                                Agregar extra
+                                <Plus size={16} className="mr-2" /> Agregar
+                                extra
                             </Button>
                         </TabsContent>
                     </div>
                 </Tabs>
 
-                {/* FOOTER */}
-                <div className="flex justify-end border-t bg-white px-4 py-3">
+                {/* Footer */}
+                <div className="flex justify-end gap-3 border-t border-purple-100 bg-white px-6 py-4">
+                    <Button
+                        variant="ghost"
+                        onClick={onClose}
+                        className="text-gray-500"
+                    >
+                        Cancelar
+                    </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={form.processing}
-                        className="rounded-xl bg-orange-600 px-4 font-black text-white hover:bg-orange-700"
+                        className="bg-purple-600 px-6 font-semibold text-white hover:bg-purple-700 active:scale-95 disabled:opacity-50"
                     >
                         {form.processing ? (
-                            <LoaderCircle className="animate-spin" />
+                            <LoaderCircle className="animate-spin" size={18} />
                         ) : (
-                            <Save className="mr-2" size={18} />
+                            <>
+                                <Save className="mr-2" size={18} /> Guardar
+                                cambios
+                            </>
                         )}
-                        Guardar
                     </Button>
                 </div>
             </DialogContent>

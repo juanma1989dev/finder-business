@@ -32,19 +32,19 @@ export const LayoutBusinessModules = ({
         <DashboardLayout breadcrumbs={breadcrumbs}>
             <Head title={titleHead} />
 
-            <div className="mx-auto w-full px-4 py-4 sm:px-6 lg:px-8">
-                <header className="mb-6 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
-                    <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mx-auto w-full p-2 sm:px-6 lg:px-8">
+                <header className="sticky top-12 z-40 mb-6 rounded-lg border border-purple-200 bg-white p-3 shadow-sm">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-orange-600 ring-1 ring-slate-200">
-                                <Icon size={20} strokeWidth={2.2} />
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-700 ring-1 ring-purple-200">
+                                <Icon size={18} strokeWidth={1.5} />
                             </div>
 
                             <div className="space-y-1">
-                                <h1 className="text-base font-semibold text-slate-900 sm:text-lg">
+                                <h1 className="text-base font-semibold text-gray-700 sm:text-lg">
                                     {headerTitle}
                                 </h1>
-                                <p className="max-w-xl text-sm leading-relaxed text-slate-500">
+                                <p className="max-w-xl text-sm leading-relaxed text-gray-500">
                                     {headerDescription}
                                 </p>
                             </div>
@@ -53,7 +53,7 @@ export const LayoutBusinessModules = ({
                         <Button
                             onClick={onSubmit}
                             disabled={processing}
-                            className="mt-2 w-full rounded-xl bg-orange-600 px-6 text-sm font-medium text-white shadow-sm transition-all hover:bg-orange-700 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 sm:mt-0 sm:w-auto"
+                            className="mt-2 w-full rounded-lg bg-purple-600 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-purple-700 active:scale-95 disabled:pointer-events-none disabled:opacity-60 sm:mt-0 sm:w-auto"
                         >
                             {processing ? (
                                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
@@ -65,7 +65,6 @@ export const LayoutBusinessModules = ({
                     </div>
                 </header>
 
-                {/* Content */}
                 <main className="grid grid-cols-1 gap-6 lg:grid-cols-12">
                     {children}
                 </main>

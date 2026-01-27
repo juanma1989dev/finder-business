@@ -30,7 +30,6 @@ export default function Gallery({ business }: Props) {
         images: [] as GalleryImage[],
     });
 
-    // Sincronizar estado local con el formulario
     useEffect(() => {
         setData('images', images);
     }, [images]);
@@ -69,7 +68,7 @@ export default function Gallery({ business }: Props) {
     };
 
     const handleSaveGallery = () => {
-        post(`/dashboard/business/${business.id}/gallery`, {
+        post(`/dashboard/business/${business.id}-${business.slug}/gallery`, {
             forceFormData: true,
             onSuccess: () =>
                 toast.success('Galería sincronizada correctamente'),

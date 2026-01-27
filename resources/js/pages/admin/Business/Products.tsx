@@ -1,7 +1,7 @@
 import { confirmAlert } from '@/components/app/ConfirmAlert';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-import { Edit3, ImageIcon, Package, Trash2 } from 'lucide-react';
+import { Edit, ImageIcon, Package, Trash2 } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -60,6 +60,8 @@ export default function Products({
         async (businessId?: string, serviceId?: string) => {
             if (!businessId || !serviceId) return;
 
+            const slug = null;
+
             await confirmAlert({
                 title: '¿Eliminar producto?',
                 description: 'Esta acción no se puede deshacer.',
@@ -67,7 +69,7 @@ export default function Products({
                 cancelText: 'Cancelar',
                 onConfirm: async () => {
                     router.delete(
-                        `/dashboard/business/${businessId}/services/${serviceId}`,
+                        `/dashboard/business/${businessId}-${slug}/services/${serviceId}`,
                         {
                             onSuccess: (page) => {
                                 const flash = (page.props as any)
@@ -99,7 +101,7 @@ export default function Products({
         >
             <div className="lg:col-span-12">
                 {services.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
                         {services.map((service) => {
                             const hasImage =
                                 typeof service.image_url === 'string' &&
@@ -114,51 +116,47 @@ export default function Products({
                             return (
                                 <div
                                     key={service.id}
-                                    className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition"
+                                    className="group flex flex-col overflow-hidden rounded-lg border border-purple-200 bg-white shadow-sm transition hover:shadow-md"
                                 >
-                                    {/* Imagen */}
-                                    <div className="relative aspect-video w-full overflow-hidden bg-slate-50">
+                                    <div className="relative aspect-square h-55 w-full overflow-hidden bg-purple-50">
                                         {hasImage ? (
                                             <img
                                                 src={service.image_url}
                                                 alt={service.name || 'Producto'}
-                                                className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                                                className="h-20 w-full object-cover transition-transform group-hover:scale-105"
                                             />
                                         ) : (
-                                            <div className="flex h-full w-full items-center justify-center text-slate-200">
+                                            <div className="flex h-full w-full items-center justify-center text-gray-300">
                                                 <ImageIcon size={36} />
                                             </div>
                                         )}
 
-                                        {/* Precio */}
                                         <div className="absolute top-3 right-3">
-                                            <span className="rounded-lg bg-white/90 px-2 py-1 text-xs font-semibold text-orange-600 shadow-sm backdrop-blur">
+                                            <span className="rounded-lg bg-white/90 px-2 py-1 text-xs font-semibold text-purple-700 shadow-sm backdrop-blur-sm">
                                                 ${formattedPrice}
                                             </span>
                                         </div>
                                     </div>
 
-                                    {/* Contenido */}
-                                    <div className="flex flex-1 flex-col p-4">
-                                        <h4 className="line-clamp-1 text-sm font-semibold text-slate-800">
+                                    <div className="flex flex-1 flex-col p-3">
+                                        <h4 className="line-clamp-1 text-sm font-semibold text-purple-800">
                                             {service.name}
                                         </h4>
 
-                                        <p className="mt-1 line-clamp-2 min-h-[32px] text-xs text-slate-500">
+                                        <p className="mt-1 line-clamp-2 min-h-[32px] text-xs font-normal text-gray-500">
                                             {service.description ||
                                                 'Sin descripción disponible.'}
                                         </p>
 
-                                        {/* Acciones */}
-                                        <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-3">
+                                        <div className="mt-4 flex items-center gap-2 border-t border-purple-100 pt-3">
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
                                                 aria-label="Eliminar producto"
-                                                className="cursor-pointer rounded-lg text-slate-300 hover:bg-red-50 hover:text-red-500"
+                                                className="h-8 w-8 cursor-pointer rounded-lg text-gray-300 transition-colors hover:bg-red-50 hover:text-red-600 active:scale-95"
                                                 onClick={() =>
                                                     handleDeleteService(
-                                                        service.business_id,
+                                                        service.businesses_id,
                                                         service.id,
                                                     )
                                                 }
@@ -168,12 +166,12 @@ export default function Products({
 
                                             <Button
                                                 size="sm"
-                                                className="flex-1 cursor-pointer rounded-lg bg-orange-600 text-xs font-semibold text-white hover:bg-orange-700"
+                                                className="h-8 flex-1 cursor-pointer rounded-lg bg-purple-600 text-xs font-semibold text-white transition-all hover:bg-purple-700 active:scale-95"
                                                 onClick={() =>
                                                     openEdit(service)
                                                 }
                                             >
-                                                <Edit3
+                                                <Edit
                                                     size={14}
                                                     className="mr-2"
                                                 />
@@ -186,16 +184,19 @@ export default function Products({
                         })}
                     </div>
                 ) : (
-                    /* Estado vacío */
-                    <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-16 text-center">
-                        <Package size={40} className="mb-3 text-slate-200" />
-                        <p className="text-sm font-medium text-slate-400">
+                    /* ESTADO VACÍO: Paleta Gris */
+                    <div className="flex w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50/50 py-16 text-center">
+                        <Package size={40} className="mb-3 text-gray-300" />
+                        <p className="text-base font-semibold text-gray-700">
                             No hay productos aún
+                        </p>
+                        <p className="mb-4 text-sm text-gray-500">
+                            Comienza agregando artículos a tu catálogo.
                         </p>
                         <Button
                             onClick={openCreate}
                             variant="link"
-                            className="mt-1 text-sm font-semibold text-orange-600"
+                            className="text-sm font-semibold text-purple-600 active:scale-95"
                         >
                             Crear el primero
                         </Button>
