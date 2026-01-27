@@ -25,7 +25,7 @@ return new class extends Migration
 
             # Campos del Porducto
             $table->string('name');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->decimal('price', 10, 2)->default(0);
             $table->string('duration')->nullable();
             $table->string('image_url')->nullable();

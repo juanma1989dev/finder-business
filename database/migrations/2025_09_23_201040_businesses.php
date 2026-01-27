@@ -24,6 +24,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('name');
+            $table->string('slug')->unique();
             $table->string('slogan')->nullable();
             $table->mediumText('description')->nullable();            
             $table->string('phone');

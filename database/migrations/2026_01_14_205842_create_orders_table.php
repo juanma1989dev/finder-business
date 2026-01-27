@@ -25,7 +25,6 @@ return new class extends Migration
                 ->constrained()
                 ->nullOnDelete();
 
-
             $table->string('status')->default(OrderStatusEnum::PENDING->value);
             $table->decimal('subtotal', 10, 2);
             $table->decimal('shipping', 10, 2)->default(0);
@@ -34,7 +33,7 @@ return new class extends Migration
 
              $table->foreignId('delivery_id')
                 ->nullable()
-                ->constrained()
+                ->constrained('users')
                 ->nullOnDelete();
 
             $table->timestamp('ready_for_pickup_at')->nullable();
