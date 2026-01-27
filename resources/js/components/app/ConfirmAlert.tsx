@@ -66,13 +66,15 @@ function InternalConfirmAlert({
                     <AlertDialogCancel
                         disabled={loading}
                         onClick={handleCancel}
+                        className="flex items-center gap-2 border-none bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-600"
                     >
                         {cancelText}
                     </AlertDialogCancel>
+
                     <AlertDialogAction
                         disabled={loading}
                         onClick={handleConfirm}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 border-none bg-red-50 text-red-600 shadow-none hover:bg-red-100 hover:text-red-700"
                     >
                         {loading && (
                             <Loader2 className="h-4 w-4 animate-spin" />
