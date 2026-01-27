@@ -13,66 +13,23 @@ use App\Http\Controllers\Dashboard\IndexController;
 use Illuminate\Support\Facades\Route; 
 
  Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')->group(function () {
-
-    # Dashboard home
-    Route::get('/', [IndexController::class, 'index'])->name('index');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Business context (usuario con negocio)
-    |--------------------------------------------------------------------------
-    */
+    
+    # /business 
     Route::middleware('business')->group(function () {
+        # Dashboard home
+        Route::resource('/business', BusinessController::class)->only(['index', 'store', 'update']);
 
-    //    Route::patch(
-    //         'business/{business}/cover',
-    //         [BusinessController::class, 'updateCoverImage']
-    //     )->name('business.cover');
+        #
+        Route::prefix('business/{business}')->as('business.')->group(function () {
 
-    //     Route::patch(
-    //         'business/{business}/opening',
-    //         [BusinessController::class, 'manageOpening']
-    //     )->name('business.opening');
+            Route::patch('opening-hours', [BusinessOpeningController::class, 'update'])->name('opening.update');
 
-    //     /*
-    //     | Business base
-    //     */
-    //     Route::resource('business', BusinessController::class)->only([
-    //         'index',
-    //         'store',
-    //         'update',
-    //     ]);
-
-        Route::prefix('business/{business}')
-        ->as('business.')
-        ->group(function () {
-
-            Route::patch(
-                'opening-hours',
-                [BusinessOpeningController::class, 'update']
-            )->name('opening.update');
-
-            // Route::patch(
-            //     'cover-image',
-            //     [BusinessCoverController::class, 'update']
-            // )->name('cover.update');
+            # Route::patch('cover-image', [BusinessCoverController::class, 'update'])->name('cover.update'); /// mover
         });
 
-        Route::resource('business', BusinessController::class)->only([
-            'index',
-            'store',
-            'update',
-        ]);
-
-
-       
-
-        /*
-        |--------------------------------------------------------------------------
-        | Business sections  
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('business/{business}')->name('business.')->group(function () {
+        # Secciones
+        Route::prefix('business/{business}-{slug}')->name('business.')->group(function () {
+            Route::get('/home', [IndexController::class, 'index'])->name('business.dashboard');
 
             Route::get('info-general', [InfoGeneralController::class, 'edit'])->name('info-general.edit');
             Route::put('info-general', [InfoGeneralController::class, 'update'])->name('info-general.update');
@@ -95,7 +52,6 @@ use Illuminate\Support\Facades\Route;
         |--------------------------------------------------------------------------
         */
         Route::resource('orders', OrderManagementController::class)->only(['index', 'show']);
-
         Route::patch('orders/{order}/status', [OrderManagementController::class, 'updateStatus'])->name('orders.status');
     });
 });
