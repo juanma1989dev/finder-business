@@ -21,27 +21,25 @@ export default function OrderCard({
 
     return (
         <div
-            className={`relative flex flex-col rounded-lg bg-white p-3 shadow-sm transition-all duration-300 ${
+            className={`relative flex flex-col rounded-lg bg-white p-3 shadow-sm transition-all duration-900 ${
                 priority
-                    ? 'animate-pulse border-2 border-purple-600 ring-4 ring-purple-50'
+                    ? 'animate-pulse border-2 border-purple-600 ring-4 ring-purple-50 hover:animate-none'
                     : 'border border-purple-100'
             }`}
         >
-            {/* CAPA DE CARGA - Estilo Finder */}
             {loading && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/60 backdrop-blur-sm">
                     <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
                 </div>
             )}
 
-            {/* ===== HEADER ===== */}
             <div className="flex items-start justify-between">
                 <div>
                     <p className="text-[10px] leading-tight font-semibold tracking-widest text-gray-400 uppercase">
                         #{order.id}
                     </p>
                     <p className="text-sm leading-tight font-semibold text-purple-800">
-                        {order.user?.name ?? 'Cliente'}
+                        {order.user?.name ?? ''}
                     </p>
                 </div>
 
@@ -50,7 +48,6 @@ export default function OrderCard({
                 </span>
             </div>
 
-            {/* ===== INFO - Reloj y Total ===== */}
             <div className="mt-3 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                     <Clock
@@ -77,7 +74,6 @@ export default function OrderCard({
                 </span>
             </div>
 
-            {/* ===== ACCIONES DINÁMICAS ===== */}
             {actions.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">
                     {actions.map((action: OrderStatus) => {
@@ -102,7 +98,6 @@ export default function OrderCard({
                 </div>
             )}
 
-            {/* ===== ESTADO LISTO PARA RECOGER ===== */}
             {status === OrderStatus.READY_FOR_PICKUP && (
                 <div className="mt-4 flex flex-col items-center gap-2 rounded-lg border border-purple-100 bg-purple-50 px-3 py-3 text-center">
                     <div className="flex items-center gap-2 text-[10px] font-semibold tracking-wider text-purple-700 uppercase">

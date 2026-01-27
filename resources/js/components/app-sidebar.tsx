@@ -25,6 +25,7 @@ import {
     Globe,
     Home,
     Image as ImageIcon,
+    LayoutDashboard,
     LoaderCircle,
     MapPin,
     ShoppingBag,
@@ -39,7 +40,6 @@ export function AppSidebar() {
     const { props } = usePage<SharedData>();
     const business = getMetaValue<Business>(props, 'business');
 
-    // Optimizamos la obtención de la imagen con useMemo
     const imgSrc = useMemo(() => {
         if (!business) return '/images/default.png';
         if (business.cover_image) return `/storage/${business.cover_image}`;
@@ -51,7 +51,7 @@ export function AppSidebar() {
             props.auth.user.type === 'repartidor'
                 ? [
                       {
-                          title: 'Dashboard',
+                          title: 'Dashboard Entrega',
                           href: `/delivery`,
                           icon: Home,
                       },
@@ -60,11 +60,15 @@ export function AppSidebar() {
         [props.auth.user.type],
     );
 
-    // Items de navegación centralizados
     const mainNavItems: NavItem[] = useMemo(
         () =>
             business
                 ? [
+                      {
+                          title: 'Panel de Control',
+                          href: `/dashboard/business/${business.id}/info-general`,
+                          icon: LayoutDashboard,
+                      },
                       {
                           title: 'Información general',
                           href: `/dashboard/business/${business.id}/info-general`,
@@ -112,26 +116,30 @@ export function AppSidebar() {
     };
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader className="pt-4">
+        <Sidebar
+            collapsible="icon"
+            variant="inset"
+            className="border-purple-100 bg-white"
+        >
+            <SidebarHeader className="pt-6">
                 <SidebarMenu>
                     <SidebarMenuItem className="flex flex-col items-center gap-4">
-                        {/* Botón Volver / Home */}
+                        {/* Botón Volver - Paleta Gris a Púrpura */}
                         <Link
                             href="/dashboard/business"
-                            className="flex w-full items-center gap-2 px-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                            className="flex w-full items-center gap-2 px-2 text-[10px] font-semibold tracking-widest text-gray-500 uppercase transition-colors hover:text-purple-600 active:scale-95"
                         >
-                            <Home className="h-4 w-4" />
+                            <Home className="h-4 w-4 text-purple-600" />
                             {open && <span>Mis negocios</span>}
                         </Link>
 
-                        {/* Contenedor de Avatar/Negocio */}
+                        {/* Contenedor de Avatar - Paleta Púrpura */}
                         <div className="group relative">
                             <TooltipProvider delayDuration={200}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <div
-                                            className={`relative overflow-hidden rounded-full border-2 border-background bg-muted shadow-md transition-all duration-300 ${
+                                            className={`relative overflow-hidden rounded-lg border-2 border-purple-50 bg-purple-50 shadow-sm transition-all duration-300 ${
                                                 open ? 'h-24 w-24' : 'h-10 w-10'
                                             }`}
                                         >
@@ -141,21 +149,21 @@ export function AppSidebar() {
                                                 className="h-full w-full object-cover"
                                             />
 
-                                            {/* Overlay de Carga/Subida (Solo cuando está abierto) */}
+                                            {/* Capa de Carga / Overlay */}
                                             {open && (
                                                 <button
                                                     onClick={() =>
                                                         fileInputRef.current?.click()
                                                     }
                                                     disabled={uploadingCover}
-                                                    className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-100"
+                                                    className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-purple-900/60 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 disabled:opacity-100"
                                                 >
                                                     {uploadingCover ? (
                                                         <LoaderCircle className="h-6 w-6 animate-spin text-white" />
                                                     ) : (
                                                         <>
                                                             <Camera className="h-6 w-6 text-white" />
-                                                            <span className="text-[10px] font-medium text-white">
+                                                            <span className="mt-1 text-[10px] font-semibold text-white uppercase">
                                                                 Cambiar
                                                             </span>
                                                         </>
@@ -167,7 +175,7 @@ export function AppSidebar() {
                                     {!open && (
                                         <TooltipContent
                                             side="right"
-                                            className="font-semibold"
+                                            className="border-none bg-purple-900 font-semibold text-white"
                                         >
                                             {business?.name}
                                         </TooltipContent>
@@ -175,7 +183,6 @@ export function AppSidebar() {
                                 </Tooltip>
                             </TooltipProvider>
 
-                            {/* Input oculto */}
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -185,13 +192,13 @@ export function AppSidebar() {
                             />
                         </div>
 
-                        {/* Título del Negocio */}
+                        {/* Título del Negocio - Tipografía Finder */}
                         {open && (
-                            <div className="text-center">
-                                <h5 className="truncate px-2 text-sm font-bold tracking-tight text-foreground">
+                            <div className="space-y-1 text-center">
+                                <h5 className="truncate px-2 text-sm leading-tight font-semibold text-purple-800">
                                     {business?.name}
                                 </h5>
-                                <p className="text-[10px] tracking-widest text-muted-foreground uppercase">
+                                <p className="text-[10px] font-normal tracking-widest text-gray-500 uppercase">
                                     {business?.category?.name || 'Negocio'}
                                 </p>
                             </div>
@@ -200,14 +207,15 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className="px-2">
                 <SidebarGroup>
                     <NavMain items={deliveryNavItems} />
+                    <div className="my-2 border-t border-purple-50" />
                     <NavMain items={mainNavItems} />
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarFooter>
+            <SidebarFooter className="border-t border-purple-50 p-4">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
