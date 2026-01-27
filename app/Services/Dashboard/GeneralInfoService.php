@@ -43,8 +43,6 @@ class GeneralInfoService
 
             $infoData = $info->business->toArray(['user_id', 'location', 'cords']);
 
-            // dd($infoData);
-
             $business = $this->businessRepository->update($idBusiness, $infoData);
 
             $this->businessRepository->syncAmenities(

@@ -45,17 +45,14 @@ class ProductsService
 
             $data = $product->toPersistenceArray();
             
-            $productModel = $this->businessRepository
-                ->createProduct($idBusiness, $data);
+            $productModel = $this->businessRepository->createProduct($idBusiness, $data);
 
             foreach ($product->variations as $variation) {
-                $this->businessRepository
-                    ->createProductVariation($productModel->id, $variation);
+                $this->businessRepository->createProductVariation($productModel->id, $variation);
             }
 
             foreach ($product->extras as $extra) {
-                $this->businessRepository
-                    ->createProductExtra($productModel->id, $extra);
+                $this->businessRepository->createProductExtra($productModel->id, $extra);
             }
         });
 
@@ -65,10 +62,8 @@ class ProductsService
                 $idBusiness
             );
 
-            $this->businessRepository
-                ->update($data['id'], ['image_url' => $data['image_url']]);
+            $this->businessRepository->update($data['id'], ['image_url' => $data['image_url']]);
         }
-
     }
 
     /**
@@ -79,13 +74,13 @@ class ProductsService
         string $idService,
         ProductsDTO $productDto
     ) {
-        return DB::transaction(function () use ($idBusiness, $idService, $productDto) {
-
+        return DB::transaction(function () use ($idBusiness, $idService, $productDto) 
+        {
             $product = $this->findProduct($idBusiness, $idService);
 
             $data = $productDto->toPersistenceArray();
 
-            // 1. Viene nueva imagen → reemplazar
+            # 1. Viene nueva imagen → reemplazar
             if ($productDto->image) {
                 $data['image_url'] = $this->replaceImage(
                     $product,
@@ -94,7 +89,7 @@ class ProductsService
                 );
             }
 
-            // 2. No viene image ni image_url → eliminar imagen
+            # 2. No viene image ni image_url → eliminar imagen
             if (
                 !$productDto->image &&
                 empty($productDto->image_url) &&
@@ -104,26 +99,24 @@ class ProductsService
                 $data['image_url'] = null;
             }
 
-            // 3. Viene image_url → no hacer nada (no tocar image_url)
+            # 3. Viene image_url → no hacer nada (no tocar image_url)
             if (!empty($productDto->image_url)) {
                 unset($data['image_url']);
             }
 
             $product->update($data);
 
+            # Se crean las variaciones del producto
             $product->variations()->delete();
 
             foreach ($productDto->variations as $variation) {
-                $this->businessRepository
-                    ->createProductVariation($product->id, $variation);
+                $this->businessRepository->createProductVariation($product->id, $variation);
             }
 
-
+            # Se crean los extras del producto
             $product->extras()->delete();
-
             foreach ($productDto->extras as $extra) {
-                $this->businessRepository
-                    ->createProductExtra($product->id, $extra);
+                $this->businessRepository->createProductExtra($product->id, $extra);
             }
 
             return $product->fresh();

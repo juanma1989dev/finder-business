@@ -76,7 +76,10 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
     public function createProduct($idBusiness, array $data)
     {
         $business = $this->findById($idBusiness);
-        return $business->productsAndServices()->create($data);
+
+        $product = $business->productsAndServices()->create($data);
+
+        return $product;
     }
 
     /**
