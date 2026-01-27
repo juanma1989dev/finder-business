@@ -2,7 +2,14 @@ import { useOrderStatus } from '@/hooks/useOrderStatus';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Order } from '@/types';
 import { router } from '@inertiajs/react';
-import { Bike, Check, Clock, Search } from 'lucide-react';
+import {
+    Bike,
+    Check,
+    Clock,
+    Loader2,
+    PackageSearch,
+    Search,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -17,17 +24,23 @@ export default function DeliveryDashboard({
     const [activeTab, setActiveTab] = useState<
         'Todos' | 'Confirmado' | 'En camino'
     >('Todos');
-
-    const { labels } = useOrderStatus();
+    const [processingId, setProcessingId] = useState<number | null>(null);
 
     const avanzarEstado = (orderId: number) => {
+        setProcessingId(orderId);
         router.patch(
             `/delivery/orders/${orderId}/status`,
             {},
             {
                 preserveScroll: true,
-                onSuccess: () => toast.success('Pedido actualizado'),
-                onError: () => toast.error('Error al actualizar pedido'),
+                onSuccess: () => {
+                    toast.success('Pedido actualizado');
+                    setProcessingId(null);
+                },
+                onError: () => {
+                    toast.error('Error al actualizar pedido');
+                    setProcessingId(null);
+                },
             },
         );
     };
@@ -43,50 +56,46 @@ export default function DeliveryDashboard({
                     return false;
                 }
             }
-
             if (activeTab === 'Confirmado') return order.status === 'confirmed';
             if (activeTab === 'En camino') return order.status === 'on_the_way';
-
             return true;
         });
     }, [orders, searchTerm, activeTab]);
 
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
-            <div className="flex min-h-screen flex-col gap-4 bg-slate-50 p-4 lg:p-6">
+            <div className="flex min-h-screen flex-col gap-4 bg-purple-50/30 p-4 lg:p-6">
                 {/* HEADER */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-xl font-black">
-                            Gestión de pedidos
-                        </h1>
-                        <p className="text-sm text-slate-500">
-                            Pedidos disponibles para entregar
-                        </p>
-                    </div>
+                <div className="mb-2">
+                    <h1 className="text-base font-semibold tracking-tight text-gray-700 uppercase">
+                        Gestión de entregas
+                    </h1>
+                    <p className="text-[10px] leading-tight font-normal tracking-widest text-gray-500 uppercase">
+                        Pedidos en tiempo real
+                    </p>
                 </div>
 
                 {/* FILTER BAR */}
-                <div className="flex flex-col gap-3 rounded-2xl border bg-white p-3 shadow-sm md:flex-row md:items-center">
+                <div className="flex flex-col gap-3 rounded-lg border border-purple-200 bg-white p-3 shadow-sm md:flex-row md:items-center">
                     <div className="relative w-full md:w-64">
-                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                         <input
-                            className="w-full rounded-xl bg-slate-100 py-2 pr-4 pl-10 text-sm focus:ring-2 focus:ring-indigo-500"
+                            className="w-full rounded-lg border border-transparent bg-purple-50 py-2 pr-4 pl-10 text-sm font-normal text-gray-700 transition-all focus:border-purple-200 focus:ring-1 focus:ring-purple-600 focus:outline-none"
                             placeholder="Buscar pedido o cliente..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 overflow-x-auto pb-1 md:pb-0">
                         {['Todos', 'Confirmado', 'En camino'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab as any)}
-                                className={`rounded-lg px-4 py-2 text-xs font-bold uppercase ${
+                                className={`rounded-lg px-4 py-1.5 text-[10px] font-semibold whitespace-nowrap uppercase transition-all active:scale-95 ${
                                     activeTab === tab
-                                        ? 'bg-slate-900 text-white'
-                                        : 'text-slate-500 hover:bg-slate-100'
+                                        ? 'bg-purple-600 text-white shadow-sm'
+                                        : 'text-gray-500 hover:bg-purple-50'
                                 }`}
                             >
                                 {tab}
@@ -95,8 +104,8 @@ export default function DeliveryDashboard({
                     </div>
                 </div>
 
-                {/* GRID */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {/* GRID RESPONSIVA - Configuración de grilla Finder */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {filteredOrders.length === 0 ? (
                         <EmptyState />
                     ) : (
@@ -104,6 +113,7 @@ export default function DeliveryDashboard({
                             <DeliveryOrderCard
                                 key={order.id}
                                 pedido={order}
+                                isProcessing={processingId === order.id}
                                 avanzarEstado={avanzarEstado}
                             />
                         ))
@@ -116,72 +126,83 @@ export default function DeliveryDashboard({
 
 function DeliveryOrderCard({
     pedido,
+    isProcessing,
     avanzarEstado,
 }: {
     pedido: any;
+    isProcessing: boolean;
     avanzarEstado: (id: number) => void;
 }) {
     const { labels, flow } = useOrderStatus();
-
     const status = pedido.status;
     const nextStatuses: string[] = flow[status] ?? [];
-
     const nextMainStatus =
         nextStatuses.find((s) => s !== 'cancelled' && s !== 'rejected') ?? null;
-
     const canAdvance = Boolean(nextMainStatus);
 
     const advanceLabelMap: Record<string, string> = {
-        on_the_way: 'En camino',
-        delivered: 'Entregado',
+        on_the_way: 'Iniciar Entrega',
+        delivered: 'Marcar Entregado',
     };
-
-    const advanceLabel = nextMainStatus ? advanceLabelMap[nextMainStatus] : '';
 
     return (
         <div
-            className={`flex flex-col rounded-2xl border border-slate-200 bg-white`}
+            className={`relative flex flex-col rounded-lg border border-purple-200 bg-white shadow-sm transition-all hover:shadow-md ${isProcessing ? 'animate-pulse' : ''}`}
         >
-            {/* HEADER */}
-            <div className="p-4">
-                <div className="flex justify-between">
+            {/* CAPA DE CARGA - Overlay dinámico */}
+            {isProcessing && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/60 backdrop-blur-sm">
+                    <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
+                </div>
+            )}
+
+            <div className="space-y-4 p-3">
+                <div className="flex items-start justify-between">
                     <div className="flex gap-3">
-                        <div className="rounded-lg bg-orange-100 p-2">
-                            <Bike className="h-4 w-4 text-orange-600" />
+                        <div className="rounded-lg border border-purple-100 bg-purple-50 p-2">
+                            <Bike className="h-4 w-4 text-purple-700" />
                         </div>
                         <div>
-                            <span className="text-[10px] font-black text-slate-400">
-                                Pedido #{pedido.id}
+                            <span className="text-[10px] leading-tight font-semibold text-gray-500 uppercase">
+                                ID #{pedido.id}
                             </span>
-                            <p className="font-bold text-slate-900">
+                            <p className="text-sm leading-tight font-semibold text-purple-800">
                                 {pedido.user?.name ?? 'Cliente'}
                             </p>
                         </div>
                     </div>
-
-                    <span className="rounded-full bg-orange-50 px-3 py-1 text-[10px] font-black text-orange-600 uppercase">
+                    <span className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700 uppercase">
                         {labels[status]}
                     </span>
                 </div>
 
-                <div className="mt-4 flex justify-between">
-                    <div className="flex items-center gap-1 text-xs font-bold text-slate-400">
-                        <Clock className="h-4 w-4" />
-                        {pedido.minutes_waiting ?? 0} min
+                <div className="flex items-end justify-between">
+                    <div className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-600">
+                        <Clock className="h-3.5 w-3.5 text-purple-600" />
+                        <span>{pedido.minutes_waiting ?? 0} MIN ESPERA</span>
                     </div>
-                    <span className="text-lg font-black">${pedido.total}</span>
+                    <span className="text-base font-semibold text-gray-700">
+                        ${pedido.total}
+                    </span>
                 </div>
             </div>
 
-            {/* ACTIONS */}
-            <div className="mt-auto flex gap-2 border-t p-2">
-                {canAdvance && (
+            <div className="mt-auto border-t border-purple-50 p-2">
+                {canAdvance ? (
                     <button
+                        disabled={isProcessing}
                         onClick={() => avanzarEstado(pedido.id)}
-                        className="flex-1 rounded-xl bg-emerald-600 py-2 text-xs font-bold text-white"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 py-2.5 text-xs font-semibold text-white transition-all hover:bg-purple-700 active:scale-95 disabled:opacity-50"
                     >
-                        <Check className="inline h-3.5 w-3.5" /> {advanceLabel}
+                        <Check className="h-3.5 w-3.5" />
+                        {advanceLabelMap[nextMainStatus!] || 'Siguiente'}
                     </button>
+                ) : (
+                    <div className="py-2 text-center">
+                        <span className="text-[10px] font-semibold text-green-600 uppercase">
+                            Finalizado
+                        </span>
+                    </div>
                 )}
             </div>
         </div>
@@ -190,9 +211,15 @@ function DeliveryOrderCard({
 
 function EmptyState() {
     return (
-        <div className="col-span-full rounded-3xl border-2 border-dashed bg-white p-16 text-center">
-            <p className="font-bold text-slate-500">
+        <div className="col-span-full flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-100 bg-white py-16 text-center">
+            <div className="mb-4 rounded-lg bg-purple-50 p-4 text-gray-300 shadow-sm">
+                <PackageSearch size={32} />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-700 uppercase">
                 No hay pedidos disponibles
+            </h3>
+            <p className="mt-1 text-[10px] font-normal tracking-widest text-gray-500 uppercase">
+                Los nuevos pedidos aparecerán aquí
             </p>
         </div>
     );
