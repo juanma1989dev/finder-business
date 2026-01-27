@@ -16,6 +16,7 @@ class BusinessMapper
             'id'                => $bussines->id,
             'category_id'       => $bussines->category_id,
             'name'              => $bussines->name,
+            'slug'              => $bussines->slug, 
             'phone'             => $bussines->phone,
             'use_whatsapp'      => $bussines->use_whatsapp,
             'slogan'            => $bussines->slogan,
