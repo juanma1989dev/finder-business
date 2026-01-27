@@ -13,18 +13,21 @@ const CardUser = ({
 }) => (
     <Link
         href={`/login?type=${type}`}
-        className="group flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-blue-50/50 hover:shadow-md"
+        className="group flex flex-col items-center rounded-lg border border-purple-200 bg-purple-50 p-3 shadow-sm transition-all hover:border-purple-300 hover:bg-white active:scale-95"
     >
-        <h2 className="mb-4 text-center text-lg font-bold text-slate-800 transition-colors group-hover:text-orange-600">
+        <h2 className="mb-3 text-center text-sm font-semibold text-purple-800 uppercase transition-colors">
             {title}
         </h2>
-        <div className="mb-4 overflow-hidden rounded-xl bg-slate-100">
+        <div className="mb-3 overflow-hidden rounded-lg bg-white">
             <img
                 src={imageSrc}
                 alt={title}
                 className="h-48 w-48 object-cover transition-transform duration-500 group-hover:scale-105"
             />
         </div>
+        <span className="text-[10px] font-semibold tracking-wider text-purple-600 uppercase">
+            Seleccionar
+        </span>
     </Link>
 );
 
@@ -35,12 +38,15 @@ interface Props {
 export default function AccountPage({ accountTypes }: Props) {
     return (
         <MainLayout>
-            <div className="p-4">
-                <h1 className="mb-4 text-center text-2xl font-bold text-gray-600">
-                    Elige el tipo de cuenta quieres crear
-                </h1>
+            <div className="mx-auto max-w-7xl p-3">
+                <header className="mb-4">
+                    <h1 className="text-center text-base font-semibold tracking-tight text-gray-700 uppercase">
+                        Elige el tipo de cuenta quieres crear
+                    </h1>
+                </header>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                {/* CONFIGURACIÓN DE GRILLA RESPONSIVA */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {Object.entries(accountTypes).map(([key, value]) => (
                         <CardUser
                             key={key}
@@ -51,7 +57,7 @@ export default function AccountPage({ accountTypes }: Props) {
                     ))}
                 </div>
 
-                <footer className="bottom-0 mt-8 w-full text-center text-sm text-gray-500">
+                <footer className="mt-8 w-full text-center text-[10px] leading-tight font-normal tracking-widest text-gray-500 uppercase">
                     &copy; {new Date().getFullYear()} Finder. Todos los derechos
                     reservados.
                 </footer>
