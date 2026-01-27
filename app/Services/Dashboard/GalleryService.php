@@ -69,12 +69,15 @@ class GalleryService
         $incomingPaths = [];
 
         foreach ($gallery->images as $imageData) {
-
+            
             $path = $this->processImage($imageData, $business->id);
-
+            
             if (!$path) continue;
-
+            
             $incomingPaths[] = $path;
+
+
+
 
             # Usar repository en lugar de Eloquent directo
             $this->galleryRpository->createOrUpdate(
@@ -161,13 +164,11 @@ class GalleryService
     {
         $primaryImages = $this->galleryRpository->getPrimaryImages($business);
 
-        // Si hay múltiples primarias, mantener solo la primera
         if ($primaryImages->count() > 1) {
             $firstPrimary = $primaryImages->first();
             $this->galleryRpository->setPrimary($firstPrimary);
         }
 
-        // Si no hay ninguna primaria y hay imágenes, establecer la primera
         if ($primaryImages->isEmpty() && $this->galleryRpository->hasImages($business)) {
             $firstImage = $this->galleryRpository->getByBusiness($business)->first();
             $this->galleryRpository->setPrimary($firstImage);

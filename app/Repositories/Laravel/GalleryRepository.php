@@ -67,6 +67,11 @@ class GalleryRepository implements GalleryRepositoryInterface
     {
         // Obtener el negocio y usar su relación
         $business = $image->business;
+
+        
+        if(!$business){
+            return;
+        }
         
         // Usar la relación como en el código original
         $business->images()

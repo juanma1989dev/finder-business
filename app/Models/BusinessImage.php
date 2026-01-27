@@ -19,8 +19,8 @@ class BusinessImage extends Model
         'is_primary' => 'boolean',
     ];
 
-    // public function business()
-    // {
-    //     return $this->belongsTo(Businesses::class, 'business_id', 'id');
-    // }
+    public function business()
+    {
+        return $this->belongsTo(Businesses::class, 'businesses_id', 'id');  
+    }
 }

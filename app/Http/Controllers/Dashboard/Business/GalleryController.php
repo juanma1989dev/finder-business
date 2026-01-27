@@ -21,11 +21,12 @@ class GalleryController extends Controller
         return inertia('admin/Business/Gallery', $data);
     }
 
-    public function store(Request $request, string $businessId)
+    public function store(Request $request, string $businessId, string $slug)
     {
         $gallery = GalleryBusinessDTO::fromArray( $request );
 
         $this->galleryService->syncGallery($businessId, $gallery);
+
 
         return redirect()
             ->back()
