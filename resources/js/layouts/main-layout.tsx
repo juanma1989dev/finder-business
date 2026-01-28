@@ -10,9 +10,13 @@ import { SharedData } from '@/types';
 
 interface MainLayoutProps {
     children: ReactNode;
+    showFloatShoppingCart?: boolean;
 }
 
-export default function MainLayout({ children }: MainLayoutProps) {
+export default function MainLayout({
+    children,
+    showFloatShoppingCart = true,
+}: MainLayoutProps) {
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     const { cart, auth } = usePage<SharedData>().props;
@@ -36,12 +40,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
             {user && (
                 <>
-                    <div className="fixed right-4 bottom-24 z-[40] transition-all duration-300 ease-out md:right-8 md:bottom-8">
-                        <CartFloatButton
-                            totalItems={totalItems}
-                            onClick={() => setIsCartOpen(true)}
-                        />
-                    </div>
+                    {showFloatShoppingCart && (
+                        <div className="fixed right-4 bottom-24 z-[40] md:right-8 md:bottom-8">
+                            <CartFloatButton
+                                totalItems={totalItems}
+                                onClick={() => setIsCartOpen(true)}
+                            />
+                        </div>
+                    )}
 
                     <CartDrawer
                         isOpen={isCartOpen}

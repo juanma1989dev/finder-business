@@ -89,8 +89,7 @@ export default function DetailsPage() {
     };
 
     return (
-        <MainLayout>
-            {/* CAPA DE CARGA GLOBAL DURANTE PROCESAMIENTO */}
+        <MainLayout showFloatShoppingCart={false}>
             {processing && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 backdrop-blur-sm">
                     <Loader2 className="h-10 w-10 animate-spin text-purple-600" />
@@ -132,7 +131,6 @@ export default function DetailsPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                        {/* LISTADO DE ITEMS */}
                         <div className="space-y-3 lg:col-span-2">
                             {items.map((item) => {
                                 const unitPrice = getItemUnitPrice(item);
