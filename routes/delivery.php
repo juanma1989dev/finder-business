@@ -11,9 +11,6 @@ Route::middleware(['auth', 'verified', 'delivery'])->prefix('/delivery')->group(
 
     Route::get('', [DeliveryIndexController::class, 'index'])->name('delivery.home');
 
-
-
-    Route::get('/dashboard', [DashboardIndexController::class, 'index'])->name('delivery.dashboard');
     // Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('delivery.orders.updateStatus');
 
     Route::get('/orders/available', [OrderController::class, 'available'])->name('delivery.orders.available');
