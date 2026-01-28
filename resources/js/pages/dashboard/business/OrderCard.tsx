@@ -19,6 +19,8 @@ export default function OrderCard({
 
     const isLate = status === OrderStatus.PENDING && order.minutes_waiting > 10;
 
+    console.log({ order });
+
     return (
         <div
             className={`relative flex flex-col rounded-lg bg-white p-3 shadow-sm transition-all duration-900 ${
@@ -102,15 +104,15 @@ export default function OrderCard({
                 <div className="mt-4 flex flex-col items-center gap-2 rounded-lg border border-purple-100 bg-purple-50 px-3 py-3 text-center">
                     <div className="flex items-center gap-2 text-[10px] font-semibold tracking-wider text-purple-700 uppercase">
                         <Package className="h-4 w-4" />
-                        <span>Esperando recolecta</span>
+                        <span>Esperando al repartidor</span>
                     </div>
 
-                    <div className="rounded-lg border border-purple-100 bg-white px-4 py-1.5 text-sm font-semibold text-purple-800 shadow-sm">
+                    {/* <div className="rounded-lg border border-purple-100 bg-white px-4 py-1.5 text-sm font-semibold text-purple-800 shadow-sm">
                         CÓDIGO:{' '}
-                        <span className="ml-1 font-bold tracking-[0.2em]">
-                            111111
+                        <span className="ml-3 font-bold tracking-[0.4em]">
+                            {order.code}
                         </span>
-                    </div>
+                    </div> */}
                 </div>
             )}
         </div>

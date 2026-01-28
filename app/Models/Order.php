@@ -17,6 +17,10 @@ class Order extends Model
         'shipping',
         'total',
         'notes',
+
+        'code',
+        'code_used_at',
+        
         'ready_for_pickup_at'
     ];
 

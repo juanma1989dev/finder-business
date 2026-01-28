@@ -30,7 +30,9 @@ return new class extends Migration
             $table->decimal('shipping', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
             $table->text('notes')->nullable();
-            $table->string('code');
+            
+            $table->string('code', 10)->nullable();
+            $table->timestamp('code_used_at')->nullable();
 
             # Pasar a otra tabla
             $table->foreignId('delivery_id')
