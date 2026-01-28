@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-export default function DropdownMenu({ user }: any) {
+export default function DropdownMenu({ user, className }: any) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement | null>(null);
     const [isSigningOut, setIsSigningOut] = useState(false);
@@ -34,9 +34,8 @@ export default function DropdownMenu({ user }: any) {
     }
 
     return (
-        <div className="flex items-center">
+        <div className={`flex items-center ${className}`}>
             <div ref={ref} className="relative">
-                {/* Trigger del Menú: Estilo Cápsula */}
                 <button
                     onClick={() => setOpen((v) => !v)}
                     className={`flex items-center gap-3 rounded-full border p-1.5 transition-all duration-300 ${

@@ -2,8 +2,8 @@ import { usePage } from '@inertiajs/react';
 import { ReactNode, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 
-import BottomMenu from '@/components/app/BottomMenu';
 import Header from '@/components/app/Header';
+import MobileSidebar from '@/components/app/MobileSidebar';
 import { CartFloatButton } from '@/pages/public/business/CartFloatButton';
 import { CartDrawer } from '@/pages/public/business/drawer-cart';
 import { SharedData } from '@/types';
@@ -50,7 +50,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </>
             )}
 
-            <BottomMenu />
+            <MobileSidebar />
         </main>
     );
 }
