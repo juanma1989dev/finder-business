@@ -60,8 +60,9 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     const toggleBusiness = () => {
         const old = isBusinessOpen;
         setIsBusinessOpen(!old);
+
         router.patch(
-            `/dashboard/business/${business.id}/opening-hours`,
+            `/dashboard/business/${business.id}-${business.slug}/opening-hours`,
             { id: business.id, status: !old },
             {
                 onError: () => {
@@ -131,16 +132,16 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
 
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
-            <div className="flex min-h-screen flex-col gap-4 bg-purple-50/30 p-3 sm:p-4 lg:p-6">
+            <div className="flex min-h-screen flex-col gap-3 bg-purple-50/30 p-2 sm:p-2 lg:p-4">
                 {/* HEADER Y ESTADO DEL NEGOCIO */}
-                <div className="sticky top-14 z-40 rounded-lg border border-purple-200 bg-white p-3 shadow-sm sm:static">
+                <div className="sticky top-14 z-40 rounded-lg border border-purple-200 bg-white p-2 shadow-sm sm:static">
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-base font-semibold tracking-tight text-purple-800 uppercase">
                                 Pedidos
                             </h1>
                             <p className="text-[10px] font-normal tracking-widest text-gray-500 uppercase">
-                                Gestión en tiempo real
+                                Gestión de tus pedidos.
                             </p>
                         </div>
 
@@ -164,7 +165,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                         </button>
                     </div>
 
-                    {/* STATS - Uso de Paleta Amber para peligros y Púrpura para neutros */}
                     <div className="mt-3 grid grid-cols-3 gap-2">
                         <Stat label="Pendientes" value={pendingCount} />
                         <Stat label="Retrasados" value={lateCount} danger />
