@@ -6,19 +6,14 @@ use App\Enums\OrderStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Businesses;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class IndexController extends Controller
 {   
     public function index(Request $request)
     {
-        $user = Auth::user();
+        $user = $request->user();
 
-        $business = Businesses::where('user_id', 1)
-            // ->whereHas('orders', function ($query) {
-            //     $query->whereNotIn('status', OrderStatusEnum::finalStatuses());
-            // })
+        $business = Businesses::where('user_id', $user->id)
             ->with([
                 'orders' => function ($query) {
                     $query->whereNotIn('status', OrderStatusEnum::finalStatuses())
@@ -26,11 +21,12 @@ class IndexController extends Controller
                 },
                 'orders.items',
                 'orders.user',
-            ])
-            ->first();
+            ])->first();
+
+        $orders = $business->orders ?? [];
 
         $data = [
-            'orders' => [], //$business->orders,
+            'orders' => $orders,
             'business' => $business,
         ];
 
