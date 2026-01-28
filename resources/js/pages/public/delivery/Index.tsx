@@ -11,13 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import MainLayout from '@/layouts/main-layout';
 import { SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import {
-    AlertCircle,
-    DollarSign,
-    Navigation,
-    Package,
-    PackageSearch,
-} from 'lucide-react';
+import { DollarSign, Navigation, Package, PackageSearch } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -43,7 +37,6 @@ export default function Index({ activeOrder }: Props) {
 
     const mapRef = useRef<any>(null);
 
-    // Lógica de fetch y efectos (Se mantiene igual para no romper funcionalidad)
     const fetchAvailableOrders = useCallback(async () => {
         if (!user.is_available || hasActiveOrder) return;
         try {
@@ -131,6 +124,87 @@ export default function Index({ activeOrder }: Props) {
     return (
         <MainLayout>
             <div className="min-h-screen space-y-2 bg-purple-50/50 p-2">
+                {availableOrders.length > 0 &&
+                    !hasActiveOrder &&
+                    user.is_available && (
+                        <Card className="animate-pulse rounded-lg border-amber-200 bg-amber-50 shadow-md">
+                            <CardContent className="space-y-1 p-1">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Navigation className="h-4 w-4 text-amber-600" />
+                                        <p className="text-sm font-semibold tracking-tight text-amber-900 uppercase">
+                                            ¡Nueva Solicitud!
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-1 font-bold text-amber-700">
+                                        <DollarSign className="h-4 w-4" />
+                                        <span className="text-base leading-none">
+                                            {availableOrders[0].delivery_fee}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <Button
+                                    className="w-full rounded-lg bg-amber-600 py-2 text-sm font-bold tracking-widest text-white uppercase shadow-lg shadow-amber-200 hover:bg-amber-700 active:scale-95"
+                                    onClick={() =>
+                                        acceptOrder(availableOrders[0].id)
+                                    }
+                                >
+                                    Aceptar Pedido #{availableOrders[0].id}
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                {hasActiveOrder && user.is_available && (
+                    <Card className="rounded-lg border-purple-200 bg-white shadow-sm animate-in slide-in-from-bottom-2">
+                        <CardContent className="space-y-1 p-1">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Package className="h-4 w-4 text-purple-600" />
+                                    <p className="text-sm font-semibold tracking-tight text-purple-900">
+                                        Pedido en curso
+                                    </p>
+                                </div>
+                                <span className="text-[10px] font-bold text-purple-500 uppercase">
+                                    #{activeOrder.id}
+                                </span>
+                            </div>
+
+                            <div className="flex gap-2">
+                                <Button className="flex-1 rounded-lg bg-purple-600 text-xs font-semibold transition-all hover:bg-purple-700 active:scale-95">
+                                    Llegué
+                                </Button>
+
+                                {activeOrder.status === 'picked_up' && (
+                                    <Button
+                                        className="flex-1 rounded-lg bg-green-600 text-xs font-semibold hover:bg-green-700 active:scale-95"
+                                        onClick={startDelivery}
+                                    >
+                                        Iniciar Ruta
+                                    </Button>
+                                )}
+
+                                {activeOrder.status === 'on_the_way' && (
+                                    <Button
+                                        className="flex-1 rounded-lg bg-blue-600 text-xs font-semibold hover:bg-blue-700 active:scale-95"
+                                        onClick={finishDelivery}
+                                    >
+                                        Entregar
+                                    </Button>
+                                )}
+
+                                {/* <Button
+                                    variant="outline"
+                                    className="rounded-lg border-amber-200 px-2 text-amber-700 hover:bg-amber-50 active:scale-95"
+                                >
+                                    <AlertCircle size={18} />
+                                </Button> */}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
                 <Card
                     className={`overflow-hidden rounded-lg border-purple-200 p-0 shadow-sm ${user.is_available ? '' : 'bg-gray-300'}`}
                 >
@@ -185,7 +259,7 @@ export default function Index({ activeOrder }: Props) {
                 </Card>
 
                 {user.is_available ? (
-                    <Card className="relative h-85 overflow-hidden rounded-lg border-purple-200 py-0 shadow-sm">
+                    <Card className="relative h-65 overflow-hidden rounded-lg border-purple-200 py-0 shadow-sm">
                         <Map
                             ref={mapRef}
                             center={
@@ -238,85 +312,6 @@ export default function Index({ activeOrder }: Props) {
                             Activa tu disponibilidad para comenzar a trabajar
                         </p>
                     </div>
-                )}
-
-                {hasActiveOrder && (
-                    <Card className="rounded-lg border-purple-200 bg-white shadow-sm animate-in slide-in-from-bottom-2">
-                        <CardContent className="space-y-3 p-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Package className="h-4 w-4 text-purple-600" />
-                                    <p className="text-sm font-semibold tracking-tight text-purple-900">
-                                        Pedido en curso
-                                    </p>
-                                </div>
-                                <span className="text-[10px] font-bold text-purple-500 uppercase">
-                                    #{activeOrder.id}
-                                </span>
-                            </div>
-
-                            <div className="flex gap-2">
-                                <Button className="flex-1 rounded-lg bg-purple-600 text-xs font-semibold transition-all hover:bg-purple-700 active:scale-95">
-                                    Llegué
-                                </Button>
-
-                                {activeOrder.status === 'picked_up' && (
-                                    <Button
-                                        className="flex-1 rounded-lg bg-green-600 text-xs font-semibold hover:bg-green-700 active:scale-95"
-                                        onClick={startDelivery}
-                                    >
-                                        Iniciar Ruta
-                                    </Button>
-                                )}
-
-                                {activeOrder.status === 'on_the_way' && (
-                                    <Button
-                                        className="flex-1 rounded-lg bg-blue-600 text-xs font-semibold hover:bg-blue-700 active:scale-95"
-                                        onClick={finishDelivery}
-                                    >
-                                        Entregar
-                                    </Button>
-                                )}
-
-                                <Button
-                                    variant="outline"
-                                    className="rounded-lg border-amber-200 px-2 text-amber-700 hover:bg-amber-50 active:scale-95"
-                                >
-                                    <AlertCircle size={18} />
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-
-                {availableOrders.length > 0 && !hasActiveOrder && (
-                    <Card className="animate-pulse rounded-lg border-amber-200 bg-amber-50 shadow-md">
-                        <CardContent className="space-y-3 p-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Navigation className="h-4 w-4 text-amber-600" />
-                                    <p className="text-sm font-semibold tracking-tight text-amber-900 uppercase">
-                                        ¡Nueva Solicitud!
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-1 font-bold text-amber-700">
-                                    <DollarSign className="h-4 w-4" />
-                                    <span className="text-lg leading-none">
-                                        {availableOrders[0].delivery_fee}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <Button
-                                className="w-full rounded-lg bg-amber-600 py-6 text-sm font-bold tracking-widest text-white uppercase shadow-lg shadow-amber-200 hover:bg-amber-700 active:scale-95"
-                                onClick={() =>
-                                    acceptOrder(availableOrders[0].id)
-                                }
-                            >
-                                Aceptar Pedido #{availableOrders[0].id}
-                            </Button>
-                        </CardContent>
-                    </Card>
                 )}
             </div>
         </MainLayout>
