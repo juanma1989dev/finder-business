@@ -24,15 +24,67 @@ interface Props {
     favorite: boolean;
 }
 
+const getStatusLabel = (business: Business) => {
+    if (
+        !business?.schedules ||
+        !Array.isArray(business.schedules) ||
+        business.schedules.length === 0
+    ) {
+        return 'Horario no disponible';
+    }
+
+    const ahora = new Date();
+    const diaActualNum = ahora.getDay() === 0 ? 7 : ahora.getDay();
+
+    const horaActual =
+        ahora.getHours().toString().padStart(2, '0') +
+        ':' +
+        ahora.getMinutes().toString().padStart(2, '0');
+
+    const horarioHoy = business.schedules.find(
+        (s) => parseInt(s?.day) === diaActualNum,
+    );
+
+    if (horarioHoy?.open && horarioHoy?.close) {
+        if (horaActual >= horarioHoy.open && horaActual < horarioHoy.close) {
+            return `Abierto - Cierra a las ${horarioHoy.close}`;
+        }
+
+        if (horaActual < horarioHoy.open) {
+            return `Cerrado - Abre hoy a las ${horarioHoy.open}`;
+        }
+    }
+
+    const horariosOrdenados = [...business.schedules].sort(
+        (a, b) => parseInt(a.day) - parseInt(b.day),
+    );
+
+    let proximoHorario = horariosOrdenados.find(
+        (s) => parseInt(s.day) > diaActualNum,
+    );
+
+    if (!proximoHorario) {
+        proximoHorario = horariosOrdenados[0];
+    }
+
+    if (!proximoHorario?.label || !proximoHorario?.open) {
+        return 'Cerrado actualmente';
+    }
+
+    return `Cerrado - Abre el ${proximoHorario.label} a las ${proximoHorario.open}`;
+};
+
 export default function BusinessDetail({ business, favorite }: Props) {
     const [stateFavorite, setStateFavorite] = useState(favorite);
+
+    console.log({ business });
 
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
 
     const LEGENDS = {
         payments: business.payments.map((p) => p.name).join(' | '),
-        schedul: 'Abierto • Cierra 8pm',
+        schedul: getStatusLabel(business),
     };
 
     const copyUlrDetailBusiness = () => {
@@ -66,12 +118,9 @@ export default function BusinessDetail({ business, favorite }: Props) {
         <MainLayout>
             <div className="min-h-screen bg-white">
                 <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4">
-                    {/* Configuración de Grilla Responsiva Principal */}
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-                        {/* Panel de Información Lateral */}
                         <div className="lg:col-span-4 xl:col-span-4">
                             <div className="space-y-4 lg:sticky lg:top-20">
-                                {/* Contenedor de Imagen con Box Model y Sombra */}
                                 <div className="relative h-48 w-full overflow-hidden rounded-lg border border-purple-200 shadow-sm sm:h-64 lg:aspect-[4/3] lg:h-auto">
                                     <img
                                         src={
@@ -83,7 +132,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         alt={business.name}
                                     />
 
-                                    {/* Botones Flotantes con Efectos Dinámicos */}
                                     <div className="absolute inset-x-3 top-3 flex justify-between">
                                         <Link
                                             href="/"
@@ -98,23 +146,25 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                             >
                                                 <Share2 className="h-4 w-4" />
                                             </button>
-                                            <button
-                                                onClick={toggleFavorite}
-                                                className={`flex h-9 w-9 items-center justify-center rounded-lg shadow-sm backdrop-blur-sm transition-all active:scale-95 ${
-                                                    stateFavorite
-                                                        ? 'bg-purple-600 text-white'
-                                                        : 'bg-white/90 text-gray-700'
-                                                }`}
-                                            >
-                                                <Heart
-                                                    className={`h-4 w-4 ${stateFavorite ? 'fill-current' : ''}`}
-                                                />
-                                            </button>
+
+                                            {user && (
+                                                <button
+                                                    onClick={toggleFavorite}
+                                                    className={`flex h-9 w-9 items-center justify-center rounded-lg shadow-sm backdrop-blur-sm transition-all active:scale-95 ${
+                                                        stateFavorite
+                                                            ? 'bg-purple-600 text-white'
+                                                            : 'bg-white/90 text-gray-700'
+                                                    }`}
+                                                >
+                                                    <Heart
+                                                        className={`h-4 w-4 ${stateFavorite ? 'fill-current' : ''}`}
+                                                    />
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Textos y Labels usando Paleta Púrpura y Escalas */}
                                 <div className="space-y-2 p-1">
                                     <div className="mb-3 flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
@@ -127,7 +177,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         </h1>
                                     </div>
 
-                                    {/* Bloques de Información (Amber para Horario, Púrpura para Pagos) */}
                                     <div className="grid grid-cols-1 gap-3">
                                         <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
                                             <div className="text-amber-600">
