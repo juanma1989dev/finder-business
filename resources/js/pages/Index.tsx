@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
     CheckCircle,
@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
+import { SharedData } from '@/types';
 
 // --- Types ---
 type OrderStatus =
@@ -75,6 +76,9 @@ export default function Index({
         distance: filters.distance || 5,
         foodType: null,
     });
+
+    const { auth } = usePage<SharedData>().props;
+    const user = auth.user;
 
     const isFirstRender = useRef(true);
     const {
@@ -132,7 +136,7 @@ export default function Index({
                         />
                     </div>
 
-                    {activeOrder?.id && (
+                    {activeOrder?.id && user.type == 'client' && (
                         <div className="px-4 pb-3">
                             <Card className="overflow-hidden border-none bg-purple-600 shadow-lg ring-1 ring-white/20">
                                 <CardContent className="p-0">
