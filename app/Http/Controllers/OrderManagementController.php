@@ -17,7 +17,7 @@ class OrderManagementController extends Controller
         $note = $request->input('note', null);
 
         $canTransition = $this->canTransition($current, $nextStatus);
-        
+
         if(!$canTransition) {
             return back()->with('error', 'No se puede actualizar el estado del pedido.');
         }
@@ -26,6 +26,7 @@ class OrderManagementController extends Controller
             'status' => $nextStatus,
             'notes' => $note,
         ]);
+
 
         if ($nextStatus === OrderStatusEnum::READY_FOR_PICKUP->value) {
             $this->onReadyForPickup($order);
@@ -38,10 +39,21 @@ class OrderManagementController extends Controller
     {
         $order->update([
             'delivery_id' => null,
-            'ready_for_pickup_at' => now(),  
+            'ready_for_pickup_at' => now(),
+            'code' => $this->generateCode(),
         ]);
 
         cache()->forget('available_orders');
+    }
+
+    private function generateCode(): string
+    {
+       return str_pad(
+            random_int(0, 99999),
+            5,
+            '0',
+            STR_PAD_LEFT
+        );
     }
 
     private function canTransition(string $current, string $next): bool
