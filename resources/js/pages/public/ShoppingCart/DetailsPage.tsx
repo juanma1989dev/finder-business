@@ -37,6 +37,23 @@ export default function DetailsPage() {
         return basePrice + extrasTotal + variationsTotal;
     };
 
+    function debounce<T extends (...args: any[]) => void>(
+        fn: T,
+        delay: number,
+    ) {
+        let timer: ReturnType<typeof setTimeout> | null = null;
+
+        return (...args: Parameters<T>) => {
+            if (timer) {
+                clearTimeout(timer);
+            }
+
+            timer = setTimeout(() => {
+                fn(...args);
+            }, delay);
+        };
+    }
+
     const totalPrice = items.reduce(
         (total, item) => total + getItemUnitPrice(item) * item.quantity,
         0,
