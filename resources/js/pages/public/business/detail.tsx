@@ -6,6 +6,8 @@ import {
     ArrowLeft,
     Clock,
     CreditCard,
+    DoorClosed,
+    DoorOpen,
     Heart,
     Info,
     MapPinned,
@@ -25,59 +27,32 @@ interface Props {
 }
 
 const getStatusLabel = (business: Business) => {
+    const LABEL_SHCHEDULE_UNAVAILABLE = 'Horario no disponible';
+
     if (
         !business?.schedules ||
         !Array.isArray(business.schedules) ||
         business.schedules.length === 0
     ) {
-        return 'Horario no disponible';
+        return LABEL_SHCHEDULE_UNAVAILABLE;
     }
 
-    const ahora = new Date();
-    const diaActualNum = ahora.getDay() === 0 ? 7 : ahora.getDay();
+    const currentDate = new Date();
+    const currentDayNum = currentDate.getDay() === 0 ? 7 : currentDate.getDay();
 
-    const horaActual =
-        ahora.getHours().toString().padStart(2, '0') +
-        ':' +
-        ahora.getMinutes().toString().padStart(2, '0');
-
-    const horarioHoy = business.schedules.find(
-        (s) => parseInt(s?.day) === diaActualNum,
+    const currentSchedule = business.schedules.find(
+        (schedule) => schedule.day == currentDayNum,
     );
 
-    if (horarioHoy?.open && horarioHoy?.close) {
-        if (horaActual >= horarioHoy.open && horaActual < horarioHoy.close) {
-            return `Abierto - Cierra a las ${horarioHoy.close}`;
-        }
-
-        if (horaActual < horarioHoy.open) {
-            return `Cerrado - Abre hoy a las ${horarioHoy.open}`;
-        }
+    if (!currentSchedule) {
+        return LABEL_SHCHEDULE_UNAVAILABLE;
     }
 
-    const horariosOrdenados = [...business.schedules].sort(
-        (a, b) => parseInt(a.day) - parseInt(b.day),
-    );
-
-    let proximoHorario = horariosOrdenados.find(
-        (s) => parseInt(s.day) > diaActualNum,
-    );
-
-    if (!proximoHorario) {
-        proximoHorario = horariosOrdenados[0];
-    }
-
-    if (!proximoHorario?.label || !proximoHorario?.open) {
-        return 'Cerrado actualmente';
-    }
-
-    return `Cerrado - Abre el ${proximoHorario.label} a las ${proximoHorario.open}`;
+    return `${currentSchedule.open} hrs - ${currentSchedule.close} hrs`;
 };
 
 export default function BusinessDetail({ business, favorite }: Props) {
     const [stateFavorite, setStateFavorite] = useState(favorite);
-
-    console.log({ business });
 
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
@@ -179,15 +154,30 @@ export default function BusinessDetail({ business, favorite }: Props) {
 
                                     <div className="grid grid-cols-1 gap-3">
                                         <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                                            <div className="text-amber-600">
+                                            <div className="mr-3 text-amber-600">
                                                 <Clock className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <p className="text-[10px] leading-tight font-semibold text-amber-700 uppercase">
-                                                    Horario
+                                                <p className="text-sm leading-tight font-semibold text-amber-700 uppercase">
+                                                    Horario de referencia(Puede
+                                                    variar)
                                                 </p>
                                                 <p className="text-sm font-normal text-amber-700">
                                                     {LEGENDS.schedul}
+                                                </p>
+                                                <p className="mt-3 flex items-center gap-2 text-sm font-normal text-amber-700">
+                                                    Actualmente:
+                                                    {business.is_open ? (
+                                                        <>
+                                                            <DoorOpen className="h-5 w-5" />
+                                                            {'Abierto'}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <DoorClosed className="h-5 w-5" />
+                                                            {'Cerrado'}
+                                                        </>
+                                                    )}{' '}
                                                 </p>
                                             </div>
                                         </div>
