@@ -1,6 +1,12 @@
 import BusinessCard from '@/components/app/BusinessCard';
 import MainFilters from '@/components/app/MainFilters';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
 import { router } from '@inertiajs/react';
@@ -160,6 +166,9 @@ export default function Index({
         return () => clearInterval(interval);
     }, [activeOrder?.id]);
 
+    const [showOrderModal, setShowOrderModal] = useState(false);
+    const [orderDetail, setOrderDetail] = useState<any>(null);
+
     return (
         <MainLayout>
             {geoError && (
@@ -179,7 +188,7 @@ export default function Index({
                         <CardContent className="space-y-2 p-3">
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-semibold text-purple-800">
-                                    Pedido #{activeOrder.id}
+                                    Pedido en curso : #{activeOrder.id}
                                 </p>
 
                                 <button
@@ -201,11 +210,23 @@ export default function Index({
                                     />
 
                                     <button
-                                        onClick={() =>
+                                        onClick={() => {
                                             router.get(
                                                 `/orders/${activeOrder.id}`,
-                                            )
-                                        }
+                                                {},
+                                                {
+                                                    only: ['order'],
+                                                    preserveState: true,
+                                                    replace: true,
+                                                    onSuccess: (page) => {
+                                                        setOrderDetail(
+                                                            page.props.order,
+                                                        );
+                                                        setShowOrderModal(true);
+                                                    },
+                                                },
+                                            );
+                                        }}
                                         className="w-full rounded-lg bg-purple-600 py-2 text-sm font-semibold text-white active:scale-95"
                                     >
                                         Ver seguimiento
@@ -214,10 +235,24 @@ export default function Index({
                             )}
                         </CardContent>
                     </Card>
+
+                    <Dialog
+                        open={showOrderModal}
+                        onOpenChange={setShowOrderModal}
+                    >
+                        <DialogContent className="max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Pedido #{orderDetail?.id}
+                                </DialogTitle>
+                            </DialogHeader>
+
+                            {orderDetail && <OrderDetail order={orderDetail} />}
+                        </DialogContent>
+                    </Dialog>
                 </div>
             )}
 
-            {/* ================= FILTROS ================= */}
             <div className="mb-4">
                 <MainFilters
                     categories={categories}
@@ -227,7 +262,6 @@ export default function Index({
                 />
             </div>
 
-            {/* ================= LISTADO ================= */}
             <div className="relative min-h-[300px]">
                 {loading && (
                     <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm" />
@@ -295,6 +329,20 @@ function OrderTimeline({ status }: { status: string }) {
                     </div>
                 );
             })}
+        </div>
+    );
+}
+
+function OrderDetail({ order }: { order: any }) {
+    return (
+        <div className="space-y-4">
+            <OrderTimeline status={order.status} />
+
+            {order.items.map((item: any) => (
+                <div key={item.id} className="text-sm">
+                    {item.name} x{item.quantity}
+                </div>
+            ))}
         </div>
     );
 }
