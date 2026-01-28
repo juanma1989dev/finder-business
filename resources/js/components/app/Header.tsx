@@ -9,9 +9,9 @@ export default function Header() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-purple-100 bg-white/80 backdrop-blur-lg">
-            <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-                <div className="flex h-14 items-center justify-between gap-2 sm:h-16">
+        <header className="sticky top-0 z-50 w-full border-b border-purple-100 bg-white/80">
+            <div className="mx-auto max-w-7xl px-3">
+                <div className="flex h-13 items-center justify-between gap-2">
                     <div className="hidden items-center gap-1 md:flex">
                         <Link
                             href="/"

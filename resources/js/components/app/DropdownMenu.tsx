@@ -38,13 +38,13 @@ export default function DropdownMenu({ user, className }: any) {
             <div ref={ref} className="relative">
                 <button
                     onClick={() => setOpen((v) => !v)}
-                    className={`flex items-center gap-3 rounded-full border p-1.5 transition-all duration-300 ${
+                    className={`flex items-center gap-2 rounded-full border p-1 transition-all duration-300 ${
                         open
                             ? 'border-purple-200 bg-purple-50 shadow-md'
                             : 'border-gray-200 bg-white hover:border-purple-200 hover:shadow-sm'
                     }`}
                 >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-tr from-purple-600 to-purple-400 text-[13px] font-bold text-white shadow-inner">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-purple-600 to-purple-400 text-[13px] font-bold text-white shadow-inner">
                         {user?.name?.charAt(0).toUpperCase()}
                     </div>
                     <span className="hidden pr-1 text-sm font-bold text-gray-700 md:block">
