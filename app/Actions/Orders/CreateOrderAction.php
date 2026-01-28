@@ -28,6 +28,7 @@ class CreateOrderAction
 
             $order = $this->orderRepository->create([
                 'user_id' => $userId,
+                'businesses_id' => $items[0]['businesses_id'],
                 'status' => OrderStatusEnum::PENDING,
                 'subtotal' => 0,
                 'total' => 0,
