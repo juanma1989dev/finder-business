@@ -177,7 +177,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         ]);
     }
 
-    public function getDetails(int $businessId, int $userId): Businesses
+    public function getDetails(int $businessId, ?int $userId): Businesses
     {
         $relationships = ['category', 'hours', 'amenities', 'payments', 'socialNetworks', 'images']; // productsAndServices
 
