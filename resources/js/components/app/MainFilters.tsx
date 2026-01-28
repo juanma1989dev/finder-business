@@ -43,10 +43,8 @@ export default function MainFilters({
 
     return (
         <div className="mx-auto w-full max-w-7xl space-y-5 p-1">
-            {/* --- BARRA DE FILTROS UNIFICADA --- */}
             <div className="rounded-2xl border border-gray-100 bg-white p-2 shadow-lg shadow-purple-900/5 transition-all sm:rounded-full">
                 <div className="flex flex-col items-center gap-2 sm:flex-row">
-                    {/* Buscador (Se expande en desktop) */}
                     <div className="group relative w-full sm:flex-[1.5]">
                         <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-orange-500" />
                         <input
@@ -66,10 +64,8 @@ export default function MainFilters({
                         )}
                     </div>
 
-                    {/* Divisor visual solo en Desktop */}
                     <div className="mx-1 hidden h-6 w-px bg-gray-100 sm:block" />
 
-                    {/* Selectores en una sola fila para Desktop */}
                     <div className="flex w-full items-center gap-2 sm:w-auto">
                         <div className="flex flex-1 cursor-pointer items-center gap-2 rounded-xl border border-purple-100/50 bg-purple-50/50 px-3 py-2 transition-colors hover:bg-purple-50 sm:flex-none sm:rounded-full">
                             <Filter className="h-3.5 w-3.5 text-purple-600" />
@@ -92,7 +88,6 @@ export default function MainFilters({
                             </select>
                         </div>
 
-                        {/* Distancia */}
                         <div className="flex flex-1 cursor-pointer items-center gap-2 rounded-xl border border-orange-100/50 bg-orange-50/50 px-3 py-2 transition-colors hover:bg-orange-50 sm:flex-none sm:rounded-full">
                             <MapPin className="h-3.5 w-3.5 text-orange-600" />
                             <select
@@ -117,7 +112,6 @@ export default function MainFilters({
                 </div>
             </div>
 
-            {/* --- CARRUSEL DE ESPECIALIDADES --- */}
             <div className="group relative">
                 <div className="mb-3 flex items-center justify-between px-1">
                     <h3 className="flex items-center gap-2 text-sm font-extrabold tracking-widest text-gray-800 uppercase">
@@ -126,26 +120,20 @@ export default function MainFilters({
                     </h3>
                 </div>
 
-                {/* Contenedor con scroll y máscaras de desvanecimiento */}
                 <div className="relative overflow-hidden">
-                    {/* Máscaras de Fade (Efecto visual de continuidad) */}
-                    <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-8 bg-gradient-to-r from-gray-50/50 to-transparent" />
-                    <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-8 bg-gradient-to-l from-gray-50/50 to-transparent" />
-
-                    <div className="no-scrollbar flex gap-4 overflow-x-auto scroll-smooth px-1 pb-4">
-                        {/* Opción: Todos */}
+                    <div className="no-scrollbar flex gap-6 overflow-x-auto scroll-smooth px-1 pb-2">
                         <button
                             onClick={() => handleFilterChange('foodType', '')}
-                            className="group flex min-w-[64px] flex-col items-center gap-2"
+                            className="group flex min-w-[44px] flex-col items-center gap-2"
                         >
                             <div
-                                className={`flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 ${
+                                className={`flex h-10 w-10 items-center justify-center rounded-2xl transition-all duration-300 ${
                                     !filters.foodType
                                         ? 'scale-105 bg-purple-600 text-white shadow-lg ring-4 shadow-purple-200 ring-purple-100'
                                         : 'border border-gray-100 bg-white text-purple-600 shadow-sm hover:border-purple-200'
                                 } `}
                             >
-                                <Utensils className="h-6 w-6" />
+                                <Utensils className="h-5 w-5" />
                             </div>
                             <span
                                 className={`text-[11px] font-bold ${!filters.foodType ? 'text-purple-700' : 'text-gray-500'}`}
@@ -161,10 +149,10 @@ export default function MainFilters({
                                 onClick={() =>
                                     handleFilterChange('foodType', cat.id)
                                 }
-                                className="flex min-w-[64px] flex-col items-center gap-2"
+                                className="flex min-w-[44px] flex-col items-center gap-2"
                             >
                                 <div
-                                    className={`flex h-14 w-14 items-center justify-center rounded-2xl text-2xl transition-all duration-300 ${
+                                    className={`flex h-10 w-10 items-center justify-center rounded-2xl text-2xl transition-all duration-300 ${
                                         filters.foodType === cat.id
                                             ? 'scale-105 bg-orange-500 text-white shadow-lg ring-4 shadow-orange-200 ring-orange-100'
                                             : 'border border-gray-100 bg-white shadow-sm hover:scale-105'
