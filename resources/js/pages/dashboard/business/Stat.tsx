@@ -9,7 +9,7 @@ export default function Stat({
 }) {
     return (
         <div
-            className={`rounded-lg border p-3 text-center transition-colors ${
+            className={`rounded-lg border p-2 text-center transition-colors ${
                 danger
                     ? 'border-amber-200 bg-amber-50'
                     : 'border-purple-100 bg-purple-50'
