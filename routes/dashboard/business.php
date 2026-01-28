@@ -21,9 +21,7 @@ use Illuminate\Support\Facades\Route;
 
         #
         Route::prefix('business/{business}')->as('business.')->group(function () {
-
             Route::patch('opening-hours', [BusinessOpeningController::class, 'update'])->name('opening.update');
-
             # Route::patch('cover-image', [BusinessCoverController::class, 'update'])->name('cover.update'); /// mover
         });
 
@@ -46,11 +44,7 @@ use Illuminate\Support\Facades\Route;
             Route::put('social-networks', [SocialNetworksController::class, 'update'])->name('social.update');
         });
 
-        /*
-        |--------------------------------------------------------------------------
-        | Orders
-        |--------------------------------------------------------------------------
-        */
+        # Ordenes
         Route::resource('orders', OrderManagementController::class)->only(['index', 'show']);
         Route::patch('orders/{order}/status', [OrderManagementController::class, 'updateStatus'])->name('orders.status');
     });
