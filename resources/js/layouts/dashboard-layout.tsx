@@ -22,12 +22,6 @@ export default ({ children, breadcrumbs, ...props }: DashboardLayoutProps) => {
                 theme: 'colored',
             });
         }
-
-        // if (flash.success) {
-        //     toast.success(flash.success, {
-        //         position: "top-right",
-        //     });
-        // }
     }, [flash]);
 
     return (

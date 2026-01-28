@@ -133,7 +133,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
             <div className="flex min-h-screen flex-col gap-3 bg-purple-50/30 p-2 sm:p-2 lg:p-4">
-                {/* HEADER Y ESTADO DEL NEGOCIO */}
                 <div className="sticky top-14 z-40 rounded-lg border border-purple-200 bg-white p-2 shadow-sm sm:static">
                     <div className="flex items-center justify-between">
                         <div>
