@@ -30,12 +30,15 @@ return new class extends Migration
             $table->decimal('shipping', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
             $table->text('notes')->nullable();
+            $table->string('code');
 
-             $table->foreignId('delivery_id')
+            # Pasar a otra tabla
+            $table->foreignId('delivery_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
 
+            
             $table->timestamp('ready_for_pickup_at')->nullable();
             $table->timestamp('picked_up_at')->nullable();
             $table->timestamp('on_the_way_at')->nullable();
