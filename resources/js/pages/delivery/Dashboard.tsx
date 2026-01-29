@@ -9,73 +9,47 @@ import { useOrderStatus } from '@/hooks/useOrderStatus';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Order } from '@/types';
 import { router } from '@inertiajs/react';
-import { format, isSameDay } from 'date-fns';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import {
-    Bike,
-    CalendarIcon,
-    Clock,
-    Loader2,
-    PackageSearch,
-} from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import { Bike, CalendarIcon, Loader2, PackageSearch } from 'lucide-react';
+import { useState } from 'react';
 
 export default function DeliveryDashboard({
     breadcrumbs,
     orders,
+    filters,
 }: {
     breadcrumbs: BreadcrumbItem[];
     orders: Order[];
+    filters?: {
+        date?: string;
+    };
 }) {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState<
-        'Todos' | 'Confirmado' | 'En camino'
-    >('Todos');
-    const [processingId, setProcessingId] = useState<number | null>(null);
-    const [date, setDate] = useState<Date | undefined>();
+    const [date, setDate] = useState<Date>(
+        filters?.date ? new Date(`${filters.date}T00:00:00`) : new Date(),
+    );
 
-    const avanzarEstado = (orderId: number) => {
-        setProcessingId(orderId);
-        router.patch(
-            `/delivery/orders/${orderId}/status`,
-            {},
+    console.log({ date });
+
+    const [processingId, setProcessingId] = useState<number | null>(null);
+
+    // 📡 Cuando cambia la fecha → pedir pedidos de ese día
+    const onDateChange = (selected?: Date) => {
+        if (!selected) return;
+
+        setDate(selected);
+
+        router.get(
+            '/dashboard/delivery',
             {
-                preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Pedido actualizado');
-                    setProcessingId(null);
-                },
-                onError: () => {
-                    toast.error('Error al actualizar pedido');
-                    setProcessingId(null);
-                },
+                date: format(selected, 'yyyy-MM-dd'),
+            },
+            {
+                preserveState: true,
+                replace: true,
             },
         );
     };
-
-    const filteredOrders = useMemo(() => {
-        return orders.filter((order: any) => {
-            if (searchTerm) {
-                const q = searchTerm.toLowerCase();
-                if (
-                    !order.id.toString().includes(q) &&
-                    !order.user?.name?.toLowerCase().includes(q)
-                ) {
-                    return false;
-                }
-            }
-
-            if (activeTab === 'Confirmado') return order.status === 'confirmed';
-            if (activeTab === 'En camino') return order.status === 'on_the_way';
-
-            if (date && order.created_at) {
-                return isSameDay(new Date(order.created_at), date);
-            }
-
-            return true;
-        });
-    }, [orders, searchTerm, activeTab, date]);
 
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
@@ -86,6 +60,7 @@ export default function DeliveryDashboard({
                     </h1>
                 </div>
 
+                {/* 📅 Filtro por fecha */}
                 <div className="flex flex-col gap-3 rounded-lg border border-purple-200 bg-white p-3 shadow-sm md:flex-row md:items-center">
                     <Popover>
                         <PopoverTrigger asChild>
@@ -108,22 +83,22 @@ export default function DeliveryDashboard({
                             <Calendar
                                 mode="single"
                                 selected={date}
-                                onSelect={setDate}
+                                onSelect={onDateChange}
                             />
                         </PopoverContent>
                     </Popover>
                 </div>
 
+                {/* 📦 Pedidos */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {filteredOrders.length === 0 ? (
+                    {orders.length === 0 ? (
                         <EmptyState />
                     ) : (
-                        filteredOrders.map((order: any) => (
+                        orders.map((order) => (
                             <DeliveryOrderCard
                                 key={order.id}
                                 pedido={order}
                                 isProcessing={processingId === order.id}
-                                avanzarEstado={avanzarEstado}
                             />
                         ))
                     )}
@@ -133,20 +108,19 @@ export default function DeliveryDashboard({
     );
 }
 
+/* ===========================
+   🧾 Order Card
+=========================== */
+
 function DeliveryOrderCard({
     pedido,
     isProcessing,
-    avanzarEstado,
 }: {
     pedido: any;
     isProcessing: boolean;
-    avanzarEstado: (id: number) => void;
 }) {
-    const { labels, flow } = useOrderStatus();
+    const { labels } = useOrderStatus();
     const status = pedido.status;
-    const nextStatuses: string[] = flow[status] ?? [];
-    const nextMainStatus =
-        nextStatuses.find((s) => s !== 'cancelled' && s !== 'rejected') ?? null;
 
     return (
         <div
@@ -175,16 +149,17 @@ function DeliveryOrderCard({
                             </p>
                         </div>
                     </div>
+
                     <span className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700 uppercase">
                         {labels[status]}
                     </span>
                 </div>
 
                 <div className="flex items-end justify-between">
-                    <div className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-600">
+                    {/* <div className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-600">
                         <Clock className="h-3.5 w-3.5 text-purple-600" />
                         <span>{pedido.minutes_waiting ?? 0} MIN ESPERA</span>
-                    </div>
+                    </div> */}
                     <span className="text-base font-semibold text-gray-700">
                         ${pedido.total}
                     </span>

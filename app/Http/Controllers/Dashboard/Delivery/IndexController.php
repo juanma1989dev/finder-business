@@ -4,18 +4,32 @@ namespace App\Http\Controllers\Dashboard\Delivery;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class IndexController extends Controller
 {
     public function index(Request $request)
     {
-        $orders = Order::whereIn('status', ['confirmed', 'on_the_way'])->get();
+        $date = $request->filled('date')
+            ?  Carbon::createFromFormat('Y-m-d', $request->date)
+            : now()->startOfDay();
 
-        $data = [
+        $orders = Order::with('user')
+            ->whereNotIn('status', ['confirmed', 'on_the_way', 'rejected'])
+            ->whereBetween('created_at', [
+                $date->copy()->startOfDay(),
+                $date->copy()->endOfDay(),
+            ])
+            ->orderByDesc('created_at')
+            ->get();
+
+
+        return inertia('delivery/Dashboard', [
             'orders' => $orders,
-        ];
-
-        return inertia('delivery/Dashboard', $data);
+            'filters' => [
+                'date' => $date->toDateString(),
+            ],
+        ]);
     }
 }
