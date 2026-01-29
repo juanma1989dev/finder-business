@@ -1,12 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import { LogIn, MessageSquareHeart } from 'lucide-react';
-import { useState } from 'react';
 import DropdownMenu from './DropdownMenu';
 
 export default function Header() {
     const { auth } = usePage().props as any;
     const { user } = auth;
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-purple-100 bg-white/80">

@@ -44,15 +44,13 @@ export default function MobileSidebar() {
 
     return (
         <>
-            {/* Botón Gatillo (Hamburguesa) */}
             <button
                 onClick={toggleMenu}
-                className="fixed top-2 left-2 z-[60] flex h-11 w-11 items-center justify-center rounded-xl border border-gray-100 bg-white text-purple-600 shadow-lg transition-transform active:scale-90 md:hidden"
+                className="fixed top-2 left-2 z-[60] flex h-8 w-8 items-center justify-center rounded-xl border border-gray-300 bg-white text-purple-600 shadow-lg transition-transform active:scale-90 md:hidden"
             >
-                {isOpen ? <X size={24} /> : <Menu size={24} />}
+                {isOpen ? <X size={24} /> : <Menu size={20} />}
             </button>
 
-            {/* Overlay */}
             {isOpen && (
                 <div
                     className="fixed inset-0 z-[51] bg-slate-900/40 backdrop-blur-sm md:hidden"
@@ -60,13 +58,11 @@ export default function MobileSidebar() {
                 />
             )}
 
-            {/* Sidebar */}
             <nav
-                className={`fixed top-0 left-0 z-[55] h-full w-[280px] transform bg-white transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+                className={`fixed top-0 left-0 z-[55] h-full w-[250px] transform bg-white transition-transform duration-300 md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <div className="flex h-full flex-col">
-                    {/* Header: Información del Usuario (Inspirado en tu Dropdown) */}
-                    <div className="bg-gray-50/50 p-6 pt-16">
+                    <div className="bg-gray-50/50 p-6 pt-8">
                         {user && (
                             <div className="flex items-center gap-4">
                                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-purple-600 to-purple-400 text-lg font-bold text-white shadow-lg">
@@ -84,7 +80,6 @@ export default function MobileSidebar() {
                         )}
                     </div>
 
-                    {/* Links de navegación */}
                     <div className="flex-1 space-y-1 overflow-y-auto p-4">
                         <p className="px-4 pb-2 text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
                             Menú Principal
