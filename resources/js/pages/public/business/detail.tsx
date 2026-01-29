@@ -205,7 +205,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                                     ? `https://wa.me/${santizePhoneNumber(business.phone)}`
                                                     : `tel:${business.phone}`
                                             }
-                                            className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 p-3 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
+                                            className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 p-1 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
                                         >
                                             {business.use_whatsapp ? (
                                                 <MessageCircle className="h-4 w-4" />
@@ -216,7 +216,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         </a>
                                         <a
                                             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`}
-                                            className="flex items-center justify-center gap-2 rounded-lg bg-gray-700 p-3 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
+                                            className="flex items-center justify-center gap-2 rounded-lg bg-gray-700 p-1 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
                                         >
                                             <MapPinned className="h-4 w-4" />
                                             Mapa
@@ -232,7 +232,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                 <TabsList className="sticky top-14 z-40 mb-4 inline-flex w-full items-center justify-start gap-2 rounded-lg border border-purple-100 bg-purple-50 p-1.5 sm:w-auto">
                                     <TabsTrigger
                                         value="products"
-                                        className="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold transition-all data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-purple-700 data-[state=inactive]:hover:bg-purple-100"
+                                        className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-all data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-purple-700 data-[state=inactive]:hover:bg-purple-100"
                                     >
                                         <Sparkles className="h-4 w-4" />
                                         Menú
@@ -240,7 +240,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
 
                                     <TabsTrigger
                                         value="main"
-                                        className="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold transition-all data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-purple-700 data-[state=inactive]:hover:bg-purple-100"
+                                        className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-all data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-purple-700 data-[state=inactive]:hover:bg-purple-100"
                                     >
                                         <Info className="h-4 w-4" />
                                         Información
