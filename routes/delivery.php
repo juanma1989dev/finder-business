@@ -1,15 +1,13 @@
 <?php
 
-use App\Http\Controllers\Dashboard\Delivery\IndexController as DashboardIndexController;
 use App\Http\Controllers\Dashboard\Delivery\OrderController;
-
 use App\Http\Controllers\Public\Delivery\IndexController as DeliveryIndexController;
 use App\Http\Controllers\Public\Delivery\LocationController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'delivery'])->prefix('/delivery')->group(function () {
 
-    Route::get('', [DeliveryIndexController::class, 'index'])->name('delivery.home');
+    Route::get('/', [DeliveryIndexController::class, 'index'])->name('delivery.home');
 
     // Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('delivery.orders.updateStatus');
 
