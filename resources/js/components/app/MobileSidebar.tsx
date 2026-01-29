@@ -67,7 +67,7 @@ export default function MobileSidebar() {
                 <div className="flex h-full flex-col">
                     {/* Header: Información del Usuario (Inspirado en tu Dropdown) */}
                     <div className="bg-gray-50/50 p-6 pt-16">
-                        {user ? (
+                        {user && (
                             <div className="flex items-center gap-4">
                                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-purple-600 to-purple-400 text-lg font-bold text-white shadow-lg">
                                     {user.name?.charAt(0).toUpperCase()}
@@ -81,13 +81,6 @@ export default function MobileSidebar() {
                                     </p>
                                 </div>
                             </div>
-                        ) : (
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-gray-200" />
-                                <p className="text-sm font-bold text-gray-500 italic">
-                                    Invitado
-                                </p>
-                            </div>
                         )}
                     </div>
 
@@ -99,7 +92,7 @@ export default function MobileSidebar() {
 
                         <NavItem
                             href="/"
-                            icon={<Home size={20} />}
+                            icon={<Home size={16} />}
                             label="Inicio"
                             active={isPageActive('/')}
                             onClick={() => setIsOpen(false)}
@@ -109,14 +102,14 @@ export default function MobileSidebar() {
                             <>
                                 <NavItem
                                     href="/dashboard"
-                                    icon={<LayoutDashboard size={20} />}
+                                    icon={<LayoutDashboard size={16} />}
                                     label="Panel de Control"
                                     active={isPageActive('/dashboard')}
                                     onClick={() => setIsOpen(false)}
                                 />
                                 <NavItem
                                     href="/favorites"
-                                    icon={<Heart size={20} />}
+                                    icon={<Heart size={16} />}
                                     label="Mis Favoritos"
                                     active={isPageActive('/favorites')}
                                     onClick={() => setIsOpen(false)}
@@ -124,7 +117,7 @@ export default function MobileSidebar() {
                                 />
                                 <NavItem
                                     href="/profile"
-                                    icon={<User size={20} />}
+                                    icon={<User size={16} />}
                                     label="Ajustes Perfil"
                                     active={isPageActive('/profile')}
                                     onClick={() => setIsOpen(false)}
@@ -133,7 +126,6 @@ export default function MobileSidebar() {
                         )}
                     </div>
 
-                    {/* Footer: Botón Cerrar Sesión / Login (Estilo Cápsula) */}
                     <div className="border-t border-gray-100 p-4">
                         {user ? (
                             <button
@@ -159,7 +151,7 @@ export default function MobileSidebar() {
                             <Link
                                 href="/login"
                                 onClick={() => setIsOpen(false)}
-                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-purple-200"
+                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 px-2 py-1.5 text-sm font-bold text-white shadow-lg shadow-purple-200"
                             >
                                 <LogIn size={18} />
                                 <span>ENTRAR A MI CUENTA</span>
