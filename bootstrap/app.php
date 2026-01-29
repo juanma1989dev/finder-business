@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureBusinessUser;
+use App\Http\Middleware\EnsureDeliveryUser;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -25,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'business' =>  EnsureBusinessUser::class,
-            'delivery' => \App\Http\Middleware\EnsureDeliveryUser::class,
+            'delivery' =>  EnsureDeliveryUser::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

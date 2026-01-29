@@ -9,7 +9,7 @@ class LoginController extends Controller
 {
     public function index(SessionManagement $sessionManagement, Request $request)
     {
-        $typeAccount = $request->get('type');
+        $typeAccount = $request->get('type', 'client');
 
         $conf = $sessionManagement->validateTypeAccount($typeAccount);
 
