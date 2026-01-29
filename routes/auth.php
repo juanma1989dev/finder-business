@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/accounts', [AccountsController::class, 'index'])->name('accounts');
 
 # Login
-Route::resource('/login', LoginController::class);
+Route::get('/login', [LoginController::class, 'index'])->name('login');
 
 # Register
 Route::resource('/register', RegisterController::class);
