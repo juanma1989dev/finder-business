@@ -58,7 +58,7 @@ export default function AccountPage({ accountTypes }: Props) {
                 </div>
 
                 <footer className="mt-8 w-full text-center text-[10px] leading-tight font-normal tracking-widest text-gray-500 uppercase">
-                    &copy; {new Date().getFullYear()} Finder. Todos los derechos
+                    &copy; {new Date().getFullYear()} Findy. Todos los derechos
                     reservados.
                 </footer>
             </div>

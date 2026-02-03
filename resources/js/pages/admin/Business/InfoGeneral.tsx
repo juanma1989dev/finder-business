@@ -120,7 +120,7 @@ export default function EditBusiness({
 
     return (
         <LayoutBusinessModules
-            titleHead="Finder Business"
+            titleHead="Findy Business"
             headerTitle={business?.name || 'Cargando…'}
             headerDescription="Gestión técnica de metadatos y disponibilidad."
             buttonText="Guardar cambios"

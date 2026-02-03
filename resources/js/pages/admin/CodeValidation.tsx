@@ -1,7 +1,6 @@
 import GenerateCode from '@/components/app/create-code/generate';
 import CodeValidation from '@/components/app/create-code/validate';
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { dashboard } from '@/routes';
 import { BreadcrumbItem, SharedData } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -10,7 +9,7 @@ import { ToastContainer } from 'react-toastify';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard - Nuevo negocio',
-        href: dashboard().url,
+        href: '',
     },
 ];
 

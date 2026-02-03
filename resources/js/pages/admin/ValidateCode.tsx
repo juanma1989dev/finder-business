@@ -1,5 +1,5 @@
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { dashboard } from '@/routes';
+// import { dashboard } from '@/routes';
 import { BreadcrumbItem, SharedData } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -8,7 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard -  Validar código',
-        href: dashboard().url,
+        href: '',
     },
 ];
 

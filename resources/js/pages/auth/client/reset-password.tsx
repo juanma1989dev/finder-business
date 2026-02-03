@@ -1,11 +1,6 @@
-import NewPasswordController from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
-import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+// import NewPasswordController from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
+import { Head } from '@inertiajs/react';
 
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface ResetPasswordProps {
@@ -18,10 +13,11 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
         <AuthLayout
             title="Reset password"
             description="Please enter your new password below"
+            bannerImage=""
         >
             <Head title="Reset password" />
 
-            <Form
+            {/* <Form
                 {...NewPasswordController.store.form()}
                 transform={(data) => ({ ...data, token, email })}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -90,7 +86,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         </Button>
                     </div>
                 )}
-            </Form>
+            </Form> */}
         </AuthLayout>
     );
 }

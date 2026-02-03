@@ -1,11 +1,7 @@
 // Components
-import EmailVerificationNotificationController from '@/actions/App/Http/Controllers/Auth/EmailVerificationNotificationController';
-import { logout } from '@/routes';
-import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+// import EmailVerificationNotificationController from '@/actions/App/Http/Controllers/Auth/EmailVerificationNotificationController';
+import { Head } from '@inertiajs/react';
 
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
@@ -13,6 +9,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
         <AuthLayout
             title="Verify email"
             description="Please verify your email address by clicking on the link we just emailed to you."
+            bannerImage=""
         >
             <Head title="Email verification" />
 
@@ -23,7 +20,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             )}
 
-            <Form
+            {/* <Form
                 {...EmailVerificationNotificationController.store.form()}
                 className="space-y-6 text-center"
             >
@@ -44,7 +41,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                         </TextLink>
                     </>
                 )}
-            </Form>
+            </Form> */}
         </AuthLayout>
     );
 }

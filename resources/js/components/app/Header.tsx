@@ -21,7 +21,7 @@ export default function Header() {
                                 </span>
                             </div>
                             <h1 className="text-sm font-black tracking-tight text-purple-900 sm:text-base">
-                                Finder
+                                Findy
                             </h1>
                         </Link>
                     </div>

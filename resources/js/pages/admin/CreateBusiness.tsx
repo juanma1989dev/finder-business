@@ -1,5 +1,5 @@
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { dashboard } from '@/routes';
+// import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useEffect } from 'react';
@@ -9,7 +9,7 @@ import BusinessForm from './BusinessForm';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard - Nuevo negocio',
-        href: dashboard().url,
+        href: '',
     },
 ];
 
