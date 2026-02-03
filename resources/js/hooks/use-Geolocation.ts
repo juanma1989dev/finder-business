@@ -1,193 +1,49 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export interface GeolocationState {
-    latitude: number | null;
-    longitude: number | null;
-    accuracy: number | null;
-    error: string | null;
-    loading: boolean;
-    source: 'navigator' | 'ip' | 'cache' | null;
-}
-
-export interface GeolocationOptions {
+interface GeoOptions {
     enableHighAccuracy?: boolean;
-    timeout?: number;
-    maximumAge?: number;
     enableIPFallback?: boolean;
-    ipApiUrl?: string;
-    cacheMinutes?: number;
+    enabled?: boolean;
 }
 
-interface CachedLocation {
-    latitude: number;
-    longitude: number;
-    accuracy: number | null;
-    timestamp: number;
-    expiresAt: number;
-    source: 'navigator' | 'ip';
-}
+export function useGeolocation(options?: GeoOptions) {
+    const enabled = options?.enabled ?? true;
 
-// ... (tus interfaces GeolocationState, GeolocationOptions y CachedLocation se mantienen igual)
+    const [latitude, setLatitude] = useState<number | null>(null);
+    const [longitude, setLongitude] = useState<number | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-export function useGeolocation(options: GeolocationOptions = {}) {
-    const {
-        enableHighAccuracy = true,
-        timeout = 10000,
-        maximumAge = 0,
-        enableIPFallback = true,
-        ipApiUrl = 'https://ipapi.co/json/',
-        cacheMinutes = 30,
-    } = options;
-
-    const cacheKey = 'geolocation_cache';
-    const [state, setState] = useState<GeolocationState>({
-        latitude: null,
-        longitude: null,
-        accuracy: null,
-        error: null,
-        loading: true,
-        source: null,
-    });
-
-    const isMountedRef = useRef(true);
-
-    const getLocationByIP = useCallback(async () => {
-        try {
-            const response = await fetch(ipApiUrl);
-            if (!response.ok)
-                throw new Error('Error al obtener ubicación por IP');
-
-            const data = await response.json();
-
-            if (isMountedRef.current && data.latitude && data.longitude) {
-                const location: GeolocationState = {
-                    latitude: data.latitude,
-                    longitude: data.longitude,
-                    accuracy: null,
-                    error: null,
-                    loading: false,
-                    source: 'ip',
-                };
-
-                setState(location);
-
-                const cacheData: CachedLocation = {
-                    latitude: data.latitude,
-                    longitude: data.longitude,
-                    accuracy: null,
-                    timestamp: Date.now(),
-                    expiresAt: Date.now() + cacheMinutes * 60 * 1000,
-                    source: 'ip',
-                };
-                localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-            }
-        } catch (error) {
-            if (isMountedRef.current) {
-                setState((prev) => ({
-                    ...prev,
-                    loading: false,
-                    error: 'No se pudo obtener la ubicación',
-                }));
-            }
-        }
-    }, [ipApiUrl, cacheMinutes]);
-
-    const getLocation = useCallback(() => {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
-
-        try {
-            const cached = localStorage.getItem(cacheKey);
-            if (cached) {
-                const data: CachedLocation = JSON.parse(cached);
-                if (Date.now() < data.expiresAt) {
-                    setState({
-                        latitude: data.latitude,
-                        longitude: data.longitude,
-                        accuracy: data.accuracy,
-                        error: null,
-                        loading: false,
-                        source: 'cache',
-                    });
-                    return;
-                }
-                localStorage.removeItem(cacheKey);
-            }
-        } catch (e) {
-            localStorage.removeItem(cacheKey);
-        }
+    useEffect(() => {
+        if (!enabled) return;
 
         if (!navigator.geolocation) {
-            if (enableIPFallback) getLocationByIP();
-            else
-                setState((prev) => ({
-                    ...prev,
-                    loading: false,
-                    error: 'No soportado',
-                }));
+            setError('Geolocation not supported');
             return;
         }
 
+        setLoading(true);
+
         navigator.geolocation.getCurrentPosition(
-            (position) => {
-                if (!isMountedRef.current) return;
-
-                const location: GeolocationState = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    accuracy: position.coords.accuracy,
-                    error: null,
-                    loading: false,
-                    source: 'navigator',
-                };
-
-                setState(location);
-
-                const cacheData: CachedLocation = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    accuracy: position.coords.accuracy,
-                    timestamp: Date.now(),
-                    expiresAt: Date.now() + cacheMinutes * 60 * 1000,
-                    source: 'navigator',
-                };
-                localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+            (pos) => {
+                setLatitude(pos.coords.latitude);
+                setLongitude(pos.coords.longitude);
+                setLoading(false);
             },
-            (error) => {
-                if (enableIPFallback) getLocationByIP();
-                else {
-                    setState((prev) => ({
-                        ...prev,
-                        loading: false,
-                        error: error.message,
-                    }));
-                }
+            () => {
+                setError('Permission denied');
+                setLoading(false);
             },
-            { enableHighAccuracy, timeout, maximumAge },
+            {
+                enableHighAccuracy: options?.enableHighAccuracy ?? false,
+            },
         );
-    }, [
-        enableHighAccuracy,
-        timeout,
-        maximumAge,
-        enableIPFallback,
-        getLocationByIP,
-        cacheMinutes,
-    ]);
+    }, [enabled]);
 
-    useEffect(() => {
-        isMountedRef.current = true;
-        getLocation();
-
-        return () => {
-            isMountedRef.current = false;
-        };
-    }, [getLocation]);
-
-    const refresh = () => {
-        localStorage.removeItem(cacheKey);
-        getLocation();
+    return {
+        latitude,
+        longitude,
+        loading,
+        error,
     };
-
-    const clearCache = () => localStorage.removeItem(cacheKey);
-
-    return { ...state, refresh, clearCache };
 }
