@@ -1,0 +1,1 @@
+import{j as m}from"./app-DkDB_8CB.js";import{A as i}from"./auth-simple-layout-DabJu_Rp.js";function x({children:t,title:o,subTitle:r,description:u,bannerImage:s,...a}){return m.jsx(i,{title:o,description:u,subTitle:r,bannerImage:s,...a,children:t})}export{x as A};

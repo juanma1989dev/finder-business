@@ -1,0 +1,1 @@
+import{r,t as o}from"./app-DkDB_8CB.js";import{u as a}from"./index-Cybp8v3T.js";var n=o[" useId ".trim().toString()]||(()=>{}),c=0;function d(t){const[e,u]=r.useState(n());return a(()=>{u(s=>s??String(c++))},[t]),t||(e?`radix-${e}`:"")}function m(t){const e=r.useRef(t);return r.useEffect(()=>{e.current=t}),r.useMemo(()=>(...u)=>e.current?.(...u),[])}export{m as a,d as u};
