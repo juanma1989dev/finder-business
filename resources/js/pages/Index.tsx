@@ -1,28 +1,31 @@
 import { router, usePage } from '@inertiajs/react';
+import { AlertCircle, CheckCircle, Search } from 'lucide-react';
 import {
-    AlertCircle,
-    CheckCircle,
-    ChevronDown,
-    ChevronUp,
-    Search,
-    Truck,
-} from 'lucide-react';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+    lazy,
+    memo,
+    Suspense,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 
 import BusinessCard from '@/components/app/BusinessCard';
-import MainFilters from '@/components/app/MainFilters';
-import { Card, CardContent } from '@/components/ui/card';
+const MainFilters = lazy(() => import('@/components/app/MainFilters'));
+
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
 import { SharedData } from '@/types';
 
-// --- Types ---
+/* ---------------- TYPES ---------------- */
+
 type OrderStatus =
     | 'pending'
     | 'confirmed'
@@ -36,6 +39,7 @@ interface OrderItem {
     quantity: number;
     name: string;
 }
+
 interface Order {
     id: string | number;
     status: OrderStatus;
@@ -50,6 +54,8 @@ interface Props {
     activeOrder?: Order;
 }
 
+/* ---------------- CONSTANTS ---------------- */
+
 const STEPS: { key: OrderStatus; label: string }[] = [
     { key: 'pending', label: 'Creado' },
     { key: 'confirmed', label: 'Confirmado' },
@@ -59,6 +65,8 @@ const STEPS: { key: OrderStatus; label: string }[] = [
     { key: 'delivered', label: 'Entregado' },
 ];
 
+/* ---------------- PAGE ---------------- */
+
 export default function Index({
     businesses,
     categories,
@@ -66,10 +74,16 @@ export default function Index({
     products,
     activeOrder,
 }: Props) {
+    const { auth } = usePage<SharedData>().props;
+    const user = auth.user;
+
+    const isFirstRender = useRef(true);
+
     const [loading, setLoading] = useState(false);
     const [collapsed, setCollapsed] = useState(true);
     const [showOrderModal, setShowOrderModal] = useState(false);
     const [orderDetail, setOrderDetail] = useState<Order | null>(null);
+
     const [filtersUser, setFiltersUser] = useState({
         query: filters.q || '',
         category: filters.category || null,
@@ -77,22 +91,31 @@ export default function Index({
         foodType: null,
     });
 
-    const { auth } = usePage<SharedData>().props;
-    const user = auth.user;
+    /* ---------------- GEOLOCATION (DEFERRED) ---------------- */
 
-    const isFirstRender = useRef(true);
+    const [geoEnabled, setGeoEnabled] = useState(false);
+
     const {
         latitude,
         longitude,
         error: geoError,
         loading: loadingLocation,
-    } = useGeolocation({
-        enableHighAccuracy: true,
-        enableIPFallback: true,
-    });
+    } = useGeolocation(
+        geoEnabled
+            ? { enableHighAccuracy: true, enableIPFallback: true }
+            : null,
+    );
+
+    useEffect(() => {
+        const t = setTimeout(() => setGeoEnabled(true), 1000);
+        return () => clearTimeout(t);
+    }, []);
+
+    /* ---------------- SEARCH ---------------- */
 
     const handleSearch = useCallback(() => {
         setLoading(true);
+
         const params: any = {
             q: filtersUser.query,
             category: filtersUser.category,
@@ -120,102 +143,37 @@ export default function Index({
             isFirstRender.current = false;
             return;
         }
-        if (!loadingLocation) handleSearch();
-    }, [filtersUser, loadingLocation]);
+
+        if (!loadingLocation) {
+            handleSearch();
+        }
+    }, [filtersUser]);
+
+    /* ---------------- SKELETON STATE ---------------- */
+
+    const showSkeleton =
+        loading || (businesses.length === 0 && loadingLocation);
+
+    /* ---------------- RENDER ---------------- */
 
     return (
         <MainLayout>
             <div className="flex h-full flex-col overflow-hidden">
+                {/* HEADER */}
                 <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl">
                     <div className="px-4 pt-2 pb-3">
-                        <MainFilters
-                            categories={categories}
-                            filters={filtersUser}
-                            onFiltersChange={setFiltersUser}
-                            foodTypes={products.categories}
-                        />
+                        <Suspense fallback={<div className="h-16" />}>
+                            <MainFilters
+                                categories={categories}
+                                filters={filtersUser}
+                                onFiltersChange={setFiltersUser}
+                                foodTypes={products.categories}
+                            />
+                        </Suspense>
                     </div>
 
-                    {activeOrder?.id && user.type == 'client' && (
-                        <div className="px-4 pb-3">
-                            <Card className="overflow-hidden border-none bg-purple-600 shadow-lg ring-1 ring-white/20">
-                                <CardContent className="p-0">
-                                    <div
-                                        className="flex cursor-pointer items-center justify-between p-3 text-white active:bg-purple-700"
-                                        onClick={() => setCollapsed(!collapsed)}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="relative">
-                                                <Truck
-                                                    size={25}
-                                                    className="animate-pulse"
-                                                />
-                                                <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-800 opacity-75"></span>
-                                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-100"></span>
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] font-bold tracking-widest uppercase opacity-70">
-                                                    En curso
-                                                </span>
-                                                <span className="text-sm font-bold">
-                                                    {
-                                                        STEPS.find(
-                                                            (s) =>
-                                                                s.key ===
-                                                                activeOrder.status,
-                                                        )?.label
-                                                    }
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.get(
-                                                        `/orders/${activeOrder.id}`,
-                                                        {},
-                                                        {
-                                                            only: ['order'],
-                                                            onSuccess: (p) => {
-                                                                setOrderDetail(
-                                                                    p.props
-                                                                        .order as Order,
-                                                                );
-                                                                setShowOrderModal(
-                                                                    true,
-                                                                );
-                                                            },
-                                                        },
-                                                    );
-                                                }}
-                                                className="rounded-full bg-white/20 px-4 py-1.5 text-xs font-bold transition-all hover:bg-white/30"
-                                            >
-                                                Ver orden
-                                            </button>
-                                            {collapsed ? (
-                                                <ChevronDown size={18} />
-                                            ) : (
-                                                <ChevronUp size={18} />
-                                            )}
-                                        </div>
-                                    </div>
-                                    {!collapsed && (
-                                        <div className="border-t border-white/10 bg-white p-4">
-                                            <OrderTimeline
-                                                status={activeOrder.status}
-                                            />
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
-
                     {geoError && (
-                        <div className="mx-4 mb-2 flex items-center justify-center gap-2 rounded-full bg-amber-50 py-1 text-amber-600 ring-1 ring-amber-100">
+                        <div className="mx-4 mb-2 flex items-center gap-2 rounded-full bg-amber-50 py-1 text-amber-600">
                             <AlertCircle size={12} />
                             <span className="text-[10px] font-bold">
                                 Habilita el GPS para ver distancia real
@@ -224,26 +182,21 @@ export default function Index({
                     )}
                 </div>
 
-                <div className="scrollbar-hide flex-1 overflow-y-auto px-4 pb-24">
-                    {loading && businesses.length > 0 && (
-                        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-1 animate-pulse bg-indigo-600" />
-                    )}
-
-                    <div className="relative py-2">
-                        {businesses.length > 0 ? (
+                {/* CONTENT */}
+                <div className="flex-1 overflow-y-auto px-4 pb-24">
+                    <div className="py-2">
+                        {showSkeleton ? (
+                            <BusinessGridSkeleton />
+                        ) : businesses.length > 0 ? (
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {businesses.map((b) => (
-                                    <BusinessCard
-                                        key={b.id}
-                                        business={b}
-                                        modeEdit={false}
-                                    />
+                                    <BusinessCard key={b.id} business={b} />
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-20 opacity-40">
-                                <Search size={48} strokeWidth={1} />
-                                <p className="mt-4 text-sm font-medium">
+                            <div className="flex flex-col items-center py-20 opacity-40">
+                                <Search size={48} />
+                                <p className="mt-4 text-sm">
                                     Sin resultados por aquí
                                 </p>
                             </div>
@@ -252,83 +205,55 @@ export default function Index({
                 </div>
             </div>
 
-            <Dialog open={showOrderModal} onOpenChange={setShowOrderModal}>
-                <DialogContent className="fixed top-auto bottom-0 w-full max-w-none translate-y-0 gap-0 overflow-hidden rounded-t-[2.5rem] p-0 outline-none sm:top-1/2 sm:bottom-auto sm:max-w-md sm:-translate-y-1/2 sm:rounded-2xl">
-                    <div className="flex flex-col bg-white pb-8">
-                        <div className="mx-auto my-3 h-1.5 w-12 rounded-full bg-gray-200 sm:hidden" />
-                        <DialogHeader className="px-6 py-4">
-                            <DialogTitle className="text-xl font-black text-indigo-600 italic">
-                                ORDEN #{orderDetail?.id}
-                            </DialogTitle>
+            {showOrderModal && (
+                <Dialog open={showOrderModal} onOpenChange={setShowOrderModal}>
+                    <DialogContent className="bottom-0 w-full rounded-t-3xl p-0 sm:max-w-md">
+                        <DialogHeader className="p-4">
+                            <DialogTitle>ORDEN #{orderDetail?.id}</DialogTitle>
                         </DialogHeader>
-                        <div className="max-h-[70dvh] overflow-y-auto px-6">
-                            {orderDetail && <OrderDetail order={orderDetail} />}
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
+                        {orderDetail && <OrderDetail order={orderDetail} />}
+                    </DialogContent>
+                </Dialog>
+            )}
         </MainLayout>
     );
 }
 
+/* ---------------- SKELETON ---------------- */
+
+const BusinessGridSkeleton = () => (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+            <div
+                key={i}
+                className="animate-pulse rounded-[2rem] border bg-white p-2"
+            >
+                <div className="h-48 rounded-[1.6rem] bg-gray-200" />
+                <div className="space-y-3 p-3">
+                    <div className="h-4 w-3/4 rounded bg-gray-200" />
+                    <div className="h-3 w-1/2 rounded bg-gray-200" />
+                    <div className="h-8 rounded bg-gray-100" />
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
+/* ---------------- COMPONENTS ---------------- */
+
 const OrderTimeline = memo(({ status }: { status: OrderStatus }) => {
-    const STATUS_INDEX: Record<string, number> = {
-        pending: 0,
-        confirmed: 1,
-        ready_for_pickup: 2,
-        picked_up: 3,
-        on_the_way: 4,
-        delivered: 5,
-    };
-    const current = STATUS_INDEX[status] ?? 0;
+    const current = STEPS.findIndex((s) => s.key === status);
 
     return (
-        <div className="flex w-full items-start justify-between">
+        <div className="flex justify-between">
             {STEPS.map((step, index) => (
-                <div
-                    key={step.key}
-                    className="flex flex-1 flex-col items-center"
-                >
-                    <div className="relative flex w-full items-center justify-center">
-                        {/* Línea de conexión: Ahora mucho más delgada y clara */}
-                        {index !== 0 && (
-                            <div
-                                className={`absolute top-2 right-1/2 left-[-50%] h-[1px] ${
-                                    index <= current
-                                        ? 'bg-slate-300'
-                                        : 'bg-slate-100'
-                                }`}
-                            />
+                <div key={step.key} className="flex flex-col items-center">
+                    <div className="h-3 w-3 rounded-full border">
+                        {index < current && (
+                            <CheckCircle className="h-full w-full" />
                         )}
-
-                        {/* Círculo de estado: Minimalista */}
-                        <div
-                            className={`relative z-10 h-3.5 w-3.5 rounded-full border transition-all duration-500 ${
-                                index < current
-                                    ? 'border-emerald-400 bg-emerald-50' // Pasado: Verde muy suave
-                                    : index === current
-                                      ? 'border-slate-400 bg-white shadow-sm' // Actual: Gris suave
-                                      : 'border-slate-200 bg-white' // Futuro: Casi invisible
-                            }`}
-                        >
-                            {index < current && (
-                                <CheckCircle className="h-full w-full p-0.5 text-emerald-500" />
-                            )}
-                            {index === current && (
-                                <div className="absolute inset-0 m-auto h-1 w-1 rounded-full bg-slate-400" />
-                            )}
-                        </div>
                     </div>
-
-                    <span
-                        className={`mt-2 text-[7px] font-bold tracking-tight uppercase ${
-                            index === current
-                                ? 'text-slate-600'
-                                : 'text-slate-300'
-                        }`}
-                    >
-                        {step.label}
-                    </span>
+                    <span className="mt-1 text-[8px]">{step.label}</span>
                 </div>
             ))}
         </div>
@@ -336,31 +261,13 @@ const OrderTimeline = memo(({ status }: { status: OrderStatus }) => {
 });
 
 const OrderDetail = memo(({ order }: { order: Order }) => (
-    <div className="space-y-6">
-        <div className="rounded-2xl bg-gray-50 p-4 ring-1 ring-black/5">
-            <OrderTimeline status={order.status} />
-        </div>
-        <div>
-            <h4 className="mb-3 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
-                Tus Productos
-            </h4>
-            <div className="space-y-3">
-                {order.items.map((item) => (
-                    <div
-                        key={item.id}
-                        className="flex items-center justify-between rounded-xl bg-white p-3 shadow-sm ring-1 ring-black/5"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-xs font-bold text-indigo-600">
-                                {item.quantity}x
-                            </span>
-                            <span className="text-sm font-semibold text-gray-800">
-                                {item.name}
-                            </span>
-                        </div>
-                    </div>
-                ))}
+    <div className="space-y-4 p-4">
+        <OrderTimeline status={order.status} />
+        {order.items.map((item) => (
+            <div key={item.id} className="flex justify-between">
+                <span>{item.quantity}x</span>
+                <span>{item.name}</span>
             </div>
-        </div>
+        ))}
     </div>
 ));
