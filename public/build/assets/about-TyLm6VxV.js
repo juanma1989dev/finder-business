@@ -1,1 +1,0 @@
-import{j as e,L as t}from"./app-DkDB_8CB.js";import"./app-CGfczU0M.js";function i(){return e.jsxs("main",{children:[e.jsx(t,{href:"/",prefetch:!0,children:"Go home"}),"About PAge"]})}export{i as default};
