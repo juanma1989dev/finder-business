@@ -91,20 +91,21 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
     public function search(array $filters): Collection
     {
         $query = $this->model->query()
+             ->select([
+                'id',
+                'name',
+                'address',
+                'category_id',
+                'cover_image',
+                'cords',
+            ])
             ->with([
-                'category:id,name,image',
-                'productsAndServices' => fn($q) => $q->where('is_active', true)->select('id', 'businesses_id', 'name', 'price', 'image_url')
+                'category:id,name,image'
             ]);
 
         # Búsqueda por texto (nombre, descripción, tags)
         if (!empty($filters['q'])) {
-            $searchTerm = $filters['q'];
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('short_description', 'like', "%{$searchTerm}%")
-                  ->orWhere('long_description', 'like', "%{$searchTerm}%")
-                  ->orWhere('tags', 'like', "%{$searchTerm}%");
-            });
+            $query->where('name', 'like', "%{$filters['q']}%");
         }
 
         # Filtro por tipo de comida  
@@ -148,8 +149,10 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         } else {
             $query->orderBy('name', 'asc');
         }
-
+        
         $query->where('is_open', true);
+
+        $query->limit(9);
 
         return $query->get();
     }
