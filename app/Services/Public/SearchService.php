@@ -2,6 +2,7 @@
 
 namespace App\Services\Public;
 
+use App\Http\Requests\Public\BusinessSearchRequest;
 use App\Mappers\BusinessMapper;
 use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
@@ -23,13 +24,15 @@ final class SearchService
     /**
      * Obtener datos para la página principal con búsqueda optimizada
      *
-     * @param array $filters ['q' => ?string, 'category' => ?string, 'distance' => ?int]
-     * @param array $geo ['lat' => ?float, 'long' => ?float]
+     * @param BusinessSearchRequest $request 
      * @return array
      */
-    public function getData(array $filters, array $geo): array
+    public function getData(BusinessSearchRequest $request): array
     {
         $searchFilters = [];
+
+        $filters = $request->filters();
+        $geo = $request->geo();
 
         $distance = isset($filters['distance']) && is_numeric($filters['distance'])
             ? (float) $filters['distance']
@@ -52,7 +55,10 @@ final class SearchService
         # Buscar negocios
         $businesses = isset($searchFilters['dist'])
             ? $this->businessRepository->search($searchFilters)
-            : [];
+            : $this->businessRepository->search([
+                    'q' => $filters['q'] ?? null,
+                    'category' => $filters['category'] ?? null,
+                ]);
 
         return [
             'businesses' => BusinessMapper::toCollection($businesses),
@@ -68,6 +74,7 @@ final class SearchService
                     'distance' => $distance,
                 ]),
             ],
+            'filters' => $filters,
         ];
     }
 
