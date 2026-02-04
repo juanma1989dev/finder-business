@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 
 import Header from '@/components/app/Header';
 import MobileSidebar from '@/components/app/MobileSidebar';
+import PWAInstallBanner from '@/components/PWAInstallBanner';
 import { PwaUpdateBanner } from '@/components/PwaUpdateBanner';
 import { usePwaUpdate } from '@/hooks/usePwaUpdate';
 import { CartFloatButton } from '@/pages/public/business/CartFloatButton';
@@ -40,6 +41,7 @@ export default function MainLayout({
             <div className="relative z-10 w-full max-w-6xl p-1 md:mx-auto md:max-w-7xl">
                 {children}
                 {updateAvailable && <PwaUpdateBanner onRefresh={refreshApp} />}
+                <PWAInstallBanner />
             </div>
 
             {user && (
