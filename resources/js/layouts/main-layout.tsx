@@ -25,7 +25,7 @@ export default function MainLayout({
     const totalItems = items.length;
 
     return (
-        <main className="relative z-10 mx-auto min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <main className="relative z-10 mx-auto min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 px-4 pt-4">
             <ToastContainer
                 position="top-right"
                 className="!z-[9999]"
