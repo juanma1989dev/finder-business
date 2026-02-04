@@ -42,6 +42,7 @@ export interface SharedData {
 export enum TypeUser {
     CLIENT = 'client',
     BUSINESS = 'business',
+    DELIVERY = 'delivery',
 }
 
 export interface User {
