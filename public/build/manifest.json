@@ -288,17 +288,17 @@
     "src": "node_modules/.pnpm/leaflet@1.9.4/node_modules/leaflet/dist/images/marker-icon.png"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DOjSrROv.js",
+    "file": "assets/app-DSIGsw11.js",
     "name": "app",
     "src": "resources/css/app.css",
     "isEntry": true,
     "isDynamicEntry": true,
     "css": [
-      "assets/app-BJpyPsuP.css"
+      "assets/app-9epGln3S.css"
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-BVavU2fN.js",
+    "file": "assets/app-CF2pok5U.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -380,7 +380,7 @@
     ]
   },
   "resources/js/pages/Index.tsx": {
-    "file": "assets/Index-DpvqT78P.js",
+    "file": "assets/Index-CMcRouG6.js",
     "name": "Index",
     "src": "resources/js/pages/Index.tsx",
     "isDynamicEntry": true,
@@ -538,7 +538,7 @@
     ]
   },
   "resources/js/pages/admin/Business/Products.tsx": {
-    "file": "assets/Products-BqUssLtp.js",
+    "file": "assets/Products-BYSXdYil.js",
     "name": "Products",
     "src": "resources/js/pages/admin/Business/Products.tsx",
     "isDynamicEntry": true,
@@ -1079,7 +1079,7 @@
     ]
   },
   "resources/js/pages/public/delivery/Index.tsx": {
-    "file": "assets/Index-CN1o3zBR.js",
+    "file": "assets/Index-DsiL0iFN.js",
     "name": "Index",
     "src": "resources/js/pages/public/delivery/Index.tsx",
     "isDynamicEntry": true,
@@ -1119,7 +1119,7 @@
     ]
   },
   "resources/js/pages/settings/appearance.tsx": {
-    "file": "assets/appearance-DNNUI5lt.js",
+    "file": "assets/appearance-CX1IEDtd.js",
     "name": "appearance",
     "src": "resources/js/pages/settings/appearance.tsx",
     "isDynamicEntry": true,

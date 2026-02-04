@@ -370,7 +370,7 @@ const ActiveOrderBar = memo(({ order }: { order: Order }) => {
                             </p>
                             <p className="text-sm font-bold text-purple-900">
                                 ORDEN #{order.id} -{' '}
-                                {STEPS[CURRENT_STEP].label ?? ''}
+                                {STEPS[CURRENT_STEP]?.label ?? ''}
                             </p>
                         </div>
                         <motion.span
