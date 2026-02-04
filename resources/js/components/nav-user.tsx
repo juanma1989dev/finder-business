@@ -9,12 +9,12 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
-import { UserInfo } from '@/components/user-info';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
+import { UserInfo } from './user-info';
 
 export function NavUser() {
     const { auth } = usePage<SharedData>().props;
@@ -46,7 +46,6 @@ export function NavUser() {
                         }
                     >
                         <UserMenuContent user={auth.user} />
-
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>
