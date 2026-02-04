@@ -1,5 +1,4 @@
-import { router, usePage } from '@inertiajs/react';
-import { AlertCircle, CheckCircle, Search } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 import {
     lazy,
     memo,
@@ -10,21 +9,15 @@ import {
     useState,
 } from 'react';
 
-import BusinessCard from '@/components/app/BusinessCard';
-const MainFilters = lazy(() => import('@/components/app/MainFilters'));
-
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-
+import { Dialog, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
-import { SharedData } from '@/types';
+import { BusinessSearchFilters } from '@/types';
+import { router } from '@inertiajs/react';
+import { DialogContent } from '@radix-ui/react-dialog';
 
-/* ---------------- TYPES ---------------- */
+const MainFilters = lazy(() => import('@/components/app/MainFilters'));
+const BusinessCard = lazy(() => import('@/components/app/BusinessCard'));
 
 type OrderStatus =
     | 'pending'
@@ -54,8 +47,6 @@ interface Props {
     activeOrder?: Order;
 }
 
-/* ---------------- CONSTANTS ---------------- */
-
 const STEPS: { key: OrderStatus; label: string }[] = [
     { key: 'pending', label: 'Creado' },
     { key: 'confirmed', label: 'Confirmado' },
@@ -65,8 +56,6 @@ const STEPS: { key: OrderStatus; label: string }[] = [
     { key: 'delivered', label: 'Entregado' },
 ];
 
-/* ---------------- PAGE ---------------- */
-
 export default function Index({
     businesses,
     categories,
@@ -74,24 +63,18 @@ export default function Index({
     products,
     activeOrder,
 }: Props) {
-    const { auth } = usePage<SharedData>().props;
-    const user = auth.user;
-
-    const isFirstRender = useRef(true);
-
     const [loading, setLoading] = useState(false);
-    const [collapsed, setCollapsed] = useState(true);
+    const lastSearchKey = useRef<string | null>(null);
+
     const [showOrderModal, setShowOrderModal] = useState(false);
     const [orderDetail, setOrderDetail] = useState<Order | null>(null);
 
-    const [filtersUser, setFiltersUser] = useState({
+    const [filtersUser, setFiltersUser] = useState<BusinessSearchFilters>({
         query: filters.q || '',
         category: filters.category || null,
         distance: filters.distance || 5,
         foodType: null,
     });
-
-    /* ---------------- GEOLOCATION (DEFERRED) ---------------- */
 
     const [geoEnabled, setGeoEnabled] = useState(false);
 
@@ -102,16 +85,14 @@ export default function Index({
         loading: loadingLocation,
     } = useGeolocation(
         geoEnabled
-            ? { enableHighAccuracy: true, enableIPFallback: true }
-            : null,
+            ? { enableHighAccuracy: false, enableIPFallback: true }
+            : (null as any),
     );
 
     useEffect(() => {
-        const t = setTimeout(() => setGeoEnabled(true), 1000);
+        const t = setTimeout(() => setGeoEnabled(true), 1500);
         return () => clearTimeout(t);
     }, []);
-
-    /* ---------------- SEARCH ---------------- */
 
     const handleSearch = useCallback(() => {
         setLoading(true);
@@ -124,13 +105,15 @@ export default function Index({
         };
 
         const headers: any = {};
-        if (latitude && longitude) {
+
+        if (typeof latitude === 'number' && typeof longitude === 'number') {
             headers['X-Latitude'] = latitude.toString();
             headers['X-Longitude'] = longitude.toString();
         }
 
         router.get('/', params, {
             headers,
+            only: ['businesses', 'meta', 'filters'],
             preserveState: true,
             preserveScroll: true,
             replace: true,
@@ -139,30 +122,42 @@ export default function Index({
     }, [filtersUser, latitude, longitude]);
 
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
+        if (loadingLocation) return;
 
-        if (!loadingLocation) {
+        const searchKey = JSON.stringify({
+            filtersUser,
+            latitude,
+            longitude,
+        });
+
+        if (lastSearchKey.current === searchKey) return;
+
+        lastSearchKey.current = searchKey;
+
+        const debounce = setTimeout(() => {
             handleSearch();
-        }
-    }, [filtersUser]);
+        }, 120);
 
-    /* ---------------- SKELETON STATE ---------------- */
-
-    const showSkeleton =
-        loading || (businesses.length === 0 && loadingLocation);
-
-    /* ---------------- RENDER ---------------- */
+        return () => clearTimeout(debounce);
+    }, [filtersUser, latitude, longitude, loadingLocation]);
 
     return (
         <MainLayout>
             <div className="flex h-full flex-col overflow-hidden">
-                {/* HEADER */}
                 <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl">
+                    {loadingLocation && (
+                        <div className="mx-4 my-2 rounded-xl bg-blue-50 px-3 py-2 text-xs text-blue-600">
+                            📍 Obteniendo tu ubicación para mostrar negocios
+                            cercanos…
+                        </div>
+                    )}
+
                     <div className="px-4 pt-2 pb-3">
-                        <Suspense fallback={<div className="h-16" />}>
+                        <Suspense
+                            fallback={
+                                <div className="h-16 animate-pulse rounded-xl bg-gray-50" />
+                            }
+                        >
                             <MainFilters
                                 categories={categories}
                                 filters={filtersUser}
@@ -173,7 +168,7 @@ export default function Index({
                     </div>
 
                     {geoError && (
-                        <div className="mx-4 mb-2 flex items-center gap-2 rounded-full bg-amber-50 py-1 text-amber-600">
+                        <div className="mx-4 mb-2 flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-amber-600">
                             <AlertCircle size={12} />
                             <span className="text-[10px] font-bold">
                                 Habilita el GPS para ver distancia real
@@ -182,25 +177,15 @@ export default function Index({
                     )}
                 </div>
 
-                {/* CONTENT */}
                 <div className="flex-1 overflow-y-auto px-4 pb-24">
                     <div className="py-2">
-                        {showSkeleton ? (
-                            <BusinessGridSkeleton />
-                        ) : businesses.length > 0 ? (
+                        <Suspense fallback={<BusinessGridSkeleton />}>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {businesses.map((b) => (
                                     <BusinessCard key={b.id} business={b} />
                                 ))}
                             </div>
-                        ) : (
-                            <div className="flex flex-col items-center py-20 opacity-40">
-                                <Search size={48} />
-                                <p className="mt-4 text-sm">
-                                    Sin resultados por aquí
-                                </p>
-                            </div>
-                        )}
+                        </Suspense>
                     </div>
                 </div>
             </div>
@@ -219,8 +204,6 @@ export default function Index({
     );
 }
 
-/* ---------------- SKELETON ---------------- */
-
 const BusinessGridSkeleton = () => (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
@@ -238,8 +221,6 @@ const BusinessGridSkeleton = () => (
         ))}
     </div>
 );
-
-/* ---------------- COMPONENTS ---------------- */
 
 const OrderTimeline = memo(({ status }: { status: OrderStatus }) => {
     const current = STEPS.findIndex((s) => s.key === status);
