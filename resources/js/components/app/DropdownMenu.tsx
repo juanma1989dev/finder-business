@@ -1,12 +1,23 @@
+import { TypeUser, User } from '@/types';
 import { router } from '@inertiajs/react';
 import {
     ChevronDown,
     Heart,
     LayoutDashboard,
     LogOut,
-    User,
+    UserIcon,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+
+function getDashboardUrlByUser(user: User) {
+    const URLS = {
+        client: '/dashboard/client',
+        delivery: '/dashboard/delivery',
+        business: '/dashboard/business',
+    };
+
+    return URLS[user.type] ?? null;
+}
 
 export default function DropdownMenu({ user, className }: any) {
     const [open, setOpen] = useState(false);
@@ -21,6 +32,8 @@ export default function DropdownMenu({ user, className }: any) {
         document.addEventListener('click', onDoc);
         return () => document.removeEventListener('click', onDoc);
     }, []);
+
+    const URL_DASHBOARD = getDashboardUrlByUser(user);
 
     function handleClickLogout() {
         router.post(
@@ -70,26 +83,28 @@ export default function DropdownMenu({ user, className }: any) {
 
                         <div className="space-y-1">
                             <a
-                                href="/dashboard"
+                                href={URL_DASHBOARD}
                                 className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-purple-50 hover:text-purple-700"
                             >
                                 <LayoutDashboard className="h-4 w-4" />
                                 <span>Panel de Control</span>
                             </a>
 
-                            <a
-                                href="/favorites"
-                                className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-orange-50 hover:text-orange-700"
-                            >
-                                <Heart className="h-4 w-4" />
-                                <span>Mis Favoritos</span>
-                            </a>
+                            {user.type == TypeUser.CLIENT && (
+                                <a
+                                    href="/favorites"
+                                    className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-orange-50 hover:text-orange-700"
+                                >
+                                    <Heart className="h-4 w-4" />
+                                    <span>Mis Favoritos</span>
+                                </a>
+                            )}
 
                             <a
                                 href="/profile"
                                 className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-purple-50 hover:text-purple-700"
                             >
-                                <User className="h-4 w-4" />
+                                <UserIcon className="h-4 w-4" />
                                 <span>Ajustes del Perfil</span>
                             </a>
                         </div>
