@@ -64,7 +64,6 @@ export default function LoginPage({ loginConfig }: Props) {
                 </div>
             </div>
 
-            {/* Efecto decorativo de fondo */}
             <div className="pointer-events-none absolute -right-10 -bottom-10 h-64 w-64 rounded-full bg-purple-50 opacity-50 blur-3xl" />
         </AuthLayoutTemplate>
     );
