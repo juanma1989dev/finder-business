@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MainLayout from '@/layouts/main-layout';
-import { Business, SharedData } from '@/types';
+import { Business, SharedData, TypeUser } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
     ArrowLeft,
@@ -58,7 +58,10 @@ export default function BusinessDetail({ business, favorite }: Props) {
     const user = auth.user;
 
     const LEGENDS = {
-        payments: business.payments.map((p) => p.name).join(' | '),
+        payments:
+            business.payments.length === 0
+                ? 'Sin métodos de pago registrados.'
+                : business.payments.map((p) => p.name).join(' | '),
         schedul: getStatusLabel(business),
     };
 
@@ -122,7 +125,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                                 <Share2 className="h-4 w-4" />
                                             </button>
 
-                                            {user && (
+                                            {user.type === TypeUser.CLIENT && (
                                                 <button
                                                     onClick={toggleFavorite}
                                                     className={`flex h-9 w-9 items-center justify-center rounded-lg shadow-sm backdrop-blur-sm transition-all active:scale-95 ${
