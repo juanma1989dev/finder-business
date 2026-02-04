@@ -1,19 +1,27 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import {
-    Map,
-    MapControls,
-    MapMarker,
-    MarkerContent,
-} from '@/components/ui/map';
 import { Switch } from '@/components/ui/switch';
 import MainLayout from '@/layouts/main-layout';
 import { SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { DollarSign, Navigation, Package, PackageSearch } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+    lazy,
+    Suspense,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { toast } from 'react-toastify';
+import {
+    DollarSign,
+    Navigation,
+    Package,
+    PackageSearch,
+} from './../../../lib/icons';
+
+const MapDelivery = lazy(() => import('./MapDelivery'));
 
 interface Props {
     activeOrder: any;
@@ -260,54 +268,28 @@ export default function Index({ activeOrder }: Props) {
 
                 {user.is_available ? (
                     <Card className="relative h-65 overflow-hidden rounded-lg border-purple-200 py-0 shadow-sm">
-                        <Map
-                            ref={mapRef}
-                            center={
-                                deliveryLocation
-                                    ? [
-                                          deliveryLocation.lng,
-                                          deliveryLocation.lat,
-                                      ]
-                                    : [-97.2275336, 17.4606859]
+                        <Suspense
+                            fallback={
+                                <div className="flex h-full w-full animate-pulse items-center justify-center bg-gray-100">
+                                    <p className="text-xs text-gray-400">
+                                        Cargando mapa...
+                                    </p>
+                                </div>
                             }
-                            zoom={16}
-                            theme="light"
                         >
-                            <MapControls
-                                position="bottom-right"
-                                showZoom
-                                showLocate
-                            />
-                            {deliveryLocation && (
-                                <MapMarker
-                                    longitude={deliveryLocation.lng}
-                                    latitude={deliveryLocation.lat}
-                                >
-                                    <MarkerContent>
-                                        <div className="flex items-center justify-center rounded-full bg-purple-600 p-1.5 shadow-lg ring-2 ring-white">
-                                            <Navigation
-                                                className="fill-white text-white"
-                                                size={16}
-                                            />
-                                        </div>
-                                    </MarkerContent>
-                                </MapMarker>
-                            )}
-                        </Map>
+                            <MapDelivery deliveryLocation={deliveryLocation} />
+                        </Suspense>
                     </Card>
                 ) : (
                     <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-100 bg-purple-50/30 py-12 text-center">
-                        {/* Icono en Paleta Gris / Desactivado */}
                         <div className="mb-4 rounded-lg bg-white p-4 shadow-sm">
                             <PackageSearch className="h-10 w-10 text-gray-300" />
                         </div>
 
-                        {/* Título en Tamaño Base y Paleta Gris */}
                         <h2 className="text-base font-semibold tracking-tight text-gray-700 uppercase">
                             Actualmente no puedes recibir pedidos
                         </h2>
 
-                        {/* Texto Secundario en Tamaño Micro */}
                         <p className="mt-1 text-[10px] leading-tight font-normal tracking-widest text-gray-500 uppercase">
                             Activa tu disponibilidad para comenzar a trabajar
                         </p>
