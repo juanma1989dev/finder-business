@@ -85,7 +85,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                             </div>
                                             <p className="line-clamp-2 text-[10px] leading-tight font-normal text-gray-600">
                                                 {product.description ||
-                                                    'Nuestra receta especial preparada al momento.'}
+                                                    'Sin descripción'}
                                             </p>
                                         </div>
 
