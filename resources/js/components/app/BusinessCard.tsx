@@ -50,8 +50,8 @@ const BusinessCard = memo(({ business, modeEdit, index = 0 }: Props) => {
                 <div className="space-y-3 p-3">
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
-                            <h3 className="truncate text-lg font-extrabold text-gray-900 transition-colors group-hover:text-purple-700">
-                                {business.nombre}
+                            <h3 className="truncate text-lg font-extrabold text-gray-900 text-purple-700 transition-colors">
+                                {business.name}
                             </h3>
 
                             {/* <div className="mt-0.5 flex items-center gap-1">
@@ -76,6 +76,7 @@ const BusinessCard = memo(({ business, modeEdit, index = 0 }: Props) => {
                     </div>
 
                     <div className="flex items-center justify-between pt-1">
+                        {/* Todos incican que estan abiertos ya que solo se muestran si ya estan abaiertos */}
                         <span className="text-[10px] font-bold tracking-tighter text-purple-600 uppercase">
                             Abierto ahora
                         </span>
