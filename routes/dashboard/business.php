@@ -13,7 +13,6 @@ use App\Http\Controllers\Dashboard\IndexController;
 use Illuminate\Support\Facades\Route; 
 
  Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')->group(function () {
-    
     # /business 
     Route::middleware('business')->group(function () {
         # Dashboard home
@@ -49,9 +48,6 @@ use Illuminate\Support\Facades\Route;
         Route::patch('orders/{order}/status', [OrderManagementController::class, 'updateStatus'])->name('orders.status');
     });
 });
-
-
-
 //    /******************************* */
 //     Route::get('/dashboard/profile/business/confirm-code', [BusinessController::class, 'codes'])->name('dashboard.business.codes');
 //     Route::post('/dashboard/profile/business/validate-code', [BusinessController::class, 'codeValidate'])->name('dashboard.business.code.validate');
