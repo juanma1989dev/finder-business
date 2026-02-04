@@ -21,17 +21,13 @@ final class BusinessController extends Controller
      */
     public function index(BusinessSearchRequest $request): Response
     {
-        $filters = $request->filters();
-        $geoData = $request->geo();
-
-        $data = $this->searchService->getData($filters, $geoData);
+        $data = $this->searchService->getData($request);
 
         $user = Auth::user()->id ?? null;
         $user = User::find($user);
         
         return inertia('Index', [
             ...$data,
-            'filters' => $filters,
             'activeOrder' => $user->activeOrder ?? []
         ]);
     }
