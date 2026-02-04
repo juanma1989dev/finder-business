@@ -250,3 +250,10 @@ export enum OrderStatus {
     CANCELLED = 'cancelled',
     REJECTED = 'rejected',
 }
+
+export interface BusinessSearchFilters {
+    query: string;
+    category: string | null;
+    distance: number | null;
+    foodType: number | null;
+}
