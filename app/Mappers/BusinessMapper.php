@@ -26,6 +26,7 @@ class BusinessMapper
             'cover_image'       => $bussines->cover_image,
             'tags'              => self::tags($bussines->tags),
             'social_networks'   => self::socialNetworks($bussines->socialNetworks),
+            'distance'          => $bussines->distance,
 
             'products'          => ProductsAndServicesMapper::toArray( $bussines->productsAndServices),
             'amenities'         => AmenitiesMapper::toArray($bussines->amenities),
@@ -40,7 +41,7 @@ class BusinessMapper
     {
         return collect($businesses)
             ->map(fn (Businesses $b) => self::toArray($b))
-            ->values();
+            ->toArray();
     }
 
     private static function tags(?string $tags) : array
