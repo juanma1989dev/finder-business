@@ -17,7 +17,7 @@ class IndexController extends Controller
             : now()->startOfDay();
 
         $orders = Order::with('user')
-            ->whereNotIn('status', [ OrderStatusEnum::DELIVERED ,  OrderStatusEnum::CANCELLED, OrderStatusEnum::REJECTED ])
+            ->whereIn('status', [ OrderStatusEnum::DELIVERED ,  OrderStatusEnum::CANCELLED, OrderStatusEnum::REJECTED ])
             ->whereBetween('created_at', [
                 $date->copy()->startOfDay(),
                 $date->copy()->endOfDay(),
