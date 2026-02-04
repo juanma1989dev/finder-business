@@ -39,7 +39,7 @@ export default function MainFilters({
     };
 
     return (
-        <div className="mx-auto w-full max-w-7xl space-y-5 p-1">
+        <div className="mx-auto w-full space-y-3 p-1">
             <div className="rounded-2xl border border-gray-100 bg-white p-2 shadow-lg shadow-purple-900/5 transition-all sm:rounded-full">
                 <div className="flex flex-col items-center gap-2 sm:flex-row">
                     <div className="group relative w-full sm:flex-[1.5]">

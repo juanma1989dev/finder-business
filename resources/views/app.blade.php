@@ -81,6 +81,10 @@
             }
         </style>
 
+        <link rel="manifest" href="/manifest.customer.json">
+        <meta name="theme-color" content="#7c3aed">
+
+
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @inertiaHead

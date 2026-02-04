@@ -54,3 +54,12 @@ createInertiaApp({
 });
 
 initializeTheme();
+
+if ('serviceWorker' in navigator) {
+    console.log('Service worker');
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.custumer.js');
+    });
+} else {
+    console.log('Siiuii Service worker');
+}
