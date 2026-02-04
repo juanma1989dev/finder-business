@@ -6,6 +6,38 @@ interface GeoOptions {
     enabled?: boolean;
 }
 
+const GEO_CACHE_KEY = 'geo_coords';
+const GEO_CACHE_TTL = 20 * 60 * 1000; // 20 minutos
+
+function getCachedCoords() {
+    try {
+        const raw = sessionStorage.getItem(GEO_CACHE_KEY);
+        if (!raw) return null;
+
+        const cached = JSON.parse(raw);
+
+        if (Date.now() - cached.timestamp > GEO_CACHE_TTL) {
+            sessionStorage.removeItem(GEO_CACHE_KEY);
+            return null;
+        }
+
+        return cached;
+    } catch {
+        return null;
+    }
+}
+
+function setCachedCoords(lat: number, lng: number) {
+    sessionStorage.setItem(
+        GEO_CACHE_KEY,
+        JSON.stringify({
+            lat,
+            lng,
+            timestamp: Date.now(),
+        }),
+    );
+}
+
 export function useGeolocation(options?: GeoOptions) {
     const enabled = options?.enabled ?? true;
 
@@ -17,6 +49,13 @@ export function useGeolocation(options?: GeoOptions) {
     useEffect(() => {
         if (!enabled) return;
 
+        const cached = getCachedCoords();
+        if (cached) {
+            setLatitude(cached.lat);
+            setLongitude(cached.lng);
+            return;
+        }
+
         if (!navigator.geolocation) {
             setError('Geolocation not supported');
             return;
@@ -26,8 +65,13 @@ export function useGeolocation(options?: GeoOptions) {
 
         navigator.geolocation.getCurrentPosition(
             (pos) => {
-                setLatitude(pos.coords.latitude);
-                setLongitude(pos.coords.longitude);
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+
+                setLatitude(lat);
+                setLongitude(lng);
+                setCachedCoords(lat, lng);
+
                 setLoading(false);
             },
             () => {
