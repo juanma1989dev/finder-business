@@ -1,1 +1,0 @@
-import{j as e,H as t}from"./vendor-core-VmliHTPN.js";import{A as s}from"./auth-layout-DpAh1Ggy.js";import"./auth-simple-layout-CCRyc9cp.js";import"./vendor-icons-1nBL8bh1.js";function d({token:r,email:o}){return e.jsx(s,{title:"Reset password",description:"Please enter your new password below",bannerImage:"",children:e.jsx(t,{title:"Reset password"})})}export{d as default};

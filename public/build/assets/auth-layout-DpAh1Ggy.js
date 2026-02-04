@@ -1,1 +1,0 @@
-import{j as m}from"./vendor-core-VmliHTPN.js";import{A as i}from"./auth-simple-layout-CCRyc9cp.js";function x({children:t,title:o,subTitle:r,description:u,bannerImage:s,...a}){return m.jsx(i,{title:o,description:u,subTitle:r,bannerImage:s,...a,children:t})}export{x as A};
