@@ -1,13 +1,16 @@
 import { Link } from '@inertiajs/react';
-import { ArrowRight, MapPinned, Star } from 'lucide-react';
+import { ArrowRight, MapPinned } from 'lucide-react';
 import { memo } from 'react';
 
 interface Props {
     business: any;
     modeEdit?: boolean;
+    index?: number;
 }
 
-const BusinessCard = memo(({ business, modeEdit }: Props) => {
+const BusinessCard = memo(({ business, modeEdit, index = 0 }: Props) => {
+    const isPriority = index < 3;
+
     return (
         <Link
             href={`/business/detail/${business.id}`}
@@ -22,9 +25,9 @@ const BusinessCard = memo(({ business, modeEdit }: Props) => {
                                 : `/images/${business.category?.image}`
                         }
                         alt={business.nombre}
-                        loading="lazy"
-                        decoding="async"
-                        fetchPriority="low"
+                        loading={isPriority ? 'eager' : 'lazy'}
+                        fetchPriority={isPriority ? 'high' : 'low'}
+                        decoding={isPriority ? 'sync' : 'async'}
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
 
@@ -51,7 +54,7 @@ const BusinessCard = memo(({ business, modeEdit }: Props) => {
                                 {business.nombre}
                             </h3>
 
-                            <div className="mt-0.5 flex items-center gap-1">
+                            {/* <div className="mt-0.5 flex items-center gap-1">
                                 <Star className="h-3 w-3 fill-orange-400 text-orange-400" />
                                 <span className="text-xs font-bold text-gray-600">
                                     4.8
@@ -59,7 +62,7 @@ const BusinessCard = memo(({ business, modeEdit }: Props) => {
                                 <span className="text-[11px] font-medium text-gray-400">
                                     (120+ reseñas)
                                 </span>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 

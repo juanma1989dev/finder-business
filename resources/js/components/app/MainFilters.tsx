@@ -1,3 +1,4 @@
+import { BusinessSearchFilters } from '@/types';
 import { CircleX, Filter, MapPin, Search, Utensils } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -8,17 +9,10 @@ const distances = [
     { label: '20 km', value: 20 },
 ];
 
-export interface Filters {
-    query: string;
-    category: string | null;
-    distance: number | null;
-    foodType: number | null;
-}
-
 interface Props {
     categories: any[];
-    filters: Filters;
-    onFiltersChange: (filters: Filters) => void;
+    filters: BusinessSearchFilters;
+    onFiltersChange: (filters: BusinessSearchFilters) => void;
     foodTypes: any[];
 }
 
@@ -37,7 +31,10 @@ export default function MainFilters({
         return () => clearTimeout(handler);
     }, [localQuery]);
 
-    const handleFilterChange = (key: keyof Filters, value: any) => {
+    const handleFilterChange = (
+        key: keyof BusinessSearchFilters,
+        value: any,
+    ) => {
         onFiltersChange({ ...filters, [key]: value || null });
     };
 
