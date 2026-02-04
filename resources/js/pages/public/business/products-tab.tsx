@@ -99,7 +99,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                                 </span>
                                             </div>
 
-                                            {(user.type === TypeUser.CLIENT  && (
+                                            {user.type === TypeUser.CLIENT && (
                                                 <button
                                                     onClick={() =>
                                                         setSelectedProduct(
