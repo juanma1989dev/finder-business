@@ -1,4 +1,4 @@
-import { Business, ServicesAndProducts, SharedData } from '@/types';
+import { Business, ServicesAndProducts, SharedData, TypeUser } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { PackageSearch, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -99,7 +99,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
                                                 </span>
                                             </div>
 
-                                            {user && (
+                                            {(user.type === TypeUser.CLIENT  && (
                                                 <button
                                                     onClick={() =>
                                                         setSelectedProduct(
