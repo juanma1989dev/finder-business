@@ -25,10 +25,10 @@ final class BusinessController extends Controller
 
         $user = Auth::user()->id ?? null;
         $user = User::find($user);
-        
+
         return inertia('Index', [
             ...$data,
-            'activeOrder' => $user->activeOrder ?? []
+            'activeOrder' => $user->activeOrder ?? null
         ]);
     }
 
