@@ -1,12 +1,6 @@
 import { TypeUser, User } from '@/types';
 import { router } from '@inertiajs/react';
-import {
-    ChevronDown,
-    Heart,
-    LayoutDashboard,
-    LogOut,
-    UserIcon,
-} from 'lucide-react';
+import { ChevronDown, Heart, LayoutDashboard, LogOut } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 function getDashboardUrlByUser(user: User) {
@@ -68,10 +62,8 @@ export default function DropdownMenu({ user, className }: any) {
                     />
                 </button>
 
-                {/* Menú Desplegable */}
                 {open && (
                     <div className="absolute right-0 z-50 mt-3 w-64 origin-top-right rounded-[1.5rem] border border-gray-100 bg-white p-2 shadow-2xl ring-1 shadow-purple-900/10 ring-black/5 transition-all">
-                        {/* Header del dropdown (Info usuario) */}
                         <div className="mb-1 border-b border-gray-50 px-4 py-3">
                             <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
                                 Cuenta
@@ -100,16 +92,17 @@ export default function DropdownMenu({ user, className }: any) {
                                 </a>
                             )}
 
-                            <a
-                                href="/profile"
-                                className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-purple-50 hover:text-purple-700"
-                            >
-                                <UserIcon className="h-4 w-4" />
-                                <span>Ajustes del Perfil</span>
-                            </a>
+                            {/* {user.type == TypeUser.CLIENT && (
+                                <a
+                                    href="/profile"
+                                    className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-purple-50 hover:text-purple-700"
+                                >
+                                    <UserIcon className="h-4 w-4" />
+                                    <span>Ajustes del Perfil</span>
+                                </a>
+                            )} */}
                         </div>
 
-                        {/* Botón Logout Estilizado */}
                         <div className="mt-2 border-t border-gray-50 pt-2">
                             <button
                                 onClick={handleClickLogout}
