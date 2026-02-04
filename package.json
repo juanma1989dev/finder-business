@@ -54,6 +54,7 @@
         "concurrently": "^9.2.1",
         "date-fns": "^4.1.0",
         "framer-motion": "^12.29.2",
+        "geist": "^1.5.1",
         "globals": "^15.15.0",
         "input-otp": "^1.4.2",
         "laravel-vite-plugin": "^2.1.0",

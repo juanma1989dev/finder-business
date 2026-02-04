@@ -8,6 +8,7 @@ import {
 import { useOrderStatus } from '@/hooks/useOrderStatus';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Order } from '@/types';
+import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Bike, CalendarIcon, Loader2, PackageSearch } from 'lucide-react';
@@ -30,22 +31,21 @@ export default function ClientDashboard({
 
     const [processingId, setProcessingId] = useState<number | null>(null);
 
-    // 📡 Cuando cambia la fecha → pedir pedidos de ese día
     const onDateChange = (selected?: Date) => {
         if (!selected) return;
 
         setDate(selected);
 
-        // router.get(
-        //     '/dashboard/delivery',
-        //     {
-        //         date: format(selected, 'yyyy-MM-dd'),
-        //     },
-        //     {
-        //         preserveState: true,
-        //         replace: true,
-        //     },
-        // );
+        router.get(
+            '/dashboard/client',
+            {
+                date: format(selected, 'yyyy-MM-dd'),
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
     };
 
     return (
@@ -53,7 +53,7 @@ export default function ClientDashboard({
             <div className="flex min-h-screen flex-col gap-4 bg-purple-50/30 p-4 lg:p-6">
                 <div className="mb-2">
                     <h1 className="text-base font-semibold tracking-tight text-gray-700 uppercase">
-                        Historial de pedidos del cleinte
+                        Historial de pedidos
                     </h1>
                 </div>
 
@@ -103,10 +103,6 @@ export default function ClientDashboard({
         </DashboardLayout>
     );
 }
-
-/* ===========================
-   🧾 Order Card
-=========================== */
 
 function DeliveryOrderCard({
     pedido,

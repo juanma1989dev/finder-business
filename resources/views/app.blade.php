@@ -11,8 +11,8 @@
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         {{-- Preconectar a fuentes para ahorrar ~200ms --}}
-        <!-- <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet" /> -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet" />
 
 
         <style>
@@ -57,6 +57,7 @@
                 overflow: hidden;
             }
 
+            /* Animación Shimmer suave */
             .shell-card::after {
                 content: "";
                 position: absolute;
