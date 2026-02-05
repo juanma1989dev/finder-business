@@ -16,7 +16,7 @@ class AccountConfigController extends Controller
             'accountTypes'  => $config,
             'suggestedType' => UserTypeEnum::CLIENT->value
         ];
-
+        
         return inertia('AccountConfig', $data);
     }
 
@@ -36,14 +36,10 @@ class AccountConfigController extends Controller
             'type' => $validated['account_type'],
         ]);
 
-        switch ($user->type) {
-            case 'business':
-                return redirect()->to('/dashboard/business');
-            case 'delivery':
-                return redirect()->to('/dashboard/delivery');
-            default:
-                return redirect()->to('/dashboard/client');
-        }
+        $config = config('login')[$user->type] ?? [];
+        $urlRedirect = $config['route.start']  ?? 'public.home';
+
+        return redirect()->route($urlRedirect);
     }
 
 }
