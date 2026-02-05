@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureAccountTypeIsSet;
 use App\Http\Middleware\EnsureBusinessUser;
 use App\Http\Middleware\EnsureDeliveryUser;
 use App\Http\Middleware\HandleAppearance;
@@ -25,8 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'business' =>  EnsureBusinessUser::class,
-            'delivery' =>  EnsureDeliveryUser::class,
+            'account.configured' =>  EnsureAccountTypeIsSet::class,
+            'business'           =>  EnsureBusinessUser::class,
+            'delivery'           =>  EnsureDeliveryUser::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
