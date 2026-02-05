@@ -12,7 +12,7 @@ use App\Http\Controllers\Dashboard\Business\LocationController;
 use App\Http\Controllers\Dashboard\IndexController; 
 use Illuminate\Support\Facades\Route; 
 
- Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')->group(function () {
+ Route::middleware(['auth', 'verified', 'account.configured'])->prefix('dashboard')->name('dashboard.')->group(function () { 
     # /business 
     Route::middleware('business')->group(function () {
         # Dashboard home
