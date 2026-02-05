@@ -161,14 +161,14 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                                 <Clock className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <p className="text-sm leading-tight font-semibold text-amber-700 uppercase">
-                                                    Horario de referencia(Puede
+                                                <p className="text-xs leading-tight font-semibold text-amber-700 uppercase">
+                                                    Horario de referencia (Puede
                                                     variar)
                                                 </p>
-                                                <p className="text-sm font-normal text-amber-700">
+                                                <p className="text-xs font-normal text-amber-700">
                                                     {LEGENDS.schedul}
                                                 </p>
-                                                <p className="mt-3 flex items-center gap-2 text-sm font-normal text-amber-700">
+                                                <p className="mt-3 flex items-center gap-2 text-xs font-normal text-amber-700">
                                                     Actualmente:
                                                     {business.is_open ? (
                                                         <>
