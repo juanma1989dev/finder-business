@@ -7,7 +7,7 @@ export default function Header() {
     const { user } = auth;
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-purple-100 bg-white/80">
+        <header className="sticky top-0 z-50 w-full border-b border-purple-100 bg-red-900 bg-white/80">
             <div className="mx-auto max-w-7xl px-3">
                 <div className="flex h-13 items-center justify-between gap-2">
                     <div className="hidden items-center gap-1 md:flex">
@@ -42,7 +42,7 @@ export default function Header() {
                             <DropdownMenu user={user} />
                         ) : (
                             <Link
-                                href="/accounts"
+                                href="/login"
                                 className="group flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-purple-700 active:scale-95"
                             >
                                 <LogIn className="h-4 w-4" />

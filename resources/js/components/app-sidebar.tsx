@@ -59,7 +59,7 @@ export function AppSidebar() {
             user.type === TypeUser.DELIVERY
                 ? [
                       {
-                          title: 'Dashboard Entrega',
+                          title: 'Aceptar pedidos',
                           href: `/delivery`,
                           icon: Home,
                       },
