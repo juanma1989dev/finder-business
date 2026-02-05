@@ -6,14 +6,12 @@ import { type PropsWithChildren } from 'react';
 interface AuthLayoutProps {
     title?: string;
     subTitle?: string;
-    bannerImage: string;
 }
 
 export default function AuthLayout({
     children,
     title,
     subTitle,
-    bannerImage,
 }: PropsWithChildren<AuthLayoutProps>) {
     const pageData = usePage<SharedData>();
     const { name: nameApp } = pageData.props;
@@ -30,7 +28,7 @@ export default function AuthLayout({
 
                     <div className="relative">
                         <img
-                            src={bannerImage}
+                            src={'/images/banner_findy.webp'}
                             alt="Logo"
                             className="mb-10 h-60 w-full rounded-lg object-cover shadow-sm"
                         />
