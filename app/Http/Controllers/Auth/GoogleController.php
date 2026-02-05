@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Services\Auth\GoogleAuthService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Throwable;
 
@@ -60,13 +61,19 @@ class GoogleController extends Controller
                     ->with('error', $result['error']);
             }
 
-            $redirect = redirect()->route($result['redirect']);
-            
-            if (isset($result['message'])) {
-                $redirect->with('success', $result['message']);
+            $userLogged = Auth::user();
+
+            if(!$userLogged->type || empty($userLogged->type)){
+                return redirect()->route('account.config.home');
             }
 
-            return $redirect;
+
+            # Redirect en caso de registro
+            if (isset($result['message'])) {
+                return redirect()->route($result['redirect'])->with('success', $result['message']);
+            }
+
+            return redirect()->route($result['redirect']);
 
         } catch (Throwable $e) {
 

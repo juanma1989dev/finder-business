@@ -115,17 +115,26 @@ class GoogleAuthService
             ];
         }
 
+
+        $configLogin = config('login');
+        $URL_HOME = 'public.home';
+
+
         # Caso 3: Registro exitoso
         if ($action === self::ACTION_REGISTER && !$existingUser) {
             $user = $this->createUserFromGoogle($googleUser);
             
             $this->loginUser($user);
-            
+
+            $conf = $this->getConfigLogin( $configLogin);
+
+            $urlRedirect = $conf['route.start'] ?? $URL_HOME;
+
             return [
                 'success' => true,
                 'user' => $user,
                 'error' => null,
-                'redirect' => 'public.home',
+                'redirect' => $urlRedirect,  
                 'message' => '¡Cuenta creada exitosamente!'
             ];
         } 
@@ -134,11 +143,25 @@ class GoogleAuthService
         $this->syncGoogleId($existingUser, $googleUser->getId());
         $this->loginUser($existingUser);
 
+        $conf = $this->getConfigLogin( $configLogin);
+        $urlRedirect = $conf['route.start'] ?? $URL_HOME;
+
         return [
             'success' => true,
             'user' => $existingUser,
             'error' => null,
-            'redirect' => 'public.home'
+            'redirect' =>  $urlRedirect
         ];
+    }
+
+    private function getConfigLogin(array $configLogin = [])
+    {
+        $userLogged = Auth::user();
+
+        $userType = $userLogged->type ?? null;
+
+        $conf = $configLogin[ $userType ] ?? [];
+
+        return $conf;
     }
 }
