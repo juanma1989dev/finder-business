@@ -1,14 +1,10 @@
 <?php
  
-use App\Http\Controllers\Auth\AccountsController; 
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-# Tipo de cuentas
-Route::get('/accounts', [AccountsController::class, 'index'])->name('accounts');
 
 # Login
 Route::get('/login', [LoginController::class, 'index'])->name('login');
