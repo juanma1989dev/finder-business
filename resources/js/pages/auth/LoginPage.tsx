@@ -14,11 +14,7 @@ export default function LoginPage({ loginConfig }: Props) {
 
     return (
         <MainLayout>
-            <AuthLayoutTemplate
-                title={`Login`}
-                subTitle={'Inicia sesión'}
-                bannerImage={loginConfig.banner}
-            >
+            <AuthLayoutTemplate title={`Login`} subTitle={'Inicia sesión'}>
                 <Head title="Iniciar sesión" />
 
                 {flash?.error && (

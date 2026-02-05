@@ -34,7 +34,6 @@ export default function RegisterPage({ registerConfig }: Props) {
             <AuthLayoutTemplate
                 title={`Registrarse `}
                 subTitle={registerConfig.subTitle}
-                bannerImage={registerConfig.banner}
             >
                 <Head title="Registrarse" />
 
