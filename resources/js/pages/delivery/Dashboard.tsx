@@ -60,7 +60,6 @@ export default function DeliveryDashboard({
                     </h1>
                 </div>
 
-                {/* 📅 Filtro por fecha */}
                 <div className="flex flex-col gap-3 rounded-lg border border-purple-200 bg-white p-3 shadow-sm md:flex-row md:items-center">
                     <Popover>
                         <PopoverTrigger asChild>
