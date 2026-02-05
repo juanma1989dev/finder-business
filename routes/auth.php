@@ -6,10 +6,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-# Login
+# Login y Register
 Route::get('/login', [LoginController::class, 'index'])->name('login');
-
-# Register
 Route::resource('/register', RegisterController::class);
  
 # Rutas Google
