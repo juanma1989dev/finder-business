@@ -29,7 +29,7 @@ export default function MainLayout({
     const { updateAvailable, refreshApp } = usePwaUpdate();
 
     return (
-        <main className="relative z-10 mx-auto min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-0 md:px-4 md:pt-4">
+        <main className="relative z-10 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
             <ToastContainer
                 position="top-right"
                 className="!z-[9999]"
