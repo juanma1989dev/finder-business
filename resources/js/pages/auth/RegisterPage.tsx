@@ -2,16 +2,14 @@ import { GoogleButtonRegister } from '@/components/app/GoogleButtonRegsiter';
 import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
 
 import MainLayout from '@/layouts/main-layout';
-import { AccountType, SharedData } from '@/types';
+import { SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight, Info, ShieldCheck, X } from 'lucide-react';
 import { useState } from 'react';
 
-interface Props {
-    registerConfig: AccountType;
-}
+interface Props {}
 
-export default function RegisterPage({ registerConfig }: Props) {
+export default function RegisterPage({}: Props) {
     const { flash } = usePage<SharedData>().props;
     const [acceptPrivacy, setAcceptPrivacy] = useState(false);
     const [open, setOpen] = useState(false);
@@ -20,7 +18,7 @@ export default function RegisterPage({ registerConfig }: Props) {
         if (!acceptPrivacy) return;
         router.post(
             '/session/privacy-accept',
-            { typeUser: registerConfig.type },
+            {},
             {
                 onSuccess: () => {
                     window.location.href = '/auth/google/register';
@@ -31,10 +29,7 @@ export default function RegisterPage({ registerConfig }: Props) {
 
     return (
         <MainLayout>
-            <AuthLayoutTemplate
-                title={`Registrarse `}
-                subTitle={registerConfig.subTitle}
-            >
+            <AuthLayoutTemplate title={`Registrarse `} subTitle={'Registrate '}>
                 <Head title="Registrarse" />
 
                 {flash?.error && (

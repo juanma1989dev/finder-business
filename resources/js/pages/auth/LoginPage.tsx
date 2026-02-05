@@ -5,11 +5,9 @@ import { SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { AlertCircle, ArrowRight } from 'lucide-react';
 
-interface Props {
-    loginConfig: any;
-}
+interface Props {}
 
-export default function LoginPage({ loginConfig }: Props) {
+export default function LoginPage({}: Props) {
     const { flash } = usePage<SharedData>().props;
 
     return (
@@ -50,7 +48,7 @@ export default function LoginPage({ loginConfig }: Props) {
                             ¿Aún no tienes cuenta?
                         </p>
                         <Link
-                            href={`/register?type=${loginConfig.type}`}
+                            href={`/register`}
                             className="group mt-4 inline-flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition-all active:scale-95"
                         >
                             Crear cuenta
