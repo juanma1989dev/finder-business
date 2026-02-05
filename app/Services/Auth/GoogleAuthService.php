@@ -2,7 +2,6 @@
 
 namespace App\Services\Auth;
 
-use App\Enums\UserTypeEnum;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -59,7 +58,7 @@ class GoogleAuthService
             return User::create([
             'name'                => $googleUser->getName(),
             'email'               => $googleUser->getEmail(),
-            'type'                => Session::get('type_user', UserTypeEnum::CLIENT), 
+            'type'                => null, 
             'google_id'           => $googleUser->getId(),
             'password'            => bcrypt(Str::random(16)),
             'privacy_accepted'    => true,
@@ -93,7 +92,9 @@ class GoogleAuthService
      */
     public function handleGoogleAuthentication(SocialiteUser $googleUser, string $action): array
     {
+
         $existingUser = $this->findExistingUser($googleUser);
+
 
         # Caso 1: Intentando registrarse pero ya existe
         if ($action === self::ACTION_REGISTER && $existingUser) {
@@ -105,13 +106,14 @@ class GoogleAuthService
             ];
         }
 
+
         # Caso 2: Intentando login pero no existe
         if ($action === self::ACTION_LOGIN && !$existingUser) {
             return [
                 'success' => false,
                 'user' => null,
                 'error' => 'No existe una cuenta con este correo. Por favor regístrate primero.',
-                'redirect' => 'login.index' 
+                'redirect' => 'register.index' 
             ];
         }
 
