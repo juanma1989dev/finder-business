@@ -19,7 +19,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('type')->default('client');
+            $table->string('type')->nullable();
 
             $table->boolean('is_available')->default(false);
             $table->timestamp('last_available_at')->nullable();
