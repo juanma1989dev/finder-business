@@ -1,0 +1,1 @@
+var _=(E=>(E.CLIENT="client",E.BUSINESS="business",E.DELIVERY="delivery",E))(_||{}),e=(E=>(E.PENDING="pending",E.CONFIRMED="confirmed",E.READY_FOR_PICKUP="ready_for_pickup",E.PICKED_UP="picked_up",E.ON_THE_WAY="on_the_way",E.DELIVERED="delivered",E.CANCELLED="cancelled",E.REJECTED="rejected",E))(e||{});export{e as O,_ as T};
