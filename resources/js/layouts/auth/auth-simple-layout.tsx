@@ -19,8 +19,8 @@ export default function AuthLayout({
     const { name: nameApp } = pageData.props;
 
     return (
-        <div className="relative mt-10 flex flex-col items-center justify-center space-y-4 p-3">
-            <h1 className="mb-4 text-base font-semibold text-gray-700">
+        <div className="relative flex h-screen flex-col items-center justify-center space-y-4">
+            <h1 className="mb-3 text-center text-2xl leading-tight font-semibold text-purple-800">
                 {title}
             </h1>
 

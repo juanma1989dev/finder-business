@@ -32,13 +32,12 @@ export default function RegisterPage({ registerConfig }: Props) {
     return (
         <MainLayout>
             <AuthLayoutTemplate
-                title={`Registrarse como ${registerConfig.label}`}
+                title={`Registrarse `}
                 subTitle={registerConfig.subTitle}
                 bannerImage={registerConfig.banner}
             >
                 <Head title="Registrarse" />
 
-                {/* ERROR FLASH */}
                 {flash?.error && (
                     <div className="mb-6 rounded-2xl border border-red-100 bg-red-50/50 p-4 text-[12px] font-bold text-red-600 animate-in fade-in slide-in-from-top-2">
                         {flash.error}
@@ -46,7 +45,6 @@ export default function RegisterPage({ registerConfig }: Props) {
                 )}
 
                 <div className="flex flex-col space-y-6">
-                    {/* BOTÓN GOOGLE CON GLOW CONDICIONAL */}
                     <div className="group relative">
                         {acceptPrivacy && (
                             <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-r from-orange-400 to-purple-500 opacity-25 blur transition duration-1000 group-hover:opacity-50" />
@@ -60,7 +58,6 @@ export default function RegisterPage({ registerConfig }: Props) {
                         </div>
                     </div>
 
-                    {/* SELECTOR DE PRIVACIDAD ESTILIZADO */}
                     {!acceptPrivacy ? (
                         <button
                             type="button"
@@ -106,7 +103,6 @@ export default function RegisterPage({ registerConfig }: Props) {
                     </div>
                 </div>
 
-                {/* MODAL DE PRIVACIDAD REFINADO */}
                 {open && (
                     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm">
                         <div className="w-full max-w-xl overflow-hidden rounded-3xl bg-white shadow-2xl duration-200 animate-in fade-in zoom-in">
