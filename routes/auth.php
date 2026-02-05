@@ -17,7 +17,6 @@ Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallb
 
 Route::post('/session/privacy-accept', function (Request $request) {
     session([
-        'type_user' => $request->input('typeUser'),
         'accept_privacy' => true,
         'privacy_version' => config('privacy.version'),
     ]);
