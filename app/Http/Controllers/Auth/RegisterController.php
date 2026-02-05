@@ -7,15 +7,9 @@ use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
-  public function index(SessionManagement $sessionManagement, Request $request)
+    public function index(Request $request)
     {
-        $typeAccount = $request->get('type');
-
-        $conf = $sessionManagement->validateTypeAccount($typeAccount);
-
-        $data = [
-            "registerConfig" => $conf
-        ];
+         $data = [];
 
         return inertia('auth/RegisterPage', $data);
     }

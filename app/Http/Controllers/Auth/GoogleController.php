@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Services\Auth\GoogleAuthService;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -21,6 +22,7 @@ class GoogleController extends Controller
      */
     public function redirectToGoogleLogin(): RedirectResponse
     {
+        // dd('---> LOGIN');
         $this->googleAuthService->setAuthAction('login');
         return Socialite::driver('google')->redirect();
     }
@@ -54,7 +56,8 @@ class GoogleController extends Controller
             $action = $this->googleAuthService->getAndForgetAuthAction();
 
             $result = $this->googleAuthService->handleGoogleAuthentication($googleUser, $action);
-            
+
+
             if (!$result['success']) {
                 return redirect()
                     ->route($result['redirect'])
@@ -67,7 +70,6 @@ class GoogleController extends Controller
                 return redirect()->route('account.config.home');
             }
 
-
             # Redirect en caso de registro
             if (isset($result['message'])) {
                 return redirect()->route($result['redirect'])->with('success', $result['message']);
@@ -75,9 +77,7 @@ class GoogleController extends Controller
 
             return redirect()->route($result['redirect']);
 
-        } catch (Throwable $e) {
-
-            // dd(79, $e->getMessage() );
+        } catch (Exception $e) {
 
             $this->googleAuthService->clearAuthAction();
             

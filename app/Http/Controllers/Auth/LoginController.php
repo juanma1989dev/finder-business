@@ -7,15 +7,9 @@ use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
-    public function index(SessionManagement $sessionManagement, Request $request)
+    public function index(Request $request)
     {
-        $typeAccount = $request->get('type', 'client');
-
-        $conf = $sessionManagement->validateTypeAccount($typeAccount);
-
-        $data = [
-            "loginConfig" => $conf
-        ];
+        $data = [];
 
         return inertia('auth/LoginPage', $data);
     }
