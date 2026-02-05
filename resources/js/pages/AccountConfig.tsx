@@ -36,7 +36,7 @@ export default function AccountConfig({ accountTypes, suggestedType }: Props) {
 
     return (
         <DashboardLayout>
-            <div className="mx-auto max-w-4xl space-y-6 rounded-xl bg-white p-4 shadow-sm md:p-6">
+            <div className="space-y-6 rounded-xl bg-white p-4 shadow-sm md:p-6">
                 <header className="space-y-1 text-center">
                     <h1 className="text-xl font-semibold md:text-2xl">
                         Antes de continuar…
