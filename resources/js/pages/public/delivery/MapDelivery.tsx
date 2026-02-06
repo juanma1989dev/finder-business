@@ -1,42 +1,58 @@
-import {
-    Map,
-    MapControls,
-    MapMarker,
-    MarkerContent,
-} from '@/components/ui/map';
-import { Navigation } from 'lucide-react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 
 interface MapProps {
     deliveryLocation: { lat: number; lng: number } | null;
 }
 
+/* Icono custom del repartidor */
+const deliveryIcon = new L.DivIcon({
+    className: '',
+    html: `
+        <div style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#7c3aed;
+            width:32px;
+            height:32px;
+            border-radius:9999px;
+            box-shadow:0 4px 10px rgba(0,0,0,.3);
+            border:2px solid white;
+        ">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
+                <path d="M12 2L3 21l9-4 9 4-9-19z"/>
+            </svg>
+        </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+});
+
 export default function MapDelivery({ deliveryLocation }: MapProps) {
+    const center: [number, number] = deliveryLocation
+        ? [deliveryLocation.lat, deliveryLocation.lng]
+        : [17.4606859, -97.2275336];
+
     return (
-        <Map
-            center={
-                deliveryLocation
-                    ? [deliveryLocation.lng, deliveryLocation.lat]
-                    : [-97.2275336, 17.4606859]
-            }
+        <MapContainer
+            center={center}
             zoom={16}
-            theme="light"
+            scrollWheelZoom={false}
+            style={{ height: '100%', width: '100%' }}
         >
-            <MapControls position="bottom-right" showZoom showLocate />
+            <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+            />
+
             {deliveryLocation && (
-                <MapMarker
-                    longitude={deliveryLocation.lng}
-                    latitude={deliveryLocation.lat}
-                >
-                    <MarkerContent>
-                        <div className="flex items-center justify-center rounded-full bg-purple-600 p-1.5 shadow-lg ring-2 ring-white">
-                            <Navigation
-                                className="fill-white text-white"
-                                size={16}
-                            />
-                        </div>
-                    </MarkerContent>
-                </MapMarker>
+                <Marker
+                    position={[deliveryLocation.lat, deliveryLocation.lng]}
+                    icon={deliveryIcon}
+                />
             )}
-        </Map>
+        </MapContainer>
     );
 }
