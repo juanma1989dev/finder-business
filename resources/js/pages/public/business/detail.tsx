@@ -58,9 +58,12 @@ export default function BusinessDetail({ business, favorite }: Props) {
         schedul: getStatusLabel(business),
     };
 
+    // business/la-cafe/1
     const copyUlrDetailBusiness = () => {
         navigator.clipboard
-            .writeText(`${window.location.origin}/detail/${business.id}`)
+            .writeText(
+                `${window.location.origin}/business/${business.slug}/${business.id}`,
+            )
             .then(() => toast.success('Enlace copiado al portapapeles'))
             .catch(() => toast.error('Error al copiar'));
     };
@@ -263,7 +266,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
 
                         <div className="lg:col-span-8">
                             <Tabs defaultValue="products" className="w-full">
-                                <TabsList className="sticky top-14 z-40 mb-4 inline-flex w-full gap-2 rounded-lg border border-purple-100 bg-purple-50 p-1.5 sm:w-auto">
+                                <TabsList className="sticky top-12 z-40 mb-4 inline-flex w-full gap-2 rounded-lg border border-purple-100 bg-purple-50 p-1.5 sm:w-auto">
                                     <TabsTrigger
                                         value="products"
                                         className="gap-2 px-4 py-3"
