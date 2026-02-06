@@ -9,7 +9,6 @@ interface Props {
 export const InfoBusinessTab = ({ business }: Props) => {
     return (
         <div className="flex flex-col gap-4 lg:flex-row">
-            {/* COLUMNA IZQUIERDA - Información Principal */}
             <div className="flex-1 space-y-4">
                 <div className="p-3">
                     <h3 className="mb-3 text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
@@ -36,7 +35,6 @@ export const InfoBusinessTab = ({ business }: Props) => {
                     </div>
                 )} */}
 
-                {/* Galería de Imágenes */}
                 {business.images && business.images.length > 0 && (
                     <div className="space-y-3 p-3">
                         <h3 className="text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
@@ -60,7 +58,6 @@ export const InfoBusinessTab = ({ business }: Props) => {
                 )}
             </div>
 
-            {/* COLUMNA DERECHA - Sidecards */}
             <div className="w-full space-y-4 lg:w-[320px]">
                 {/* Horarios */}
                 <div className="overflow-hidden rounded-lg border border-purple-200 bg-white p-4 shadow-sm">
@@ -101,7 +98,6 @@ export const InfoBusinessTab = ({ business }: Props) => {
                     )}
                 </div>
 
-                {/* Amenidades y Pagos combinados */}
                 <div className="space-y-6 rounded-lg border border-purple-200 bg-white p-4 shadow-sm">
                     {/* Amenidades */}
                     {business?.amenities && business?.amenities.length > 0 && (
@@ -131,7 +127,6 @@ export const InfoBusinessTab = ({ business }: Props) => {
                         </div>
                     )}
 
-                    {/* Métodos de Pago */}
                     {business?.payments && business?.payments.length > 0 && (
                         <div className="border-t border-purple-50 pt-4">
                             <div className="mb-3 flex items-center gap-2">
@@ -160,7 +155,6 @@ export const InfoBusinessTab = ({ business }: Props) => {
                     )}
                 </div>
 
-                {/* Redes Sociales - Botones con efecto activo */}
                 {Object.entries(business?.social_networks ?? {}).length > 0 && (
                     <div className="rounded-lg border border-purple-200 bg-white p-4 shadow-sm">
                         <div className="mb-4 flex items-center gap-2">
