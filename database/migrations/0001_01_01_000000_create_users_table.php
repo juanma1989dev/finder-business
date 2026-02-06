@@ -53,7 +53,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // 🔥 ORDEN CORRECTO
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('users');
