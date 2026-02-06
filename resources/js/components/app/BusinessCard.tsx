@@ -13,7 +13,7 @@ const BusinessCard = memo(({ business, modeEdit, index = 0 }: Props) => {
 
     return (
         <Link
-            href={`/business/detail/${business.id}`}
+            href={`/business/${business.slug}/${business.id}`}
             className="group block will-change-transform"
         >
             <div className="relative overflow-hidden rounded-[2rem] border border-gray-100 bg-white p-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-900/10">
