@@ -20,10 +20,10 @@ class AccountConfigController extends Controller
         return inertia('AccountConfig', $data);
     }
 
-     public function store(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
-            'account_type' => ['required', Rule::in(['client', 'business', 'delivery'])],
+            'account_type' => ['required', Rule::in( UserTypeEnum::cases() )],
         ]);
 
         $user = $request->user();
@@ -31,15 +31,14 @@ class AccountConfigController extends Controller
         if ($user->type) {
             abort(403, 'El tipo de cuenta ya fue definido.');
         }
-
+        
         $user->update([
             'type' => $validated['account_type'],
         ]);
-
+        
         $config = config('login')[$user->type] ?? [];
         $urlRedirect = $config['route.start']  ?? 'public.home';
 
         return redirect()->route($urlRedirect);
     }
-
 }
