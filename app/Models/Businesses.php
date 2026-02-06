@@ -30,7 +30,8 @@ class Businesses extends Model
     ];
 
     protected $casts = [
-        'cords' => Point::class
+        'cords' => Point::class,
+        'status' => 'boolean',
     ];
 
     public function category()
