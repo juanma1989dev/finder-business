@@ -1,1 +1,0 @@
-import{j as m}from"./vendor-core-exSyXSqW.js";import{A as i}from"./auth-simple-layout-C_Qx_6Da.js";function x({children:t,title:o,subTitle:r,description:u,bannerImage:s,...a}){return m.jsx(i,{title:o,description:u,subTitle:r,bannerImage:s,...a,children:t})}export{x as A};
