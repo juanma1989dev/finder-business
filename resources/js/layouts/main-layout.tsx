@@ -47,12 +47,10 @@ export default function MainLayout({
             {user && (
                 <>
                     {showFloatShoppingCart && (
-                        <div className="fixed right-4 bottom-24 z-[40] md:right-8 md:bottom-8">
-                            <CartFloatButton
-                                totalItems={totalItems}
-                                onClick={() => setIsCartOpen(true)}
-                            />
-                        </div>
+                        <CartFloatButton
+                            totalItems={totalItems}
+                            onClick={() => setIsCartOpen(true)}
+                        />
                     )}
 
                     <CartDrawer
