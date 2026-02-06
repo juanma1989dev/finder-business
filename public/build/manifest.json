@@ -305,7 +305,7 @@
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-1sji9qIh.js",
+    "file": "assets/app-DbSIurTr.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -388,7 +388,7 @@
     ]
   },
   "resources/js/pages/AccountConfig.tsx": {
-    "file": "assets/AccountConfig-B9NJlcO2.js",
+    "file": "assets/AccountConfig-CS8umJ_d.js",
     "name": "AccountConfig",
     "src": "resources/js/pages/AccountConfig.tsx",
     "isDynamicEntry": true,
@@ -407,7 +407,7 @@
     ]
   },
   "resources/js/pages/Index.tsx": {
-    "file": "assets/Index-DPp-KdTJ.js",
+    "file": "assets/Index-B5-V-koO.js",
     "name": "Index",
     "src": "resources/js/pages/Index.tsx",
     "isDynamicEntry": true,
@@ -570,7 +570,7 @@
     ]
   },
   "resources/js/pages/admin/Business/Products.tsx": {
-    "file": "assets/Products-C5fQp8Bl.js",
+    "file": "assets/Products-7dLGY1zj.js",
     "name": "Products",
     "src": "resources/js/pages/admin/Business/Products.tsx",
     "isDynamicEntry": true,
@@ -724,7 +724,7 @@
     ]
   },
   "resources/js/pages/auth/LoginPage.tsx": {
-    "file": "assets/LoginPage-3Lutnhh5.js",
+    "file": "assets/LoginPage-s27a-ic_.js",
     "name": "LoginPage",
     "src": "resources/js/pages/auth/LoginPage.tsx",
     "isDynamicEntry": true,
@@ -742,7 +742,7 @@
     ]
   },
   "resources/js/pages/auth/RegisterPage.tsx": {
-    "file": "assets/RegisterPage-Dw7YPlaT.js",
+    "file": "assets/RegisterPage-pWsYcycn.js",
     "name": "RegisterPage",
     "src": "resources/js/pages/auth/RegisterPage.tsx",
     "isDynamicEntry": true,
@@ -1093,7 +1093,7 @@
     ]
   },
   "resources/js/pages/public/business/detail.tsx": {
-    "file": "assets/detail-CL-6AXN9.js",
+    "file": "assets/detail-9DYsAlMQ.js",
     "name": "detail",
     "src": "resources/js/pages/public/business/detail.tsx",
     "isDynamicEntry": true,
@@ -1154,7 +1154,7 @@
     ]
   },
   "resources/js/pages/public/delivery/Index.tsx": {
-    "file": "assets/Index-C71r4A9N.js",
+    "file": "assets/Index-CDdNWdN3.js",
     "name": "Index",
     "src": "resources/js/pages/public/delivery/Index.tsx",
     "isDynamicEntry": true,
@@ -1195,7 +1195,7 @@
     ]
   },
   "resources/js/pages/settings/appearance.tsx": {
-    "file": "assets/appearance-JSbfqLkI.js",
+    "file": "assets/appearance-DsHtxas_.js",
     "name": "appearance",
     "src": "resources/js/pages/settings/appearance.tsx",
     "isDynamicEntry": true,
