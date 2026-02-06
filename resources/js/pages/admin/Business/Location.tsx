@@ -1,3 +1,7 @@
+import { FlyTo } from '@/components/leaflet/FlyTo';
+import { Map } from '@/components/leaflet/Map';
+import { MapMarker } from '@/components/leaflet/MapMarker';
+import { businessIcon } from '@/components/leaflet/icons';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,33 +19,11 @@ import { useForm } from '@inertiajs/react';
 import 'leaflet/dist/leaflet.css';
 import { Info, LoaderCircle, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import { toast } from 'react-toastify';
 import { LayoutBusinessModules } from './LayoutBusinessModules';
 
 interface Props {
     business: Business;
-}
-
-function FlyToOnLocationChange({
-    position,
-    enabled,
-}: {
-    position: [number, number];
-    enabled: boolean;
-}) {
-    const map = useMap();
-
-    useEffect(() => {
-        if (!enabled) return;
-
-        map.flyTo(position, 16, {
-            animate: true,
-            duration: 0.5,
-        });
-    }, [position, enabled, map]);
-
-    return null;
 }
 
 export default function Location({ business }: Props) {
@@ -181,40 +163,26 @@ export default function Location({ business }: Props) {
                     )}
 
                     {mapReady && (
-                        <MapContainer
-                            center={[data.cords.lat, data.cords.long]}
-                            zoom={16}
-                            // scrollWheelZoom={false}
-                            style={{ height: '100%', width: '100%' }}
-                        >
-                            <TileLayer
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                attribution="&copy; OpenStreetMap contributors"
-                            />
-
-                            <Marker
+                        <Map center={[data.cords.lat, data.cords.long]}>
+                            <MapMarker
                                 position={[data.cords.lat, data.cords.long]}
                                 draggable
-                                eventHandlers={{
-                                    dragend: (e) => {
-                                        const { lat, lng } =
-                                            e.target.getLatLng();
-
-                                        setFromSelect(false);
-
-                                        setData('cords', {
-                                            lat: Number(lat.toFixed(6)),
-                                            long: Number(lng.toFixed(6)),
-                                        });
-                                    },
+                                icon={businessIcon}
+                                onDragEnd={(lat, lng) => {
+                                    setFromSelect(false);
+                                    setData('cords', {
+                                        lat: Number(lat.toFixed(6)),
+                                        long: Number(lng.toFixed(6)),
+                                    });
                                 }}
                             />
 
-                            <FlyToOnLocationChange
+                            <FlyTo
                                 enabled={fromSelect}
                                 position={[data.cords.lat, data.cords.long]}
+                                zoom={16}
                             />
-                        </MapContainer>
+                        </Map>
                     )}
                 </Card>
             </div>
