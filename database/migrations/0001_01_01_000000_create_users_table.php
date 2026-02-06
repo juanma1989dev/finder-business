@@ -26,12 +26,15 @@ return new class extends Migration
 
             $table->string('google_id')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            
             $table->boolean('privacy_accepted')->default(false);
             $table->string('privacy_version')->nullable();
             $table->timestamp('privacy_accepted_at')->nullable();
-            $table->string('password');
+            
+            $table->string('password');            
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
