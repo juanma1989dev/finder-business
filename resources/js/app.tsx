@@ -60,6 +60,6 @@ initializeTheme();
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.custumer.js');
+        navigator.serviceWorker.register('/pwa.sw.js');
     });
 }
