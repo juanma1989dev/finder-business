@@ -11,7 +11,7 @@ use App\Http\Controllers\Public\DeliveryContoller;
 Route::get('/', [BusinessController::class, 'index'])->name('public.home');
 Route::get('/favorites', [BusinessController::class, 'favorites'])->name('public.favorites');
 Route::post('/business/detail/set-favorite', [BusinessController::class, 'setFavorite']);
-Route::get('/business/detail/{id}', [BusinessController::class, 'details'])->name('public.business.detail');
+Route::get('/business/{slug}/{id}', [BusinessController::class, 'details'])->name('public.business.detail');
 
 Route::prefix('/shopping-cart')->group(function() {
     Route::post('/', [ShoppingCartController::class, 'create'])->name('shopping.cart.create');
