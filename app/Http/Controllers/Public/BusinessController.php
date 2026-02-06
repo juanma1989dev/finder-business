@@ -35,7 +35,7 @@ final class BusinessController extends Controller
     /**
      * Detalles de un negocio específico
      */
-    public function details(string $id): Response
+    public function details(string $slug, string $id): Response
     {
         $data = $this->searchService->getBusinessDetails($id, Auth::id());
 
