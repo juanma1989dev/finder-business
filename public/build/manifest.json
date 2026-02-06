@@ -6,14 +6,6 @@
       "_vendor-core-exSyXSqW.js"
     ]
   },
-  "_TileLayer-Ck5D7tC8.js": {
-    "file": "assets/TileLayer-Ck5D7tC8.js",
-    "name": "TileLayer",
-    "imports": [
-      "resources/js/app.tsx",
-      "_vendor-core-exSyXSqW.js"
-    ]
-  },
   "_auth-layout-JJOxINKA.js": {
     "file": "assets/auth-layout-JJOxINKA.js",
     "name": "auth-layout",
@@ -106,6 +98,14 @@
       "_vendor-core-exSyXSqW.js",
       "_vendor-ui-BC6GVMXR.js",
       "_utils-ZvPxgyVA.js"
+    ]
+  },
+  "_icons-DUN4oFg2.js": {
+    "file": "assets/icons-DUN4oFg2.js",
+    "name": "icons",
+    "imports": [
+      "_vendor-core-exSyXSqW.js",
+      "resources/js/app.tsx"
     ]
   },
   "_index-BU_B9Ap-.js": {
@@ -307,17 +307,17 @@
     "src": "node_modules/.pnpm/leaflet@1.9.4/node_modules/leaflet/dist/images/marker-shadow.png"
   },
   "resources/css/app.css": {
-    "file": "assets/app-ho6zMTOc.js",
+    "file": "assets/app-UAH-NDiG.js",
     "name": "app",
     "src": "resources/css/app.css",
     "isEntry": true,
     "isDynamicEntry": true,
     "css": [
-      "assets/app-qbnlYgvI.css"
+      "assets/app-BYlnwbUj.css"
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-Dpu3mrQQ.js",
+    "file": "assets/app-Lsx9vzYk.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -428,7 +428,7 @@
     ]
   },
   "resources/js/pages/Index.tsx": {
-    "file": "assets/Index-nmE22A61.js",
+    "file": "assets/Index-CppfXcUV.js",
     "name": "Index",
     "src": "resources/js/pages/Index.tsx",
     "isDynamicEntry": true,
@@ -538,12 +538,13 @@
     ]
   },
   "resources/js/pages/admin/Business/Location.tsx": {
-    "file": "assets/Location-2W0QJ_5t.js",
+    "file": "assets/Location-BuXyiMdh.js",
     "name": "Location",
     "src": "resources/js/pages/admin/Business/Location.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-core-exSyXSqW.js",
+      "_icons-DUN4oFg2.js",
       "_card-D5k2MC8Y.js",
       "_input-3TT18shE.js",
       "_label-BJtWGace.js",
@@ -554,7 +555,6 @@
       "_index-zdFYkwEh.js",
       "resources/js/pages/admin/Business/LayoutBusinessModules.tsx",
       "_vendor-icons-C0rekE6d.js",
-      "_TileLayer-Ck5D7tC8.js",
       "_utils-ZvPxgyVA.js",
       "_vendor-ui-BC6GVMXR.js",
       "_button-DROHPe1W.js",
@@ -586,7 +586,7 @@
     ]
   },
   "resources/js/pages/admin/Business/Products.tsx": {
-    "file": "assets/Products-B-YL1qbi.js",
+    "file": "assets/Products-2LLGsvE3.js",
     "name": "Products",
     "src": "resources/js/pages/admin/Business/Products.tsx",
     "isDynamicEntry": true,
@@ -1170,7 +1170,7 @@
     ]
   },
   "resources/js/pages/public/delivery/Index.tsx": {
-    "file": "assets/Index-HtjAwLWd.js",
+    "file": "assets/Index-SroG8Sp7.js",
     "name": "Index",
     "src": "resources/js/pages/public/delivery/Index.tsx",
     "isDynamicEntry": true,
@@ -1196,19 +1196,19 @@
     ]
   },
   "resources/js/pages/public/delivery/MapDelivery.tsx": {
-    "file": "assets/MapDelivery-DaYJZvZz.js",
+    "file": "assets/MapDelivery-CzNZXRR5.js",
     "name": "MapDelivery",
     "src": "resources/js/pages/public/delivery/MapDelivery.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-core-exSyXSqW.js",
+      "_icons-DUN4oFg2.js",
       "resources/js/app.tsx",
-      "_TileLayer-Ck5D7tC8.js",
       "resources/css/app.css"
     ]
   },
   "resources/js/pages/settings/appearance.tsx": {
-    "file": "assets/appearance-2TRmSvgp.js",
+    "file": "assets/appearance-DAVa7DNg.js",
     "name": "appearance",
     "src": "resources/js/pages/settings/appearance.tsx",
     "isDynamicEntry": true,
