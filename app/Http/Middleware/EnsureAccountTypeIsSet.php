@@ -22,7 +22,7 @@ class EnsureAccountTypeIsSet
             return $next($request);
         }
 
-        if (! empty($user->account_type)) {
+        if (! empty($user->type)) {
             return $next($request);
         }
 
