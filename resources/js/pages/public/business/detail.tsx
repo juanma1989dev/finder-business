@@ -125,7 +125,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                                 <Share2 className="h-4 w-4" />
                                             </button>
 
-                                            {user.type === TypeUser.CLIENT && (
+                                            {user?.type === TypeUser.CLIENT && (
                                                 <button
                                                     onClick={toggleFavorite}
                                                     className={`flex h-9 w-9 items-center justify-center rounded-lg shadow-sm backdrop-blur-sm transition-all active:scale-95 ${
