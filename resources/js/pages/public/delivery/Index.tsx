@@ -5,14 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import MainLayout from '@/layouts/main-layout';
 import { SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import {
-    lazy,
-    Suspense,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
     DollarSign,
@@ -21,9 +14,10 @@ import {
     PackageSearch,
 } from './../../../lib/icons';
 
+import { Map } from '@/components/leaflet/Map';
+import { useLeafletMap } from '@/components/leaflet/useLeafletMap';
 import { messaging, onMessage, registerFCMToken } from '@/firebase';
-
-const MapDelivery = lazy(() => import('./MapDelivery'));
+import { useGeolocation } from '@/hooks/use-Geolocation';
 
 const notificationAudio =
     typeof window !== 'undefined'
@@ -36,9 +30,7 @@ interface Props {
 
 const vibrateDevice = () => {
     if ('vibrate' in navigator) {
-        // Patrón: vibrar, pausa, vibrar, pausa, vibrar
         navigator.vibrate([200, 100, 200, 100, 200]);
-        console.log('Dispositivo vibrando');
     }
 };
 
@@ -53,12 +45,11 @@ export default function Index({ activeOrder }: Props) {
 
     const [availableOrders, setAvailableOrders] = useState<any[]>([]);
     const [pollingEnabled, setPollingEnabled] = useState(true);
-    const [deliveryLocation, setDeliveryLocation] = useState<{
-        lat: number;
-        lng: number;
-    } | null>(null);
+    const [deliveryLocation, setDeliveryLocation] = useState<[number, number]>([
+        0, 0,
+    ]);
 
-    const mapRef = useRef<any>(null);
+    const { latitude, longitude } = useGeolocation();
 
     const fetchAvailableOrders = useCallback(async () => {
         if (!user.is_available || hasActiveOrder) return;
@@ -115,6 +106,14 @@ export default function Index({ activeOrder }: Props) {
 
         return () => unsubscribe();
     }, [fetchAvailableOrders]);
+
+    useEffect(() => {
+        if (latitude && longitude) {
+            setDeliveryLocation([latitude, longitude]);
+
+            console.log({ latitude, longitude });
+        }
+    }, [latitude, longitude]);
 
     const acceptOrder = async (orderId: number) => {
         try {
@@ -188,7 +187,10 @@ export default function Index({ activeOrder }: Props) {
         );
     };
 
-    // Efectos de geolocalización omitidos por brevedad pero mantenidos internamente para el renderizado
+    function FollowDelivery({ position }: { position: [number, number] }) {
+        useLeafletMap({ follow: position });
+        return null;
+    }
 
     return (
         <MainLayout>
@@ -329,17 +331,13 @@ export default function Index({ activeOrder }: Props) {
 
                 {user.is_available ? (
                     <Card className="relative h-65 overflow-hidden rounded-lg border-purple-200 py-0 shadow-sm">
-                        <Suspense
-                            fallback={
-                                <div className="flex h-full w-full animate-pulse items-center justify-center bg-gray-100">
-                                    <p className="text-xs text-gray-400">
-                                        Cargando mapa...
-                                    </p>
-                                </div>
-                            }
-                        >
-                            <MapDelivery deliveryLocation={deliveryLocation} />
-                        </Suspense>
+                        <Map center={deliveryLocation}>
+                            {/* <MapMarker
+                                position={deliveryLocation}
+                                icon={businessIcon}
+                            /> */}
+                            <FollowDelivery position={deliveryLocation} />
+                        </Map>
                     </Card>
                 ) : (
                     <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-100 bg-purple-50/30 py-12 text-center">
