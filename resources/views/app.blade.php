@@ -72,7 +72,7 @@
             }
         </style>
 
-        <link rel="manifest" href="pwa.manifest.json">
+        <link rel="manifest" href="/pwa.manifest.json">
         <meta name="theme-color" content="#7c3aed">
 
         @viteReactRefresh
