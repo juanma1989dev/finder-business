@@ -5,11 +5,18 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatusEnum;
 use App\Flows\OrderFlow;
 use App\Models\Order;
+use App\Services\OrderNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderManagementController extends Controller
 {
+    public function __construct(
+        protected OrderNotificationService $notifications
+    )
+    {
+    }
+
     public function updateStatus( Request $request, Order $order)
     {
         $current    = strtolower( $order->status );
@@ -44,6 +51,8 @@ class OrderManagementController extends Controller
         ]);
 
         cache()->forget('available_orders');
+
+        $this->notifications->notifyReadyForPickup($order);
     }
 
     private function generateCode(): string
