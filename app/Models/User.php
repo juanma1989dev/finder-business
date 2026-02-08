@@ -33,7 +33,8 @@ class User extends Authenticatable
         'google_id',
         'privacy_accepted',
         'privacy_version',
-        'privacy_accepted_at'
+        'privacy_accepted_at',
+        'fcm_token'
     ];
 
     /**
