@@ -11,17 +11,19 @@ export default function Header() {
 
     const getIconUser = () => {
         const icons: Record<TypeUser, JSX.Element | null> = {
-            [TypeUser.DELIVERY]: <Motorbike className="h-7 w-7 text-red-900" />,
-            [TypeUser.CLIENT]: <CircleUser className="h-7 w-7 text-blue-900" />,
-            [TypeUser.BUSINESS]: <Store className="h-7 w-7 text-green-900" />,
+            [TypeUser.DELIVERY]: <Motorbike className="h-6 w-6 text-red-900" />,
+            [TypeUser.CLIENT]: <CircleUser className="h-6 w-6 text-blue-900" />,
+            [TypeUser.BUSINESS]: <Store className="h-6 w-6 text-green-900" />,
         };
 
         return icons[user?.type] || null;
     };
 
+    const iconUser = getIconUser();
+
     return (
         <header className="sticky top-0 z-50 w-full border-b border-purple-100 bg-red-900 bg-white/80">
-            <div className="mx-auto max-w-7xl px-3">
+            <div className="px-2">
                 <div className="flex h-13 items-center justify-between gap-2">
                     <div className="hidden items-center gap-1 md:flex">
                         <Link
@@ -37,9 +39,19 @@ export default function Header() {
                                 Findy
                             </h1>
 
-                            {getIconUser()}
+                            {iconUser}
                         </Link>
                     </div>
+
+                    <div className="flex flex-1 items-center justify-between gap-1.5 md:hidden">
+                        <span></span>
+                        <h1 className="flex items-center gap-2 text-sm font-black tracking-tight text-purple-900 sm:text-base">
+                            Findy
+                            {iconUser}
+                        </h1>
+                        <span></span>
+                    </div>
+
                     <div className="hidden flex-1 items-center justify-end gap-1.5 sm:gap-4 md:flex">
                         <a
                             href="https://forms.gle/NT3EPoh1VyRUuQKG6"
