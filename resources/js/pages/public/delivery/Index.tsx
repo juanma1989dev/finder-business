@@ -18,6 +18,7 @@ import { Map } from '@/components/leaflet/Map';
 import { useLeafletMap } from '@/components/leaflet/useLeafletMap';
 import { messaging, onMessage, registerFCMToken } from '@/firebase';
 import { useGeolocation } from '@/hooks/use-Geolocation';
+import { User2 } from 'lucide-react';
 
 const notificationAudio =
     typeof window !== 'undefined'
@@ -282,11 +283,7 @@ export default function Index({ activeOrder }: Props) {
                     <CardContent className="flex items-center justify-between p-2">
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <img
-                                    src="https://i.pravatar.cc/100"
-                                    alt="Repartidor"
-                                    className="h-10 w-10 rounded-full border border-purple-100"
-                                />
+                                <User2 className="h-8 w-8 text-purple-700" />
                                 <div
                                     className={`absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white ${user.is_available ? 'bg-green-500' : 'bg-gray-400'}`}
                                 />
@@ -330,7 +327,7 @@ export default function Index({ activeOrder }: Props) {
                 </Card>
 
                 {user.is_available ? (
-                    <Card className="relative h-65 overflow-hidden rounded-lg border-purple-200 py-0 shadow-sm">
+                    <Card className="relative h-70 overflow-hidden rounded-lg border-purple-200 py-0 shadow-sm">
                         <Map center={deliveryLocation}>
                             {/* <MapMarker
                                 position={deliveryLocation}
