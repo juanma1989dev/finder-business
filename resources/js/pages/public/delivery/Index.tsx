@@ -21,11 +21,26 @@ import {
     PackageSearch,
 } from './../../../lib/icons';
 
+import { messaging, onMessage, registerFCMToken } from '@/firebase';
+
 const MapDelivery = lazy(() => import('./MapDelivery'));
+
+const notificationAudio =
+    typeof window !== 'undefined'
+        ? new Audio('/sounds/notification.mp3')
+        : null;
 
 interface Props {
     activeOrder: any;
 }
+
+const vibrateDevice = () => {
+    if ('vibrate' in navigator) {
+        // Patrón: vibrar, pausa, vibrar, pausa, vibrar
+        navigator.vibrate([200, 100, 200, 100, 200]);
+        console.log('Dispositivo vibrando');
+    }
+};
 
 export default function Index({ activeOrder }: Props) {
     const { auth } = usePage<SharedData>().props;
@@ -66,6 +81,41 @@ export default function Index({ activeOrder }: Props) {
         return () => clearInterval(interval);
     }, [fetchAvailableOrders, pollingEnabled, hasActiveOrder]);
 
+    useEffect(() => {
+        const handleSubscription = async () => {
+            if (user.is_available) {
+                await registerFCMToken();
+            }
+        };
+
+        handleSubscription();
+    }, [user.is_available]);
+
+    useEffect(() => {
+        if (!messaging) return;
+
+        const unsubscribe = onMessage(messaging, (payload) => {
+            // toast.success(
+            //     <div className="flex flex-col gap-1">
+            //         <p className="font-bold">
+            //             {payload.notification?.title || 'Nuevo Pedido'}
+            //         </p>
+            //         <p className="text-xs">{payload.notification?.body}</p>
+            //     </div>,
+            //     {
+            //         position: 'top-right',
+            //         autoClose: 5000,
+            //         icon: '🚴‍♂️',
+            //     },
+            // );
+
+            vibrateDevice();
+            fetchAvailableOrders();
+        });
+
+        return () => unsubscribe();
+    }, [fetchAvailableOrders]);
+
     const acceptOrder = async (orderId: number) => {
         try {
             const response = await fetch(`/delivery/orders/${orderId}/accept`, {
@@ -90,6 +140,17 @@ export default function Index({ activeOrder }: Props) {
     };
 
     const handleChangeAvailability = () => {
+        if (notificationAudio) {
+            notificationAudio.muted = true;
+            notificationAudio
+                .play()
+                .then(() => {
+                    notificationAudio.pause();
+                    notificationAudio.muted = false;
+                })
+                .catch(() => {});
+        }
+
         router.patch('/delivery/availability', { status: !user.is_available });
     };
 

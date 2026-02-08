@@ -612,7 +612,7 @@ const RuralDeliveryLanding = () => {
                         </div>
                     </div>
                     <p className="text-center text-[10px] tracking-widest text-gray-300 uppercase">
-                        © 2026 RuralDelivery Technology
+                        {/* © 2026 RuralDelivery Technology */}
                     </p>
                 </footer>
             </main>
