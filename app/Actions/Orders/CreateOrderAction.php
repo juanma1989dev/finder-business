@@ -4,12 +4,48 @@ namespace App\Actions\Orders;
 
 use App\Enums\OrderStatusEnum;
 use App\Models\BusinessProduct;
+use App\Models\Order;
 use App\Repositories\Laravel\OrderItemRepository;
 use App\Repositories\Laravel\OrderRepository;
 use App\Services\Public\OrderPricingService;
 use App\Services\Public\ProductAvailabilityService;
-
+use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Messaging\CloudMessage;
+
+class BusinessNotificationService
+{
+    public function notifyNewOrder(Order $order): void
+    {
+        $order->load(['business.owner']);
+
+        $business = $order->business;
+        $owner = $business->owner;
+        
+        if (!$owner || !$owner->fcm_token) {
+            return;
+        }
+
+        $message = CloudMessage::fromArray([
+            'token' => $owner->fcm_token,
+            'notification' => [
+                'title' => '🛍️ ¡Nuevo Pedido Recibido!',
+                'body'  => "Has recibido el pedido #{$order->id}. ¡Empieza a prepararlo!",
+            ],
+            'data' => [
+                'order_id' => (string) $order->id,
+                'type'     => 'new_order_business',
+            ],
+        ]);
+
+        try {
+            app('firebase.messaging')->send($message);
+        } catch (Exception $e) {
+            Log::error("Error notificando al negocio {$business->id}: " . $e->getMessage());
+        }
+    }
+}
 
 class CreateOrderAction
 {
@@ -17,14 +53,15 @@ class CreateOrderAction
         protected OrderRepository $orderRepository,
         protected OrderItemRepository $orderItemRepository,
         protected OrderPricingService $orderPricingService,
-        protected ProductAvailabilityService $productAvailabilityService
+        protected ProductAvailabilityService $productAvailabilityService,
+        protected BusinessNotificationService $businessNotificationService
     )
     {
     }
     
     public function execute(array $items, ?int $userId = null)
     {   
-        return DB::transaction(function () use ($items, $userId) {
+        $order = DB::transaction(function () use ($items, $userId) {
 
             $order = $this->orderRepository->create([
                 'user_id' => $userId,
@@ -85,5 +122,12 @@ class CreateOrderAction
 
             return $order;
         });
+
+
+        if ($order) {
+            $this->businessNotificationService->notifyNewOrder($order);
+        }
+
+        return $order;
     }
 }
