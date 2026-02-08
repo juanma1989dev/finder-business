@@ -1,10 +1,23 @@
+import { SharedData, TypeUser } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LogIn, MessageSquareHeart } from 'lucide-react';
+import { CircleUser, LogIn, MessageSquareHeart, Store } from 'lucide-react';
+import { JSX } from 'react';
+import Motorbike from '../icons/Motorbike';
 import DropdownMenu from './DropdownMenu';
 
 export default function Header() {
-    const { auth } = usePage().props as any;
+    const { auth } = usePage<SharedData>().props;
     const { user } = auth;
+
+    const getIconUser = () => {
+        const icons: Record<TypeUser, JSX.Element | null> = {
+            [TypeUser.DELIVERY]: <Motorbike className="h-7 w-7 text-red-900" />,
+            [TypeUser.CLIENT]: <CircleUser className="h-7 w-7 text-blue-900" />,
+            [TypeUser.BUSINESS]: <Store className="h-7 w-7 text-green-900" />,
+        };
+
+        return icons[user?.type] || null;
+    };
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-purple-100 bg-red-900 bg-white/80">
@@ -13,7 +26,7 @@ export default function Header() {
                     <div className="hidden items-center gap-1 md:flex">
                         <Link
                             href="/"
-                            className="group flex items-center gap-2"
+                            className="group flex items-center gap-3"
                         >
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 shadow-md transition-transform group-active:scale-90 sm:h-9 sm:w-9">
                                 <span className="text-lg font-bold text-white">
@@ -23,6 +36,8 @@ export default function Header() {
                             <h1 className="text-sm font-black tracking-tight text-purple-900 sm:text-base">
                                 Findy
                             </h1>
+
+                            {getIconUser()}
                         </Link>
                     </div>
                     <div className="hidden flex-1 items-center justify-end gap-1.5 sm:gap-4 md:flex">
