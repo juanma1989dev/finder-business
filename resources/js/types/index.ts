@@ -52,9 +52,6 @@ export interface User {
     avatar?: string;
     type: TypeUser;
     is_available: boolean;
-
-    // email_verified_at: string | null;
-    // two_factor_enabled?: boolean;
     [key: string]: unknown;
 }
 
