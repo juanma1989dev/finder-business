@@ -25,9 +25,10 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { locations } from '@/data/locations';
+import { messaging, onMessage, registerFCMToken } from '@/firebase';
 import { useDialog } from '@/hooks/useDialog';
 import { Business as BusinessType, SharedData } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     ChevronRight,
     Edit,
@@ -40,7 +41,7 @@ import {
     Store,
     Trash2,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 
 interface Props {
@@ -51,6 +52,9 @@ interface Props {
 }
 
 export default function Business({ businesses, catalogs }: Props) {
+    const { auth } = usePage<SharedData>().props;
+    const { user } = auth;
+
     const [loadingBusinessId, setLoadingBusinessId] = useState<string | null>(
         null,
     );
@@ -77,6 +81,38 @@ export default function Business({ businesses, catalogs }: Props) {
             location: '',
         },
     });
+
+    useEffect(() => {
+        const handleSubscription = async () => {
+            if (user) {
+                await registerFCMToken();
+            }
+        };
+        handleSubscription();
+    }, [user.id]);
+
+    useEffect(() => {
+        if (!messaging) return;
+
+        const unsubscribe = onMessage(messaging, (payload) => {
+            console.log('Notificación recibida en el componente:', payload);
+
+            const title =
+                payload.notification?.title ||
+                payload.data?.title ||
+                'Nuevo pedido';
+            const body = payload.notification?.body || payload.data?.body || '';
+
+            toast.success(
+                <div>
+                    <p className="font-bold">{title}</p>
+                    <p className="text-[10px]">{body}</p>
+                </div>,
+            );
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     const handleOnSubmit: React.FormEventHandler<HTMLFormElement> = (evt) => {
         evt.preventDefault();
