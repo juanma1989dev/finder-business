@@ -29,11 +29,8 @@ export default function DeliveryDashboard({
         filters?.date ? new Date(`${filters.date}T00:00:00`) : new Date(),
     );
 
-    console.log({ date });
-
     const [processingId, setProcessingId] = useState<number | null>(null);
 
-    // 📡 Cuando cambia la fecha → pedir pedidos de ese día
     const onDateChange = (selected?: Date) => {
         if (!selected) return;
 
@@ -106,10 +103,6 @@ export default function DeliveryDashboard({
         </DashboardLayout>
     );
 }
-
-/* ===========================
-   🧾 Order Card
-=========================== */
 
 function DeliveryOrderCard({
     pedido,
