@@ -39,4 +39,10 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+    
+    public function business(): BelongsTo /****** */
+    {
+        return $this->belongsTo(Businesses::class, 'businesses_id', 'id');
+    }
 }
+
