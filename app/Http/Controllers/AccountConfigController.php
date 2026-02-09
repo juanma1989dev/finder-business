@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserTypeEnum;
+use App\Models\DeliveryProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class AccountConfigController extends Controller
@@ -22,7 +24,7 @@ class AccountConfigController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'account_type' => ['required', Rule::in( UserTypeEnum::cases() )],
         ]);
 
@@ -32,13 +34,27 @@ class AccountConfigController extends Controller
             abort(403, 'El tipo de cuenta ya fue definido.');
         }
         
-        $user->update([
-            'type' => $validated['account_type'],
-        ]);
+        $this->processAccountType($user, $data);
         
         $config = config('login')[$user->type] ?? [];
         $urlRedirect = $config['route.start']  ?? 'public.home';
 
         return redirect()->route($urlRedirect);
+    }
+
+    private function processAccountType($user, array $data)
+    {
+        DB::transaction(function () use ($user, $data) {
+            $user->update([
+                'type' => $data['account_type'],
+            ]);
+
+            if ($data['account_type'] === UserTypeEnum::DELIVERY->value) {
+                DeliveryProfile::updateOrCreate(
+                    ['user_id' => $user->id],
+                    ['is_active' => true]
+                );
+            }
+        });
     }
 }
