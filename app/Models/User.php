@@ -27,14 +27,11 @@ class User extends Authenticatable
         'name',
         'email',
         'type',
-        'is_available',
-        'last_available_at',
         'password',
         'google_id',
         'privacy_accepted',
         'privacy_version',
         'privacy_accepted_at',
-        'fcm_token'
     ];
 
     /**
@@ -90,4 +87,18 @@ class User extends Authenticatable
             ->latest();
     }
 
+    public function fcmTokens()
+    {
+        return $this->hasMany(FcmToken::class);
+    }
+
+    public function deliveryProfile()
+    {
+        return $this->hasOne(DeliveryProfile::class);
+    }
+
+    public function isDelivery(): bool
+    {
+        return $this->deliveryProfile()->exists();
+    }
 }
