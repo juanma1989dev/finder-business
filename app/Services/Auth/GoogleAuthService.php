@@ -55,7 +55,7 @@ class GoogleAuthService
      */
     public function createUserFromGoogle(SocialiteUser $googleUser): User
     {
-            return User::create([
+        return User::create([
             'name'                => $googleUser->getName(),
             'email'               => $googleUser->getEmail(),
             'type'                => null, 

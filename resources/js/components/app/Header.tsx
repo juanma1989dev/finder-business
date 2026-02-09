@@ -11,9 +11,13 @@ export default function Header() {
 
     const getIconUser = () => {
         const icons: Record<TypeUser, JSX.Element | null> = {
-            [TypeUser.DELIVERY]: <Motorbike className="h-6 w-6 text-red-900" />,
-            [TypeUser.CLIENT]: <CircleUser className="h-6 w-6 text-blue-900" />,
-            [TypeUser.BUSINESS]: <Store className="h-6 w-6 text-green-900" />,
+            [TypeUser.DELIVERY]: (
+                <Motorbike className="h-6 w-6 text-purple-900" />
+            ),
+            [TypeUser.CLIENT]: (
+                <CircleUser className="h-6 w-6 text-purple-900" />
+            ),
+            [TypeUser.BUSINESS]: <Store className="h-6 w-6 text-purple-900" />,
         };
 
         return icons[user?.type] || null;
@@ -45,7 +49,7 @@ export default function Header() {
 
                     <div className="flex flex-1 items-center justify-between gap-1.5 md:hidden">
                         <span></span>
-                        <h1 className="flex items-center gap-2 text-sm font-black tracking-tight text-purple-900 sm:text-base">
+                        <h1 className="text-md flex items-center gap-2 font-black tracking-tight text-purple-900 sm:text-base">
                             Findy
                             {iconUser}
                         </h1>

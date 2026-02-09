@@ -148,8 +148,8 @@ export default function MobileSidebar() {
                                 onClick={() => setIsOpen(false)}
                                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 px-2 py-1.5 text-sm font-bold text-white shadow-lg shadow-purple-200"
                             >
-                                <LogIn size={18} />
-                                <span>ENTRAR A MI CUENTA</span>
+                                <LogIn size={16} />
+                                <span>Ingresar</span>
                             </Link>
                         )}
                     </div>
