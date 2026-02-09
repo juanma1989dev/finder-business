@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,12 +13,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('type')->nullable();
+            $table->enum(
+                'type',
+                array_column(UserTypeEnum::cases(), 'value')
+            )->nullable();
 
-            $table->boolean('is_available')->default(false);
-            $table->timestamp('last_available_at')->nullable();
-
-            $table->string('google_id')->unique();
+            $table->string('google_id')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
 
             $table->boolean('privacy_accepted')->default(false);
@@ -27,8 +28,38 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes(); // ✅ correcto
+            $table->softDeletes(); 
         });
+
+        Schema::create('delivery_profiles', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('user_id')
+                ->constrained()
+                ->cascadeOnDelete()
+                ->unique();
+
+            // $table->string('vehicle_type')->nullable(); // moto, bici, auto
+            $table->boolean('is_active')->default(true);  
+
+            $table->timestamps();
+        });
+
+        Schema::create('delivery_statuses', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('delivery_profile_id')
+                ->constrained()
+                ->cascadeOnDelete()
+                ->unique();
+
+            $table->boolean('is_available')->default(false);
+            $table->timestamp('last_available_at')->nullable();
+
+            $table->timestamps();
+        });
+
+
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
@@ -55,6 +86,8 @@ return new class extends Migration
     {
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('delivery_statuses');
+        Schema::dropIfExists('delivery_profiles');
         Schema::dropIfExists('users');
     }
 };

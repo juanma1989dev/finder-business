@@ -34,7 +34,6 @@ return new class extends Migration
             $table->string('code', 10)->nullable();
             $table->timestamp('code_used_at')->nullable();
 
-            # Pasar a otra tabla
             $table->foreignId('delivery_id')
                 ->nullable()
                 ->constrained('users')
