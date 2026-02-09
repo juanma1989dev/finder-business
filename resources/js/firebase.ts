@@ -1,6 +1,7 @@
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { User } from './types';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -14,20 +15,30 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+/* ===============================
+   Analytics
+================================ */
 export const analytics =
     typeof window !== 'undefined'
         ? isSupported().then((yes) => (yes ? getAnalytics(app) : null))
         : null;
 
+/* ===============================
+   Messaging
+================================ */
 export const messaging =
     typeof window !== 'undefined' ? getMessaging(app) : null;
 
-export async function registerFCMToken() {
+/* ===============================
+   Register FCM Token
+================================ */
+export async function registerFCMToken(user: User) {
     if (!messaging) return;
     if (!('Notification' in window)) return;
+    if (!('serviceWorker' in navigator)) return;
 
     if (Notification.permission === 'denied') {
-        console.warn('Las notificaciones están bloqueadas en este navegador.');
+        console.warn('Las notificaciones están bloqueadas.');
         return;
     }
 
@@ -35,42 +46,38 @@ export async function registerFCMToken() {
     if (permission !== 'granted') return;
 
     try {
-        console.log('BEFORE TOKE');
+        const registration = await navigator.serviceWorker.ready;
 
         const token = await getToken(messaging, {
             vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+            serviceWorkerRegistration: registration,
         });
 
-        console.log('TOKEN :: ', token);
+        // if (import.meta.env.VITE_DEV === 'TRUE') {
+        //     await deleteToken(messaging);
+        // }
 
-        if (token) {
-            const lastToken = localStorage.getItem('last_fcm_token');
-            if (lastToken === token) {
-                console.log('El token ya está sincronizado con el servidor.');
-                return;
-            }
+        if (!token) return;
 
-            const response = await fetch('/fcm/token', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN':
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute('content') || '',
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-                body: JSON.stringify({ token }),
-            });
-
-            console.log(response.ok);
-
-            if (response.ok) {
-                localStorage.setItem('last_fcm_token', token);
-            }
+        if (user.fcm_token === token) {
+            console.warn('Token ya sincronizado.');
+            return;
         }
+
+        await fetch('/fcm/token', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN':
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '',
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({ token }),
+        });
     } catch (error) {
-        console.error('Error detallado en FCM:', error);
+        console.error('FCM error:', error);
     }
 }
 
