@@ -43,6 +43,14 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+
+        $user = $request->user()
+            ? $request->user()->load([
+                'deliveryProfile.status'
+            ])
+            : null
+        ;
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
