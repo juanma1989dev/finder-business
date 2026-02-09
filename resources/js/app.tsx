@@ -14,7 +14,6 @@ L.Icon.Default.mergeOptions({
 
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
-// import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Findy';
 
@@ -57,13 +56,7 @@ createInertiaApp({
 });
 
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/pwa.sw.js');
-    });
-
-    window.addEventListener('load', () => {
-        navigator.serviceWorker
-            .register('/firebase-messaging-sw.js')
-            .catch(console.log);
+    window.addEventListener('load', async () => {
+        await navigator.serviceWorker.register('/pwa.sw.js');
     });
 }
