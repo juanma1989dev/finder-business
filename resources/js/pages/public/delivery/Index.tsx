@@ -49,11 +49,13 @@ export default function Index({ activeOrder }: Props) {
     const [deliveryLocation, setDeliveryLocation] = useState<[number, number]>([
         0, 0,
     ]);
+    const deliveryAvailable =
+        user?.delivery_profile?.status?.is_available ?? false;
 
     const { latitude, longitude } = useGeolocation();
 
     const fetchAvailableOrders = useCallback(async () => {
-        if (!user.is_available || hasActiveOrder) return;
+        if (!deliveryAvailable || hasActiveOrder) return;
         try {
             const response = await fetch('/delivery/orders/available', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -64,7 +66,7 @@ export default function Index({ activeOrder }: Props) {
         } catch (error) {
             console.error(error);
         }
-    }, [user.is_available, hasActiveOrder]);
+    }, [deliveryAvailable, hasActiveOrder]);
 
     useEffect(() => {
         if (!pollingEnabled || hasActiveOrder) return;
@@ -75,13 +77,13 @@ export default function Index({ activeOrder }: Props) {
 
     useEffect(() => {
         const handleSubscription = async () => {
-            if (user.is_available) {
-                await registerFCMToken();
+            if (deliveryAvailable) {
+                await registerFCMToken(user);
             }
         };
 
         handleSubscription();
-    }, [user.is_available]);
+    }, [deliveryAvailable]);
 
     useEffect(() => {
         if (!messaging) return;
@@ -111,8 +113,6 @@ export default function Index({ activeOrder }: Props) {
     useEffect(() => {
         if (latitude && longitude) {
             setDeliveryLocation([latitude, longitude]);
-
-            console.log({ latitude, longitude });
         }
     }, [latitude, longitude]);
 
@@ -140,18 +140,18 @@ export default function Index({ activeOrder }: Props) {
     };
 
     const handleChangeAvailability = () => {
-        if (notificationAudio) {
-            notificationAudio.muted = true;
-            notificationAudio
-                .play()
-                .then(() => {
-                    notificationAudio.pause();
-                    notificationAudio.muted = false;
-                })
-                .catch(() => {});
-        }
+        // if (notificationAudio) {
+        //     notificationAudio.muted = true;
+        //     notificationAudio
+        //         .play()
+        //         .then(() => {
+        //             notificationAudio.pause();
+        //             notificationAudio.muted = false;
+        //         })
+        //         .catch(() => {});
+        // }
 
-        router.patch('/delivery/availability', { status: !user.is_available });
+        router.patch('/delivery/availability', { status: !deliveryAvailable });
     };
 
     const playBlockedSound = () => {
@@ -198,7 +198,7 @@ export default function Index({ activeOrder }: Props) {
             <div className="min-h-screen space-y-2 bg-purple-50/50 p-2">
                 {availableOrders.length > 0 &&
                     !hasActiveOrder &&
-                    user.is_available && (
+                    deliveryAvailable && (
                         <Card className="animate-pulse rounded-lg border-amber-200 bg-amber-50 shadow-md">
                             <CardContent className="space-y-1 p-1">
                                 <div className="flex items-center justify-between">
@@ -228,7 +228,7 @@ export default function Index({ activeOrder }: Props) {
                         </Card>
                     )}
 
-                {hasActiveOrder && user.is_available && (
+                {hasActiveOrder && deliveryAvailable && (
                     <Card className="rounded-lg border-purple-200 bg-white shadow-sm animate-in slide-in-from-bottom-2">
                         <CardContent className="space-y-1 p-1">
                             <div className="flex items-center justify-between">
@@ -278,14 +278,14 @@ export default function Index({ activeOrder }: Props) {
                 )}
 
                 <Card
-                    className={`overflow-hidden rounded-lg border-purple-200 p-0 shadow-sm ${user.is_available ? '' : 'bg-gray-300'}`}
+                    className={`overflow-hidden rounded-lg border-purple-200 p-0 shadow-sm ${deliveryAvailable ? '' : 'bg-gray-300'}`}
                 >
                     <CardContent className="flex items-center justify-between p-2">
                         <div className="flex items-center gap-3">
                             <div className="relative">
                                 <User2 className="h-8 w-8 text-purple-700" />
                                 <div
-                                    className={`absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white ${user.is_available ? 'bg-green-500' : 'bg-gray-400'}`}
+                                    className={`absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white ${deliveryAvailable ? 'bg-green-500' : 'bg-gray-400'}`}
                                 />
                             </div>
                             <div>
@@ -305,7 +305,7 @@ export default function Index({ activeOrder }: Props) {
                                 htmlFor="disponibilidad"
                                 className="text-[10px] font-bold text-purple-800 uppercase"
                             >
-                                {user.is_available
+                                {deliveryAvailable
                                     ? 'En línea'
                                     : 'Desconectado'}
                             </Label>
@@ -316,7 +316,7 @@ export default function Index({ activeOrder }: Props) {
                             >
                                 <Switch
                                     id="disponibilidad"
-                                    checked={user.is_available}
+                                    checked={deliveryAvailable}
                                     disabled={hasActiveOrder}
                                     onCheckedChange={handleChangeAvailability}
                                     className="focus-visible:ring-purple-400 data-[state=checked]:bg-purple-600"
@@ -326,7 +326,7 @@ export default function Index({ activeOrder }: Props) {
                     </CardContent>
                 </Card>
 
-                {user.is_available ? (
+                {deliveryAvailable ? (
                     <Card className="relative h-70 overflow-hidden rounded-lg border-purple-200 py-0 shadow-sm">
                         <Map center={deliveryLocation}>
                             {/* <MapMarker
