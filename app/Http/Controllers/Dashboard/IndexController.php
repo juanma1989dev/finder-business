@@ -12,24 +12,23 @@ class IndexController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-
-        $business = Businesses::where('user_id', $user->id)
-            ->with([
-                'orders' => function ($query) {
-                    $query->whereNotIn('status', OrderStatusEnum::finalStatuses())
-                    ->latest();  
-                },
-                'orders.items',
-                'orders.user',
-            ])->first();
-
-        $orders = $business->orders ?? [];
-
+ 
         $data = [
-            'orders' => $orders,
-            'business' => $business,
+            'business' => fn () => Businesses::where('user_id', $user->id)->first(),
+            'orders' => fn () => Businesses::where('user_id', $user->id)
+                ->first()
+                ?->orders()
+                ->whereNotIn('status', OrderStatusEnum::finalStatuses())
+                ->with(['items', 'user'])
+                ->latest()
+                ->get(),
         ];
 
         return inertia('dashboard/business/Index', $data);
+    }
+
+    public function refresh()
+    {
+        
     }
 }

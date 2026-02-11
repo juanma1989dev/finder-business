@@ -34,6 +34,7 @@ class OrderManagementController extends Controller
             'notes' => $note,
         ]);
 
+        // $order->status = 'ready_for_pickup'; // TEST
 
         if ($nextStatus === OrderStatusEnum::READY_FOR_PICKUP->value) {
             $this->onReadyForPickup($order);

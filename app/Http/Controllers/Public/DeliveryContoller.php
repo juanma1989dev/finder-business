@@ -10,6 +10,7 @@ class DeliveryContoller extends Controller
 {
     public function availability(Request $request)
     {
+
         $request->validate([
             'status' => ['required', 'boolean'],
         ]);
@@ -20,12 +21,13 @@ class DeliveryContoller extends Controller
             if (! $user || ! $user->deliveryProfile) {
                 abort(403);
             }
-
+            
             $profile = $user->deliveryProfile;
-
-            if (! $profile->is_active) {
+            
+            if (!$profile->is_active) {
                 abort(403);
             }
+
 
             $status = $profile->status()->firstOrCreate([]);
 
