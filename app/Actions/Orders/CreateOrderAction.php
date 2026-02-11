@@ -7,44 +7,51 @@ use App\Models\BusinessProduct;
 use App\Models\Order;
 use App\Repositories\Laravel\OrderItemRepository;
 use App\Repositories\Laravel\OrderRepository;
+use App\Services\FcmNotificationService;
 use App\Services\Public\OrderPricingService;
 use App\Services\Public\ProductAvailabilityService;
-use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Kreait\Firebase\Messaging\CloudMessage;
 
 class BusinessNotificationService
-{
+{   
+    public function __construct(
+        private FcmNotificationService $fcmNotificationService
+    )
+    {
+    }
+
     public function notifyNewOrder(Order $order): void
     {
-        $order->load(['business.owner']);
+        $order->load(['items.business.owner.fcmTokens']);
 
-        $business = $order->business;
-        $owner = $business->owner;
-        
-        if (!$owner || !$owner->fcm_token) {
-            return;
-        }
+        $businesses = $order->items
+            ->pluck('business')
+            ->unique('id');
 
-        $message = CloudMessage::fromArray([
-            'token' => $owner->fcm_token,
-            'notification' => [
-                'title' => '🛍️ ¡Nuevo Pedido Recibido!',
-                'body'  => "Has recibido el pedido #{$order->id}. ¡Empieza a prepararlo!",
-            ],
-            'data' => [
-                'order_id' => (string) $order->id,
-                'type'     => 'new_order_business',
-            ],
-        ]);
+        foreach ($businesses as $business) {
 
-        try {
-            app('firebase.messaging')->send($message);
-        } catch (Exception $e) {
-            Log::error("Error notificando al negocio {$business->id}: " . $e->getMessage());
+            $owner = $business->owner;
+
+            if (!$owner || empty($owner->fcmTokens->token)) {
+                continue;
+            }
+
+            // foreach ($owner->fcmTokens as $fcmToken) {
+                $data = [
+                    'title' => '🛍️ ¡Nuevo Pedido Recibido!',
+                    'body'  => "Has recibido el pedido #{$order->id}. ¡Empieza a prepararlo!",
+                    'order_id' => (string) $order->id,
+                    'type' => 'new_order_business'
+                ];
+
+                $this->fcmNotificationService->send(
+                    $data,
+                    [$owner->fcmTokens->token]
+                );
+            // }
         }
     }
+
 }
 
 class CreateOrderAction
