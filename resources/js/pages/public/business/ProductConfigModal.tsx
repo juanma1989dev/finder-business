@@ -1,6 +1,6 @@
 import { CartExtra, CartVariation } from '@/types';
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
     product: any;
@@ -16,6 +16,7 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
     const [extras, setExtras] = useState<CartExtra[]>([]);
     const [variation, setVariation] = useState<CartVariation | null>(null);
     const [notes, setNotes] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const toggleExtra = (extra: CartExtra) => {
         setExtras((prev) =>
@@ -25,23 +26,41 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
         );
     };
 
-    const hasVariations = product.variations?.length > 0;
+    const hasVariations = !!product.variations?.length;
     const isInvalid = hasVariations && !variation;
 
+    const safeNumber = (value: any) => {
+        const n = parseFloat(value);
+        return isNaN(n) ? 0 : n;
+    };
+
     const currentTotal =
-        Number(product.price) +
-        (variation ? Number(variation.price) : 0) +
-        extras.reduce((acc, curr) => acc + Number(curr.price), 0);
+        safeNumber(product.price) +
+        safeNumber(variation?.price) +
+        extras.reduce((acc, curr) => acc + safeNumber(curr.price), 0);
+
+    useEffect(() => {
+        setExtras([]);
+        setVariation(null);
+        setNotes('');
+    }, [product.id]);
+
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [onClose]);
 
     return (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm">
-            {/* ESTRUCTURA Y SOMBRA DE TARJETA */}
             <div className="relative w-full max-w-[420px] overflow-hidden rounded-lg bg-white shadow-2xl duration-200 animate-in fade-in zoom-in">
-                {/* HEADER - Paleta Gris para títulos neutros */}
                 <div className="flex items-center justify-between border-b border-purple-50 px-6 py-5">
                     <div>
                         <h2 className="text-sm font-semibold text-gray-700 uppercase">
-                            Personalizar pedido
+                            Personalizar pedidossss
                         </h2>
                         <p className="text-sm font-semibold text-purple-800">
                             {product.name}
@@ -55,9 +74,7 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                     </button>
                 </div>
 
-                {/* CUERPO - Padding p-3 (usado aquí en el contenedor de scroll) */}
                 <div className="scrollbar-hide max-h-[60vh] space-y-4 overflow-y-auto px-6 py-4">
-                    {/* VARIACIONES - Paleta Púrpura */}
                     {hasVariations && (
                         <div className="mb-4">
                             <p className="mb-3 text-[10px] font-semibold tracking-widest text-gray-700 uppercase">
@@ -90,7 +107,6 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                                     );
                                 })}
                             </div>
-                            {/* ALERTA - Paleta Amber */}
                             {isInvalid && (
                                 <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-2">
                                     <p className="text-center text-[10px] leading-tight font-semibold text-amber-700 uppercase">
@@ -101,7 +117,6 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                         </div>
                     )}
 
-                    {/* EXTRAS - Paleta Púrpura (Secundarios) */}
                     {product.extras?.length > 0 && (
                         <div className="mb-4">
                             <p className="mb-3 text-[10px] font-semibold tracking-widest text-gray-700 uppercase">
@@ -136,7 +151,6 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                         </div>
                     )}
 
-                    {/* NOTAS */}
                     <div className="mb-1">
                         <p className="mb-1 text-[10px] font-semibold tracking-widest text-gray-700 uppercase">
                             Notas adicionales
@@ -150,7 +164,6 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                     </div>
                 </div>
 
-                {/* FOOTER - Paleta Púrpura para botones */}
                 <div className="border-t border-purple-50 bg-white p-3">
                     <div className="flex gap-3">
                         <button
@@ -161,14 +174,17 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                         </button>
 
                         <button
-                            disabled={isInvalid}
-                            onClick={() =>
+                            disabled={isInvalid || isSubmitting}
+                            onClick={() => {
+                                if (isSubmitting) return;
+                                setIsSubmitting(true);
+
                                 onConfirm({
                                     extras,
                                     variations: variation ? [variation] : [],
                                     notes,
-                                })
-                            }
+                                });
+                            }}
                             className={`flex-[2] rounded-lg py-3 text-sm font-semibold text-white shadow-sm transition-all active:scale-95 ${
                                 isInvalid
                                     ? 'cursor-not-allowed bg-gray-300'
