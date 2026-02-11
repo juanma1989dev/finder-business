@@ -43,4 +43,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(BusinessProduct::class, 'product_id', 'id');
     }
+
+    public function business(): BelongsTo  
+    {
+        return $this->belongsTo(Businesses::class, 'business_id');
+    }
 }
