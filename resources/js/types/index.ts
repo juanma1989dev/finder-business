@@ -45,6 +45,23 @@ export enum TypeUser {
     DELIVERY = 'delivery',
 }
 
+export interface DeliveryStatus {
+    is_available: boolean;
+    last_available_at?: string | null;
+}
+
+export interface DeliveryProfile {
+    id: number;
+    is_active: boolean;
+    status?: DeliveryStatus;
+}
+
+export interface FcmToken {
+    token: string;
+    device: string;
+    is_active: boolean;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -52,6 +69,8 @@ export interface User {
     avatar?: string;
     type: TypeUser;
     is_available: boolean;
+    delivery_profile?: DeliveryProfile;
+    fcm_tokens?: FcmToken;
     [key: string]: unknown;
 }
 
