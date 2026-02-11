@@ -157,7 +157,7 @@ export const CartDrawer = ({ isOpen, onClose }: Props) => {
                                                     }
                                                     className="text-gray-300 transition-colors hover:text-red-400"
                                                 >
-                                                    <Trash2 size={14} />
+                                                    <Trash2 size={20} />
                                                 </button>
                                             </div>
 
