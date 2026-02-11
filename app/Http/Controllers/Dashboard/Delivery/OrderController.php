@@ -6,9 +6,12 @@ use App\Enums\OrderStatusEnum;
 use App\Enums\UserTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -59,31 +62,46 @@ class OrderController extends Controller
         }
     }   
 
-    public function accept(Request $request, Order $order)
+    public function accept(Order $order)
     {
+
+        $delivery = User::with('deliveryProfile.status')->find(Auth::id());
+
+
+        if ($delivery->type !== UserTypeEnum::DELIVERY->value) {
+            return response()->json([
+                'message' => 'No tienes permisos para realizar esta acción.'
+            ], 403);
+        }
+
+
+        if (!$delivery->deliveryProfile?->status->is_available) {
+            return response()->json([
+                'message' => 'No estás disponible'
+            ], 422);
+        }
+
         try {
-            $delivery = Auth::user();
 
-            if($delivery->type !== UserTypeEnum::DELIVERY->value) {
-                return response()->json(['message' => 'No tienes permisos para realizar esta acción.']);
-            }
-            
-            if (!$delivery->is_available) {
-                return response()->json(['message' => 'No estás disponible'], 422);
-            }
-            
+            DB::beginTransaction();
 
+            // 🔒 Verificar si ya tiene un pedido activo
             $hasActiveOrder = Order::where('delivery_id', $delivery->id)
                 ->whereIn('status', [
                     OrderStatusEnum::PICKED_UP->value,
                     OrderStatusEnum::ON_THE_WAY->value,
                 ])
+                ->lockForUpdate()
                 ->exists();
 
             if ($hasActiveOrder) {
-                return response()->json(['message' => 'Ya tienes un pedido activo'], 422);
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Ya tienes un pedido activo'
+                ], 422);
             }
 
+            // 🔒 Intentar asignar pedido (update atómico)
             $updated = Order::where('id', $order->id)
                 ->where('status', OrderStatusEnum::READY_FOR_PICKUP->value)
                 ->whereNull('delivery_id')
@@ -94,20 +112,35 @@ class OrderController extends Controller
                 ]);
 
             if ($updated === 0) {
+                DB::rollBack();
                 return response()->json([
                     'message' => 'Este pedido ya fue tomado por otro repartidor'
                 ], 409);
             }
-            
-            cache()->forget('available_orders');
+
+            // 🚫 Desactivar disponibilidad automáticamente
+            // $delivery->update([
+            //     'is_available' => false
+            // ]);
+
+            // 🧹 Limpiar cache si aplica
+            Cache::forget('available_orders');
+
+            DB::commit();
 
             return response()->json([
-                'message' => 'Pedido aceptado',
+                'message' => 'Pedido aceptado correctamente',
                 'order_id' => $order->id,
-            ]);
-        } catch(Exception $e){
-            return response()->json(['message' => $e->getMessage()], 422);
-        }        
+            ], 200);
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Error interno al aceptar el pedido'
+            ], 500);
+        }
     }
     
     public function onTheWay(Request $request, Order $order)
