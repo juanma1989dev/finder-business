@@ -11,13 +11,29 @@ import {
     ShoppingBag,
     Trash2,
 } from 'lucide-react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
-// ... (Función debounce se mantiene igual)
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    return (...args: Parameters<T>) => {
+        if (timer) clearTimeout(timer);
+
+        timer = setTimeout(() => {
+            fn(...args);
+        }, delay);
+    };
+}
+
+const safeNumber = (value: any) => {
+    const n = parseFloat(value);
+    return isNaN(n) ? 0 : n;
+};
 
 export default function DetailsPage() {
     const { cart } = usePage<SharedData>().props;
     const items = Object.values(cart);
+    const hasItems = items.length > 0;
 
     const { post, processing, transform } = useForm({
         total: 0,
@@ -25,15 +41,18 @@ export default function DetailsPage() {
     });
 
     const getItemUnitPrice = (item: CartItem) => {
-        const basePrice = Number(item.price) || 0;
+        const basePrice = safeNumber(item.price);
+
         const extrasTotal = (item.extras ?? []).reduce(
-            (sum, e) => sum + (Number(e.price) || 0),
+            (sum, e) => sum + safeNumber(e.price),
             0,
         );
+
         const variationsTotal = (item.variations ?? []).reduce(
-            (sum, v) => sum + (Number(v.price) || 0),
+            (sum, v) => sum + safeNumber(v.price),
             0,
         );
+
         return basePrice + extrasTotal + variationsTotal;
     };
 
@@ -54,12 +73,16 @@ export default function DetailsPage() {
         };
     }
 
-    const totalPrice = items.reduce(
-        (total, item) => total + getItemUnitPrice(item) * item.quantity,
-        0,
-    );
+    const totalPrice = useMemo(() => {
+        return items.reduce(
+            (total, item) => total + getItemUnitPrice(item) * item.quantity,
+            0,
+        );
+    }, [items]);
 
     const handleUpdateQuantity = (item: CartItem, quantity: number) => {
+        if (quantity === item.quantity) return;
+
         router.patch(
             `/cart/${item.key}`,
             { quantity },
@@ -74,7 +97,7 @@ export default function DetailsPage() {
     const debouncedUpdateNotes = useCallback(
         debounce((key: string, notes: string) => {
             router.patch(`/cart/${key}`, { notes }, { preserveScroll: true });
-        }, 300),
+        }, 400),
         [],
     );
 
@@ -87,6 +110,18 @@ export default function DetailsPage() {
         transform((data) => ({ ...data, items: items, total: totalPrice }));
         post('/shopping-cart', { preserveScroll: true });
     };
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (!hasItems) return;
+            e.preventDefault();
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () =>
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [hasItems]);
 
     return (
         <MainLayout showFloatShoppingCart={false}>
@@ -106,7 +141,7 @@ export default function DetailsPage() {
                     </button>
                     <div>
                         <h1 className="text-xl font-semibold tracking-tight text-gray-700 uppercase">
-                            Mi Carrito
+                            Mi Pedido
                         </h1>
                         <p className="text-[10px] font-semibold tracking-widest text-purple-600 uppercase">
                             Confirmación de pedido
@@ -263,11 +298,10 @@ export default function DetailsPage() {
                             })}
                         </div>
 
-                        {/* RESUMEN - Paleta Púrpura/Amber */}
                         <div className="lg:col-span-1">
                             <div className="sticky top-20 overflow-hidden rounded-lg border border-purple-200 bg-white shadow-sm">
-                                <div className="bg-purple-600 px-6 py-4">
-                                    <span className="text-[10px] leading-tight font-semibold tracking-widest text-purple-200 uppercase">
+                                <div className="bg-purple-600 px-4 py-2">
+                                    <span className="text-[11px] leading-tight font-semibold tracking-widest text-purple-200 uppercase">
                                         Total Pedido
                                     </span>
                                     <div className="text-2xl font-semibold text-white">
@@ -275,9 +309,9 @@ export default function DetailsPage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 p-6">
+                                <div className="space-y-2 p-4">
                                     <div className="space-y-3 border-b border-purple-50 pb-4">
-                                        <div className="flex justify-between text-[11px] font-semibold tracking-wider uppercase">
+                                        <div className="flex justify-between text-[14px] font-semibold tracking-wider uppercase">
                                             <span className="text-gray-500">
                                                 Subtotal
                                             </span>
@@ -285,12 +319,12 @@ export default function DetailsPage() {
                                                 ${totalPrice.toFixed(2)}
                                             </span>
                                         </div>
-                                        <div className="flex justify-between text-[11px] font-semibold tracking-wider uppercase">
+                                        <div className="flex justify-between text-[12px] font-semibold tracking-wider uppercase">
                                             <span className="text-gray-500">
-                                                Envío
+                                                Envío**
                                             </span>
                                             <span className="text-amber-600 italic">
-                                                Gratis
+                                                Gratis**
                                             </span>
                                         </div>
                                     </div>
