@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { locations } from '@/data/locations';
-import { messaging, onMessage, registerFCMToken } from '@/firebase';
+import { messaging, onMessage } from '@/firebase';
 import { useDialog } from '@/hooks/useDialog';
 import { Business as BusinessType, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -81,15 +81,6 @@ export default function Business({ businesses, catalogs }: Props) {
             location: '',
         },
     });
-
-    useEffect(() => {
-        const handleSubscription = async () => {
-            if (user) {
-                await registerFCMToken();
-            }
-        };
-        handleSubscription();
-    }, [user.id]);
 
     useEffect(() => {
         if (!messaging) return;

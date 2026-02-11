@@ -1,8 +1,9 @@
+import { messaging, onMessage } from '@/firebase';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Business, Order, OrderStatus } from '@/types';
 import { router } from '@inertiajs/react';
 import { Power, PowerOff, Search } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import GridOrders from './GridOrders';
 import NotesDialog from './NotesDialog';
@@ -27,9 +28,11 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     const [isBusinessOpen, setIsBusinessOpen] = useState(
         Boolean(business?.is_open),
     );
+
     const [activeTab, setActiveTab] = useState<Tabs>(Tabs.Todos);
     const [search, setSearch] = useState('');
     const [loadingOrderId, setLoadingOrderId] = useState<number | null>(null);
+    const [ordersState, setOrdersState] = useState<Order[]>(orders);
 
     const [reasonDialog, setReasonDialog] = useState<{
         open: boolean;
@@ -38,6 +41,8 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     }>({ open: false });
 
     const [noteText, setNoteText] = useState('');
+
+    const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
@@ -56,6 +61,27 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
     }, [reasonDialog, noteText]);
+
+    useEffect(() => {
+        if (!messaging) return;
+
+        return onMessage(messaging, (payload) => {
+            toast.success(
+                <div className="flex flex-col gap-1">
+                    <p className="font-bold">
+                        {payload.data?.title || 'Nuevo Pedido'}
+                    </p>
+                    <p className="text-xs">{payload.data?.body}</p>
+                </div>,
+            );
+
+            if (reloadTimeoutRef.current) {
+                clearTimeout(reloadTimeoutRef.current);
+            }
+
+            syncOrdersDelta();
+        });
+    }, []);
 
     const toggleBusiness = () => {
         const old = isBusinessOpen;
@@ -104,7 +130,7 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     };
 
     const filteredOrders = useMemo(() => {
-        return orders.filter((order: any) => {
+        return ordersState.filter((order: any) => {
             if (search) {
                 const q = search.toLowerCase();
                 if (
@@ -121,14 +147,45 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                 return order.status === OrderStatus.DELIVERED;
             return true;
         });
-    }, [orders, search, activeTab]);
+    }, [ordersState, search, activeTab]);
 
-    const pendingCount = orders.filter(
+    const mergeOrders = (current: Order[], incoming: Order[]) => {
+        const map = new Map<number, Order>();
+
+        // 1. Órdenes actuales
+        current.forEach((order) => {
+            map.set(order.id, order);
+        });
+
+        // 2. Nuevas o actualizadas
+        incoming.forEach((order) => {
+            map.set(order.id, order); // replace si existe
+        });
+
+        // 3. Retornar ordenadas (opcional pero recomendado)
+        return Array.from(map.values());
+    };
+
+    const syncOrdersDelta = async () => {
+        const res = await fetch(`/test/orders/delta`);
+
+        const incomingOrders: Order[] = await res.json();
+
+        if (!incomingOrders.length) return;
+
+        setOrdersState((current) => mergeOrders(current, incomingOrders));
+    };
+
+    const pendingCount = ordersState.filter(
         (o) => o.status === OrderStatus.PENDING,
     ).length;
-    const lateCount = orders.filter(
+    const lateCount = ordersState.filter(
         (o) => o.status === OrderStatus.PENDING,
     ).length;
+
+    useEffect(() => {
+        console.log('ORDERS STATE UPDATED:', ordersState);
+    }, [ordersState]);
 
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
@@ -171,7 +228,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                     </div>
                 </div>
 
-                {/* BUSCADOR */}
                 <div className="relative">
                     <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
@@ -182,7 +238,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                     />
                 </div>
 
-                {/* TABS DE FILTRADO */}
                 <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-1">
                     {Object.values(Tabs).map((tab) => (
                         <button
@@ -199,7 +254,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                     ))}
                 </div>
 
-                {/* GRILLA DE PEDIDOS */}
                 <div className="relative min-h-[400px]">
                     <GridOrders
                         orders={filteredOrders}
