@@ -1,7 +1,6 @@
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { User } from './types';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -32,7 +31,7 @@ export const messaging =
 /* ===============================
    Register FCM Token
 ================================ */
-export async function registerFCMToken(user: User) {
+async function registerFCMToken(currentToken: string | null) {
     if (!messaging) return;
     if (!('Notification' in window)) return;
     if (!('serviceWorker' in navigator)) return;
@@ -53,13 +52,9 @@ export async function registerFCMToken(user: User) {
             serviceWorkerRegistration: registration,
         });
 
-        // if (import.meta.env.VITE_DEV === 'TRUE') {
-        //     await deleteToken(messaging);
-        // }
-
         if (!token) return;
 
-        if (user.fcm_token === token) {
+        if (currentToken === token) {
             console.warn('Token ya sincronizado.');
             return;
         }
@@ -75,10 +70,27 @@ export async function registerFCMToken(user: User) {
                 Accept: 'application/json',
             },
             body: JSON.stringify({ token }),
-        });
+        })
+            .then(console.log)
+            .catch(console.error);
     } catch (error) {
         console.error('FCM error:', error);
     }
 }
 
-export { onMessage };
+function initFCMListeners(currentToken: string | null) {
+    // const messaging = getMessaging();
+
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible') {
+            await registerFCMToken(currentToken);
+        }
+    });
+
+    // Mensajes en foreground
+    // onMessage(messaging, (payload) => {
+    //     console.log("Mensaje foreground:", payload);
+    // });
+}
+
+export { initFCMListeners, onMessage, registerFCMToken };

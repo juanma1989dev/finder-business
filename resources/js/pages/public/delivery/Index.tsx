@@ -1,257 +1,385 @@
+import { Map } from '@/components/leaflet/Map';
+import { useLeafletMap } from '@/components/leaflet/useLeafletMap';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import MainLayout from '@/layouts/main-layout';
-import { SharedData } from '@/types';
-import { router, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import {
-    DollarSign,
-    Navigation,
-    Package,
-    PackageSearch,
-} from './../../../lib/icons';
-
-import { Map } from '@/components/leaflet/Map';
-import { useLeafletMap } from '@/components/leaflet/useLeafletMap';
-import { messaging, onMessage, registerFCMToken } from '@/firebase';
+import { messaging, onMessage } from '@/firebase';
 import { useGeolocation } from '@/hooks/use-Geolocation';
-import { User2 } from 'lucide-react';
+import MainLayout from '@/layouts/main-layout';
+import { OrderStatus, SharedData } from '@/types';
+import { router, usePage } from '@inertiajs/react';
+import { Timer, User2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import { DollarSign, Package, PackageSearch } from './../../../lib/icons';
 
-const notificationAudio =
-    typeof window !== 'undefined'
-        ? new Audio('/sounds/notification.mp3')
-        : null;
+type Order = {
+    id: number;
+    delivery_fee?: string | number;
+    store_name?: string;
+    distance?: number | string;
+    [key: string]: any;
+};
 
 interface Props {
     activeOrder: any;
 }
 
-const vibrateDevice = () => {
-    if ('vibrate' in navigator) {
-        navigator.vibrate([200, 100, 200, 100, 200]);
-    }
-};
+/* ----------------------------- Configuration ----------------------------- */
+const AUTO_REJECT_SECONDS = 20;
+const SOUND_NOTIFICATION = '/sounds/notification.mp3';
+const SOUND_BLOCKED = '/sounds/blocked.mp3';
+const SOUND_BLOCKED_VOLUME = 0.6;
+
+/* ---------------------------- Small utilities ---------------------------- */
+const cls = (...parts: Array<string | false | null | undefined>) =>
+    parts.filter(Boolean).join(' ');
+
+/* --------------------------- FollowDelivery comp ------------------------- */
+
+function FollowDelivery({ position }: { position: [number, number] }) {
+    useLeafletMap({ follow: position });
+    return null;
+}
 
 export default function Index({ activeOrder }: Props) {
     const { auth } = usePage<SharedData>().props;
     const { user } = auth;
-
-    const csrfToken = document
-        .querySelector('meta[name="csrf-token"]')
-        ?.getAttribute('content');
-    const hasActiveOrder = Boolean(activeOrder);
-
-    const [availableOrders, setAvailableOrders] = useState<any[]>([]);
-    const [pollingEnabled, setPollingEnabled] = useState(true);
-    const [deliveryLocation, setDeliveryLocation] = useState<[number, number]>([
-        0, 0,
-    ]);
-    const deliveryAvailable =
-        user?.delivery_profile?.status?.is_available ?? false;
-
     const { latitude, longitude } = useGeolocation();
 
-    const fetchAvailableOrders = useCallback(async () => {
-        if (!deliveryAvailable || hasActiveOrder) return;
-        try {
-            const response = await fetch('/delivery/orders/available', {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            });
-            if (!response.ok) return;
-            const data = await response.json();
-            setAvailableOrders(data);
-        } catch (error) {
-            console.error(error);
-        }
-    }, [deliveryAvailable, hasActiveOrder]);
+    const deliveryAvailable = Boolean(
+        user?.delivery_profile?.status?.is_available ?? false,
+    );
+
+    const hasActiveOrder = Boolean(activeOrder);
+
+    // refs to avoid stale closures in listeners/intervals
+    const deliveryAvailableRef = useRef(deliveryAvailable);
+    const hasActiveOrderRef = useRef(hasActiveOrder);
 
     useEffect(() => {
-        if (!pollingEnabled || hasActiveOrder) return;
-        fetchAvailableOrders();
-        const interval = setInterval(fetchAvailableOrders, 20000);
-        return () => clearInterval(interval);
-    }, [fetchAvailableOrders, pollingEnabled, hasActiveOrder]);
-
-    useEffect(() => {
-        const handleSubscription = async () => {
-            if (deliveryAvailable) {
-                await registerFCMToken(user);
-            }
-        };
-
-        handleSubscription();
+        deliveryAvailableRef.current = deliveryAvailable;
     }, [deliveryAvailable]);
 
     useEffect(() => {
-        if (!messaging) return;
+        hasActiveOrderRef.current = hasActiveOrder;
+    }, [hasActiveOrder]);
 
-        const unsubscribe = onMessage(messaging, (payload) => {
-            // toast.success(
-            //     <div className="flex flex-col gap-1">
-            //         <p className="font-bold">
-            //             {payload.notification?.title || 'Nuevo Pedido'}
-            //         </p>
-            //         <p className="text-xs">{payload.notification?.body}</p>
-            //     </div>,
-            //     {
-            //         position: 'top-right',
-            //         autoClose: 5000,
-            //         icon: '🚴‍♂️',
-            //     },
-            // );
+    // --- local state ---
+    const [deliveryLocation, setDeliveryLocation] = useState<[number, number]>([
+        0, 0,
+    ]);
 
-            vibrateDevice();
-            fetchAvailableOrders();
+    const [incomingOrder, setIncomingOrder] = useState<Order | null>(null);
+    const [countdown, setCountdown] = useState<number>(AUTO_REJECT_SECONDS);
+    const [isAccepting, setIsAccepting] = useState(false);
+
+    // --- audio refs (initialized once) ---
+    const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
+    const blockedAudioRef = useRef<HTMLAudioElement | null>(null);
+    const incomingOrderRef = useRef<Order | null>(null);
+
+    useEffect(() => {
+        incomingOrderRef.current = incomingOrder;
+    }, [incomingOrder]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        notificationAudioRef.current = new Audio(SOUND_NOTIFICATION);
+        blockedAudioRef.current = new Audio(SOUND_BLOCKED);
+        blockedAudioRef.current.volume = SOUND_BLOCKED_VOLUME;
+        // ensure we don't hold onto audio objects if page unloads
+        return () => {
+            notificationAudioRef.current = null;
+            blockedAudioRef.current = null;
+        };
+    }, []);
+
+    /* -------------------------- helpers / callbacks ------------------------- */
+    const getCsrfToken = useCallback(() => {
+        if (typeof document === 'undefined') return '';
+        return (
+            document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content') ?? ''
+        );
+    }, []);
+
+    const clearIncomingOrder = useCallback((message?: string) => {
+        notificationAudioRef.current?.pause();
+        if (notificationAudioRef.current) {
+            notificationAudioRef.current.currentTime = 0;
+        }
+
+        setIncomingOrder(null);
+        setCountdown(AUTO_REJECT_SECONDS);
+
+        if (message) toast.info(message);
+    }, []);
+
+    const handleAcceptOrder = useCallback(
+        async (orderId: number) => {
+            if (isAccepting) return;
+
+            setIsAccepting(true);
+
+            console.log(getCsrfToken());
+
+            try {
+                const response = await fetch(
+                    `/delivery/orders/${orderId}/accept`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': getCsrfToken(), // Asegúrate de que esta función devuelva el string del token
+                        },
+                    },
+                );
+
+                const data = await response
+                    .json()
+                    .catch((err) => console.error('ALL ERROR :: ', err));
+                console.log('DATA RESPONSE :: ', data);
+
+                if (!response.ok) {
+                    clearIncomingOrder();
+
+                    toast.error(
+                        data?.message ?? 'Este pedido ya no está disponible',
+                    );
+                    return;
+                }
+
+                toast.success('Pedido aceptado 🚴‍♂️');
+
+                clearIncomingOrder();
+
+                router.reload({ only: ['activeOrder'] });
+            } catch (e) {
+                console.log('Error :: ', e);
+                toast.error('Error de conexión');
+            } finally {
+                setIsAccepting(false);
+            }
+        },
+        [clearIncomingOrder, getCsrfToken, isAccepting],
+    );
+
+    const updateStatus = useCallback((url: string, msg: string) => {
+        router.post(
+            url,
+            {},
+            {
+                onSuccess: () => {
+                    toast.success(msg);
+                    router.reload({ only: ['activeOrder'] });
+                },
+                onError: (e: any) => toast.error(e?.message ?? 'Error'),
+            },
+        );
+    }, []);
+
+    const playBlockedSound = useCallback(() => {
+        blockedAudioRef.current?.play().catch(() => {});
+    }, []);
+
+    const toggleAvailability = useCallback(() => {
+        if (hasActiveOrderRef.current) {
+            playBlockedSound();
+            return;
+        }
+        router.patch('/delivery/availability', {
+            status: !deliveryAvailableRef.current,
         });
+    }, [playBlockedSound]);
 
-        return () => unsubscribe();
-    }, [fetchAvailableOrders]);
-
+    /* --------------------------- Geolocation effect ------------------------- */
     useEffect(() => {
         if (latitude && longitude) {
             setDeliveryLocation([latitude, longitude]);
         }
     }, [latitude, longitude]);
 
-    const acceptOrder = async (orderId: number) => {
-        try {
-            const response = await fetch(`/delivery/orders/${orderId}/accept`, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrfToken ?? '',
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (!response.ok) {
-                const error = await response.json();
-                return toast.error(error.message ?? 'Error');
-            }
-            toast.success('Pedido aceptado 🚴‍♂️');
-            setAvailableOrders([]);
-            setPollingEnabled(false);
-            router.reload({ only: ['activeOrder'] });
-        } catch (e) {
-            toast.error('Error de conexión');
+    /* --------------------------- Incoming timer ----------------------------- */
+    useEffect(() => {
+        let timer: number | undefined;
+        if (incomingOrder) {
+            // if an incoming order exists, ensure countdown resets
+            setCountdown(AUTO_REJECT_SECONDS);
+            timer = window.setInterval(() => {
+                setCountdown((prev) => {
+                    if (prev <= 1) {
+                        clearIncomingOrder('Pedido rechazado por tiempo');
+                        return AUTO_REJECT_SECONDS;
+                    }
+                    return prev - 1;
+                });
+            }, 1_000);
         }
-    };
+        return () => {
+            if (timer) window.clearInterval(timer);
+        };
+    }, [incomingOrder, clearIncomingOrder]);
 
-    const handleChangeAvailability = () => {
-        // if (notificationAudio) {
-        //     notificationAudio.muted = true;
-        //     notificationAudio
-        //         .play()
-        //         .then(() => {
-        //             notificationAudio.pause();
-        //             notificationAudio.muted = false;
-        //         })
-        //         .catch(() => {});
-        // }
+    /* -------------------------- FCM onMessage handler ----------------------- */
+    useEffect(() => {
+        if (!messaging) return;
 
-        router.patch('/delivery/availability', { status: !deliveryAvailable });
-    };
+        const unsubscribe = onMessage(messaging, (payload: any) => {
+            if (!deliveryAvailableRef.current) return;
 
-    const playBlockedSound = () => {
-        const audio = new Audio('/sounds/blocked.mp3');
-        audio.volume = 0.6;
-        audio.play().catch(() => {});
-    };
+            toast.success(
+                <div className="flex flex-col gap-1">
+                    <p className="font-bold">
+                        {payload.data?.title ?? 'Nuevo Pedido'}
+                    </p>
+                    {payload.data?.body && (
+                        <p className="text-xs">{payload.data.body}</p>
+                    )}
+                </div>,
+            );
 
-    const startDelivery = () => {
-        router.post(
-            `/delivery/orders/${activeOrder.id}/on-the-way`,
-            {},
-            {
-                onSuccess: () => {
-                    toast.success('En camino 🚴‍♂️');
-                    router.reload({ only: ['activeOrder'] });
-                },
-                onError: (e: any) => toast.error(e.message ?? 'Error'),
-            },
-        );
-    };
+            const status = payload.data?.order_status;
 
-    const finishDelivery = () => {
-        router.post(
-            `/delivery/orders/${activeOrder.id}/delivered`,
-            {},
-            {
-                onSuccess: () => {
-                    toast.success('Entregado 📦');
-                    router.reload({ only: ['activeOrder'] });
-                },
-                onError: (e: any) => toast.error(e.message ?? 'Error'),
-            },
-        );
-    };
+            if (
+                status === OrderStatus.READY_FOR_PICKUP &&
+                !incomingOrderRef.current &&
+                !hasActiveOrderRef.current &&
+                deliveryAvailableRef.current
+            ) {
+                const newIncoming: Order = {
+                    id: Number(payload.data?.order_id),
+                    delivery_fee: payload.data?.delivery_fee,
+                    store_name: payload.data?.store_name,
+                    distance: payload.data?.distance,
+                };
+                const orderId = Number(payload.data?.order_id);
+                if (!orderId) return;
 
-    function FollowDelivery({ position }: { position: [number, number] }) {
-        useLeafletMap({ follow: position });
-        return null;
-    }
+                setIncomingOrder(newIncoming);
+                setCountdown(AUTO_REJECT_SECONDS);
+                notificationAudioRef.current?.play().catch(() => {});
+            }
+        });
+
+        return () => {
+            if (typeof unsubscribe === 'function') unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (hasActiveOrder && incomingOrder) {
+            clearIncomingOrder();
+        }
+    }, [hasActiveOrder, incomingOrder, clearIncomingOrder]);
 
     return (
         <MainLayout>
             <div className="min-h-screen space-y-2 bg-purple-50/50 p-2">
-                {availableOrders.length > 0 &&
-                    !hasActiveOrder &&
-                    deliveryAvailable && (
-                        <Card className="animate-pulse rounded-lg border-amber-200 bg-amber-50 shadow-md">
-                            <CardContent className="space-y-1 p-1">
+                {incomingOrder && (
+                    <div className="fixed inset-x-0 bottom-0 z-50 duration-300 animate-in slide-in-from-bottom">
+                        <Card className="rounded-t-2xl border-t border-purple-200 bg-white shadow-2xl">
+                            <CardContent className="space-y-3 p-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <Navigation className="h-4 w-4 text-amber-600" />
-                                        <p className="text-sm font-semibold tracking-tight text-amber-900 uppercase">
-                                            ¡Nueva Solicitud!
+                                        <p className="text-xs font-bold tracking-widest text-purple-600 uppercase">
+                                            Pedido listo
+                                        </p>
+                                        <div className="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600">
+                                            <Timer className="h-3 w-3" />
+                                            <span>{countdown}s</span>
+                                        </div>
+                                    </div>
+                                    <span className="text-xs font-semibold text-gray-400">
+                                        #{incomingOrder.id}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-900">
+                                            {incomingOrder.store_name ??
+                                                'Nuevo comercio'}
+                                        </p>
+                                        <p className="text-[11px] text-gray-500">
+                                            Distancia:{' '}
+                                            {incomingOrder.distance ?? '—'} km
                                         </p>
                                     </div>
-                                    <div className="flex items-center gap-1 font-bold text-amber-700">
+                                    <div className="flex items-center gap-1 font-bold text-green-600">
                                         <DollarSign className="h-4 w-4" />
-                                        <span className="text-base leading-none">
-                                            {availableOrders[0].delivery_fee}
+                                        <span>
+                                            {incomingOrder.delivery_fee}
                                         </span>
                                     </div>
                                 </div>
 
-                                <Button
-                                    className="w-full rounded-lg bg-amber-600 py-2 text-sm font-bold tracking-widest text-white uppercase shadow-lg shadow-amber-200 hover:bg-amber-700 active:scale-95"
-                                    onClick={() =>
-                                        acceptOrder(availableOrders[0].id)
-                                    }
-                                >
-                                    Aceptar Pedido #{availableOrders[0].id}
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        className="flex-1"
+                                        onClick={() =>
+                                            clearIncomingOrder(
+                                                'Pedido rechazado',
+                                            )
+                                        }
+                                        disabled={isAccepting}
+                                        aria-label="Rechazar pedido"
+                                    >
+                                        Rechazar
+                                    </Button>
+                                    <Button
+                                        className="flex-1 bg-purple-600 font-bold"
+                                        onClick={() =>
+                                            handleAcceptOrder(incomingOrder.id)
+                                        }
+                                        disabled={isAccepting}
+                                        aria-label="Aceptar pedido"
+                                    >
+                                        {isAccepting
+                                            ? 'Procesando...'
+                                            : 'Aceptar pedido'}
+                                    </Button>
+                                </div>
                             </CardContent>
                         </Card>
-                    )}
+                    </div>
+                )}
 
-                {hasActiveOrder && deliveryAvailable && (
-                    <Card className="rounded-lg border-purple-200 bg-white shadow-sm animate-in slide-in-from-bottom-2">
-                        <CardContent className="space-y-1 p-1">
+                {hasActiveOrder && (
+                    <Card className="border-purple-200 bg-white">
+                        <CardContent className="space-y-2 p-2">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Package className="h-4 w-4 text-purple-600" />
-                                    <p className="text-sm font-semibold tracking-tight text-purple-900">
+                                    <p className="text-sm font-semibold text-purple-900">
                                         Pedido en curso
                                     </p>
                                 </div>
-                                <span className="text-[10px] font-bold text-purple-500 uppercase">
+                                <span className="text-[10px] font-bold text-purple-500">
                                     #{activeOrder.id}
                                 </span>
                             </div>
-
                             <div className="flex gap-2">
-                                <Button className="flex-1 rounded-lg bg-purple-600 text-xs font-semibold transition-all hover:bg-purple-700 active:scale-95">
+                                <Button
+                                    className="flex-1 bg-purple-600 text-xs"
+                                    aria-label="Marcar llegada"
+                                >
                                     Llegué
                                 </Button>
 
                                 {activeOrder.status === 'picked_up' && (
                                     <Button
-                                        className="flex-1 rounded-lg bg-green-600 text-xs font-semibold hover:bg-green-700 active:scale-95"
-                                        onClick={startDelivery}
+                                        className="flex-1 bg-green-600 text-xs"
+                                        onClick={() =>
+                                            updateStatus(
+                                                `/delivery/orders/${activeOrder.id}/on-the-way`,
+                                                'En camino 🚴‍♂️',
+                                            )
+                                        }
+                                        aria-label="Iniciar ruta"
                                     >
                                         Iniciar Ruta
                                     </Button>
@@ -259,47 +387,58 @@ export default function Index({ activeOrder }: Props) {
 
                                 {activeOrder.status === 'on_the_way' && (
                                     <Button
-                                        className="flex-1 rounded-lg bg-blue-600 text-xs font-semibold hover:bg-blue-700 active:scale-95"
-                                        onClick={finishDelivery}
+                                        className="flex-1 bg-blue-600 text-xs"
+                                        onClick={() =>
+                                            updateStatus(
+                                                `/delivery/orders/${activeOrder.id}/delivered`,
+                                                'Entregado 📦',
+                                            )
+                                        }
+                                        aria-label="Entregar pedido"
                                     >
                                         Entregar
                                     </Button>
                                 )}
-
-                                {/* <Button
-                                    variant="outline"
-                                    className="rounded-lg border-amber-200 px-2 text-amber-700 hover:bg-amber-50 active:scale-95"
-                                >
-                                    <AlertCircle size={18} />
-                                </Button> */}
                             </div>
                         </CardContent>
                     </Card>
                 )}
 
+                {/* --- Profile & availability --- */}
                 <Card
-                    className={`overflow-hidden rounded-lg border-purple-200 p-0 shadow-sm ${deliveryAvailable ? '' : 'bg-gray-300'}`}
+                    className={cls(
+                        'overflow-hidden border-purple-200 py-1',
+                        !deliveryAvailable && 'bg-gray-200',
+                    )}
                 >
-                    <CardContent className="flex items-center justify-between p-2">
+                    <CardContent className="flex items-center justify-between p-1">
                         <div className="flex items-center gap-3">
                             <div className="relative">
                                 <User2 className="h-8 w-8 text-purple-700" />
                                 <div
-                                    className={`absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white ${deliveryAvailable ? 'bg-green-500' : 'bg-gray-400'}`}
+                                    className={cls(
+                                        'absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white',
+                                        deliveryAvailable
+                                            ? 'bg-green-500'
+                                            : 'bg-gray-400',
+                                    )}
                                 />
                             </div>
                             <div>
                                 <p className="text-sm leading-tight font-semibold text-purple-900">
                                     {user.name}
                                 </p>
-                                <p className="text-[10px] font-semibold tracking-wider text-gray-500 uppercase">
+                                <p className="text-[10px] font-semibold text-gray-500 uppercase">
                                     Repartidor
                                 </p>
                             </div>
                         </div>
 
                         <div
-                            className={`flex items-center gap-2 rounded-lg border border-purple-100 bg-purple-50/50 px-2 py-1.5 transition-opacity ${hasActiveOrder ? 'opacity-50' : ''}`}
+                            className={cls(
+                                'flex items-center gap-2 rounded-lg border border-purple-100 bg-purple-50 px-2 py-1.5',
+                                hasActiveOrder && 'opacity-50',
+                            )}
                         >
                             <Label
                                 htmlFor="disponibilidad"
@@ -309,45 +448,40 @@ export default function Index({ activeOrder }: Props) {
                                     ? 'En línea'
                                     : 'Desconectado'}
                             </Label>
+
                             <div
-                                onClick={() =>
-                                    hasActiveOrder && playBlockedSound()
-                                }
+                                onClick={() => toggleAvailability()}
+                                role="button"
                             >
                                 <Switch
                                     id="disponibilidad"
                                     checked={deliveryAvailable}
                                     disabled={hasActiveOrder}
-                                    onCheckedChange={handleChangeAvailability}
-                                    className="focus-visible:ring-purple-400 data-[state=checked]:bg-purple-600"
+                                    onCheckedChange={() => toggleAvailability()}
+                                    className="data-[state=checked]:bg-purple-600"
                                 />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
+                {/* --- Map or disconnected state --- */}
                 {deliveryAvailable ? (
-                    <Card className="relative h-70 overflow-hidden rounded-lg border-purple-200 py-0 shadow-sm">
+                    <Card className="relative h-80 overflow-hidden border-purple-200 bg-white p-0 shadow-sm">
                         <Map center={deliveryLocation}>
-                            {/* <MapMarker
-                                position={deliveryLocation}
-                                icon={businessIcon}
-                            /> */}
                             <FollowDelivery position={deliveryLocation} />
                         </Map>
                     </Card>
                 ) : (
-                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-100 bg-purple-50/30 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-100 bg-purple-50/30 py-12">
                         <div className="mb-4 rounded-lg bg-white p-4 shadow-sm">
                             <PackageSearch className="h-10 w-10 text-gray-300" />
                         </div>
-
-                        <h2 className="text-base font-semibold tracking-tight text-gray-700 uppercase">
-                            Actualmente no puedes recibir pedidos
+                        <h2 className="text-sm font-semibold text-gray-700 uppercase">
+                            No puedes recibir pedidos
                         </h2>
-
-                        <p className="mt-1 text-[10px] leading-tight font-normal tracking-widest text-gray-500 uppercase">
-                            Activa tu disponibilidad para comenzar a trabajar
+                        <p className="mt-1 text-[10px] tracking-widest text-gray-500 uppercase">
+                            Activa tu disponibilidad
                         </p>
                     </div>
                 )}

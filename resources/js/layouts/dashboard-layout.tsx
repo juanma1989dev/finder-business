@@ -5,6 +5,7 @@ import { useEffect, type ReactNode } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
+import ProviderLayout from './ProviderLayout';
 
 interface DashboardLayoutProps {
     children: ReactNode;
@@ -25,14 +26,16 @@ export default ({ children, breadcrumbs, ...props }: DashboardLayoutProps) => {
     }, [flash]);
 
     return (
-        <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-            <ToastContainer
-                autoClose={1800}
-                stacked
-                closeOnClick
-                pauseOnHover
-            />
-            {children}
-        </AppLayoutTemplate>
+        <ProviderLayout>
+            <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
+                <ToastContainer
+                    autoClose={1800}
+                    stacked
+                    closeOnClick
+                    pauseOnHover
+                />
+                {children}
+            </AppLayoutTemplate>
+        </ProviderLayout>
     );
 };
