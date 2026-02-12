@@ -60,7 +60,7 @@ export const ProductConfigModal = ({ product, onConfirm, onClose }: Props) => {
                 <div className="flex items-center justify-between border-b border-purple-50 px-6 py-5">
                     <div>
                         <h2 className="text-sm font-semibold text-gray-700 uppercase">
-                            Personalizar pedidossss
+                            Personalizar pedidos
                         </h2>
                         <p className="text-sm font-semibold text-purple-800">
                             {product.name}
