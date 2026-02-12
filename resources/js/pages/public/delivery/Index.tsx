@@ -124,8 +124,6 @@ export default function Index({ activeOrder }: Props) {
 
             setIsAccepting(true);
 
-            console.log(getCsrfToken());
-
             try {
                 const response = await fetch(
                     `/delivery/orders/${orderId}/accept`,
@@ -141,7 +139,6 @@ export default function Index({ activeOrder }: Props) {
                 const data = await response
                     .json()
                     .catch((err) => console.error('ALL ERROR :: ', err));
-                console.log('DATA RESPONSE :: ', data);
 
                 if (!response.ok) {
                     clearIncomingOrder();
@@ -158,7 +155,6 @@ export default function Index({ activeOrder }: Props) {
 
                 router.reload({ only: ['activeOrder'] });
             } catch (e) {
-                console.log('Error :: ', e);
                 toast.error('Error de conexión');
             } finally {
                 setIsAccepting(false);

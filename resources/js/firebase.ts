@@ -70,9 +70,7 @@ async function registerFCMToken(currentToken: string | null) {
                 Accept: 'application/json',
             },
             body: JSON.stringify({ token }),
-        })
-            .then(console.log)
-            .catch(console.error);
+        });
     } catch (error) {
         console.error('FCM error:', error);
     }

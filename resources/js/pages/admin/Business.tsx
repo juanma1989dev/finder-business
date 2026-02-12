@@ -86,8 +86,6 @@ export default function Business({ businesses, catalogs }: Props) {
         if (!messaging) return;
 
         const unsubscribe = onMessage(messaging, (payload) => {
-            console.log('Notificación recibida en el componente:', payload);
-
             const title =
                 payload.notification?.title ||
                 payload.data?.title ||
