@@ -29,18 +29,39 @@ class OrderManagementController extends Controller
             return back()->with('error', 'No se puede actualizar el estado del pedido.');
         }
 
+        if ($current === $nextStatus) {
+            return back()->with('info', 'El pedido ya tiene ese estado.');
+        }
+
         $order->update([
             'status' => $nextStatus,
             'notes' => $note,
         ]);
 
-        // $order->status = 'ready_for_pickup'; // TEST
-
-        if ($nextStatus === OrderStatusEnum::READY_FOR_PICKUP->value) {
-            $this->onReadyForPickup($order);
-        }
+        $this->handleStatusSideEffects($order, $nextStatus);
 
         return back()->with('success', 'Pedido actualizado');
+    }
+
+    private function handleStatusSideEffects(Order $order, string $status): void
+    {
+        match ($status) {
+            OrderStatusEnum::CONFIRMED->value =>
+                $this->notifications->notifyCustomerConfirmed($order),
+            OrderStatusEnum::READY_FOR_PICKUP->value =>
+                $this->onReadyForPickup($order),
+            OrderStatusEnum::PICKED_UP->value =>
+                $this->notifications->notifyCustomerPickedUp($order),
+            OrderStatusEnum::ON_THE_WAY->value =>
+                $this->notifications->notifyCustomerOnTheWay($order),
+            OrderStatusEnum::DELIVERED->value =>
+                $this->notifications->notifyCustomerDelivered($order),
+            OrderStatusEnum::CANCELLED->value =>
+                $this->notifications->notifyCustomerCancelled($order),
+            OrderStatusEnum::REJECTED->value =>
+                $this->notifications->notifyCustomerRejected($order),
+            default => null,
+        };
     }
 
     private function onReadyForPickup(Order $order)
