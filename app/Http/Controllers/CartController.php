@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BusinessProduct;
+use App\Models\BusinessProductExtra;
+use App\Models\BusinessProductVariation;
+use App\Models\Product;
+use App\Models\Extra;
+use App\Models\Variation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -9,29 +15,63 @@ class CartController extends Controller
 {
     public function store(Request $request)
     {
+
         $cart = $request->session()->get('cart', []);
 
-        $itemData = $request->validate([
+        $validated = $request->validate([
             'id' => 'required|integer',
-            'businesses_id' => 'required|integer',
-            'name' => 'required|string',
-            'price' => 'required|numeric',
-            'extras' => 'sometimes|array',
-            'variations' => 'sometimes|array',
-            'notes' => 'nullable|string',
             'quantity' => 'required|integer|min:1',
-        ]);
 
-        $key = $this->buildKey($itemData);
+            'extras' => 'sometimes|array',
+            'extras.*.id' => 'required|integer',
+            'extras.*.name' => 'required|string',
+            'extras.*.price' => 'required|numeric',
+
+            'variations' => 'sometimes|array',
+            'variations.*.id' => 'required|integer',
+            'variations.*.name' => 'required|string',
+
+            'notes' => 'nullable|string',
+        ]);
+        
+        $extraIds = collect($validated['extras'] ?? [])->pluck('id')->toArray();
+        $variationIds = collect($validated['variations'] ?? [])->pluck('id')->toArray();
+
+        $product    = BusinessProduct::findOrFail($validated['id']);
+        $extras     = BusinessProductExtra::whereIn('id', $extraIds)->get();
+        $variations = BusinessProductVariation::whereIn('id', $variationIds)->get();
+
+        $item = [
+            'id' => $product->id,
+            'businesses_id' => $product->businesses_id,
+            'name' => $product->name,
+            'price' => $product->price, 
+            'extras' => $extras->map(fn ($e) => [
+                'id' => $e->id,
+                'name' => $e->name,
+                'price' => $e->price,
+            ])->values()->toArray(),
+            'variations' => $variations->map(fn ($v) => [
+                'id' => $v->id,
+                'name' => $v->name,
+                'price' => $v->price,
+            ])->values()->toArray(),
+            'notes' => $validated['notes'] ?? null,
+            'quantity' => $validated['quantity'],
+        ];
+
+        $key = $this->buildKey($item);
 
         if (isset($cart[$key])) {
-            $cart[$key]['quantity'] += $itemData['quantity'];
+            $cart[$key]['quantity'] += $item['quantity'];
         } else {
-            $itemData['key'] = $key;
-            $cart[$key] =  $itemData;
+            $item['key'] = $key;
+            $cart[$key] = $item;
         }
 
         $request->session()->put('cart', $cart);
+
+           
 
         return Redirect::back();
     }
@@ -40,23 +80,21 @@ class CartController extends Controller
     {
         $cart = $request->session()->get('cart', []);
 
-        if (isset($cart[$key])) {
-            $validated = $request->validate([
-                'quantity' => 'sometimes|integer',
-                'notes' => 'sometimes|nullable|string',
-            ]);
+        if (!isset($cart[$key])) {
+            return Redirect::back();
+        }
 
-            if (isset($validated['quantity'])) {
-                if ($validated['quantity'] > 0) {
-                    $cart[$key]['quantity'] = $validated['quantity'];
-                } else {
-                    unset($cart[$key]);
-                }
-            }
+        $validated = $request->validate([
+            'quantity' => 'sometimes|integer|min:1',
+            'notes' => 'sometimes|nullable|string',
+        ]);
 
-            if (isset($validated['notes'])) {
-                $cart[$key]['notes'] = $validated['notes'];
-            }
+        if (isset($validated['quantity'])) {
+            $cart[$key]['quantity'] = $validated['quantity'];
+        }
+
+        if (array_key_exists('notes', $validated)) {
+            $cart[$key]['notes'] = $validated['notes'];
         }
 
         $request->session()->put('cart', $cart);
@@ -68,9 +106,7 @@ class CartController extends Controller
     {
         $cart = $request->session()->get('cart', []);
 
-        if (isset($cart[$key])) {
-            unset($cart[$key]);
-        }
+        unset($cart[$key]);
 
         $request->session()->put('cart', $cart);
 
@@ -79,11 +115,8 @@ class CartController extends Controller
 
     private function buildKey(array $item): string
     {
-        $extras = $item['extras'] ?? [];
-        $variations = $item['variations'] ?? [];
-
-        ksort($extras);
-        ksort($variations);
+        $extras = collect($item['extras'])->pluck('id')->sort()->values();
+        $variations = collect($item['variations'])->pluck('id')->sort()->values();
 
         return sha1(
             $item['id'] .
@@ -91,5 +124,4 @@ class CartController extends Controller
             json_encode($variations)
         );
     }
-
 }
