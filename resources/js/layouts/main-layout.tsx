@@ -1,9 +1,10 @@
 import { usePage } from '@inertiajs/react';
-import { ReactNode, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { ReactNode, useEffect, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 
 import Header from '@/components/app/Header';
 import MobileSidebar from '@/components/app/MobileSidebar';
+import { messaging, onMessage } from '@/firebase';
 import { usePwaUpdate } from '@/hooks/usePwaUpdate';
 import { CartFloatButton } from '@/pages/public/business/CartFloatButton';
 import { CartDrawer } from '@/pages/public/business/drawer-cart';
@@ -26,6 +27,27 @@ export default function MainLayout({
     const user = auth?.user;
     const totalItems = items.length;
     const { updateAvailable, refreshApp } = usePwaUpdate();
+
+    useEffect(() => {
+        if (!messaging) return;
+
+        const unsubscribe = onMessage(messaging, (payload) => {
+            const title =
+                payload.notification?.title ||
+                payload.data?.title ||
+                'Nuevo pedido';
+            const body = payload.notification?.body || payload.data?.body || '';
+
+            toast.success(
+                <div>
+                    <p className="font-bold">{title}</p>
+                    <p className="text-[10px]">{body}</p>
+                </div>,
+            );
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     return (
         <ProviderLayout>
