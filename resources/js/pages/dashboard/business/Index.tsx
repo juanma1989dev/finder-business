@@ -183,10 +183,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
         (o) => o.status === OrderStatus.PENDING,
     ).length;
 
-    useEffect(() => {
-        console.log('ORDERS STATE UPDATED:', ordersState);
-    }, [ordersState]);
-
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
             <div className="flex min-h-screen flex-col gap-3 bg-purple-50/30 p-2 sm:p-2 lg:p-4">
