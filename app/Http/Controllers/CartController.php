@@ -8,44 +8,78 @@ use App\Models\BusinessProductVariation;
 use App\Models\Product;
 use App\Models\Extra;
 use App\Models\Variation;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
-class CartController extends Controller
+class StoreCartItemRequest extends FormRequest
 {
-    public function store(Request $request)
+    public function rules(): array
     {
-
-        $cart = $request->session()->get('cart', []);
-
-        $validated = $request->validate([
+        return [
             'id' => 'required|integer',
             'quantity' => 'required|integer|min:1',
 
             'extras' => 'sometimes|array',
             'extras.*.id' => 'required|integer',
-            'extras.*.name' => 'required|string',
-            'extras.*.price' => 'required|numeric',
 
             'variations' => 'sometimes|array',
             'variations.*.id' => 'required|integer',
-            'variations.*.name' => 'required|string',
 
             'notes' => 'nullable|string',
-        ]);
-        
-        $extraIds = collect($validated['extras'] ?? [])->pluck('id')->toArray();
-        $variationIds = collect($validated['variations'] ?? [])->pluck('id')->toArray();
+        ];
+    }
+}
 
-        $product    = BusinessProduct::findOrFail($validated['id']);
-        $extras     = BusinessProductExtra::whereIn('id', $extraIds)->get();
+
+class CartService
+{
+    public function add(array $item, $request): void
+    {
+        $cart = $request->session()->get('cart', []);
+
+        $key = $this->buildKey($item);
+
+        if (isset($cart[$key])) {
+            $cart[$key]['quantity'] += $item['quantity'];
+        } else {
+            $item['key'] = $key;
+            $cart[$key] = $item;
+        }
+
+        $request->session()->put('cart', $cart);
+    }
+
+    private function buildKey(array $item): string
+    {
+        $extras = collect($item['extras'])->pluck('id')->sort()->values();
+        $variations = collect($item['variations'])->pluck('id')->sort()->values();
+
+        return sha1(
+            $item['id'] .
+            json_encode($extras) .
+            json_encode($variations)
+        );
+    }
+}
+
+class BuildCartItem
+{
+    public function execute(array $validated): array
+    {
+        $extraIds = collect($validated['extras'] ?? [])->pluck('id');
+        $variationIds = collect($validated['variations'] ?? [])->pluck('id');
+
+        $product = BusinessProduct::findOrFail($validated['id']);
+
+        $extras = BusinessProductExtra::whereIn('id', $extraIds)->get();
         $variations = BusinessProductVariation::whereIn('id', $variationIds)->get();
 
-        $item = [
+        return [
             'id' => $product->id,
             'businesses_id' => $product->businesses_id,
             'name' => $product->name,
-            'price' => $product->price, 
+            'price' => $product->price,
             'extras' => $extras->map(fn ($e) => [
                 'id' => $e->id,
                 'name' => $e->name,
@@ -59,69 +93,20 @@ class CartController extends Controller
             'notes' => $validated['notes'] ?? null,
             'quantity' => $validated['quantity'],
         ];
+    }
+}
 
-        $key = $this->buildKey($item);
+class CartController extends Controller
+{
+    public function store(
+        StoreCartItemRequest $request,
+        BuildCartItem $builder,
+        CartService $cartService
+    ) {
+        $item = $builder->execute($request->validated());
 
-        if (isset($cart[$key])) {
-            $cart[$key]['quantity'] += $item['quantity'];
-        } else {
-            $item['key'] = $key;
-            $cart[$key] = $item;
-        }
-
-        $request->session()->put('cart', $cart);
-
-           
+        $cartService->add($item, $request);
 
         return Redirect::back();
-    }
-
-    public function update(Request $request, $key)
-    {
-        $cart = $request->session()->get('cart', []);
-
-        if (!isset($cart[$key])) {
-            return Redirect::back();
-        }
-
-        $validated = $request->validate([
-            'quantity' => 'sometimes|integer|min:1',
-            'notes' => 'sometimes|nullable|string',
-        ]);
-
-        if (isset($validated['quantity'])) {
-            $cart[$key]['quantity'] = $validated['quantity'];
-        }
-
-        if (array_key_exists('notes', $validated)) {
-            $cart[$key]['notes'] = $validated['notes'];
-        }
-
-        $request->session()->put('cart', $cart);
-
-        return Redirect::back();
-    }
-
-    public function destroy(Request $request, $key)
-    {
-        $cart = $request->session()->get('cart', []);
-
-        unset($cart[$key]);
-
-        $request->session()->put('cart', $cart);
-
-        return Redirect::back();
-    }
-
-    private function buildKey(array $item): string
-    {
-        $extras = collect($item['extras'])->pluck('id')->sort()->values();
-        $variations = collect($item['variations'])->pluck('id')->sort()->values();
-
-        return sha1(
-            $item['id'] .
-            json_encode($extras) .
-            json_encode($variations)
-        );
     }
 }
