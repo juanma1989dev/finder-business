@@ -2,6 +2,7 @@ import { messaging, onMessage } from '@/firebase';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Business, Order, OrderStatus } from '@/types';
 import { router } from '@inertiajs/react';
+import axios from 'axios';
 import { Power, PowerOff, Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -78,7 +79,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
             if (reloadTimeoutRef.current) {
                 clearTimeout(reloadTimeoutRef.current);
             }
-
             syncOrdersDelta();
         });
     }, []);
@@ -122,6 +122,7 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                     toast.success('Pedido actualizado');
                     setReasonDialog({ open: false });
                     setNoteText('');
+                    syncOrdersDelta();
                 },
                 onError: () => toast.error('Error al actualizar pedido'),
                 onFinish: () => setLoadingOrderId(null),
@@ -167,13 +168,23 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     };
 
     const syncOrdersDelta = async () => {
-        const res = await fetch(`/test/orders/delta`);
+        try {
+            const response = await axios.get('/dashboard/orders/delta', {
+                headers: {
+                    Accept: 'application/json',
+                },
+                withCredentials: true,
+            });
 
-        const incomingOrders: Order[] = await res.json();
+            const incomingOrders: Order[] = response.data?.orders ?? [];
 
-        if (!incomingOrders.length) return;
+            if (!incomingOrders.length) return;
 
-        setOrdersState((current) => mergeOrders(current, incomingOrders));
+            // setOrdersState((current) => mergeOrders(current, incomingOrders));
+            setOrdersState(incomingOrders);
+        } catch (e) {
+            console.error('Error :: ', e);
+        }
     };
 
     const pendingCount = ordersState.filter(
