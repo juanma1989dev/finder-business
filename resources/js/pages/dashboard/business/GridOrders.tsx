@@ -35,7 +35,6 @@ export default function GridOrders({
 
     if (sortedOrders.length === 0) {
         return (
-            /* PALETA GRIS Y ESTRUCTURA DE ESTADO VACÍO */
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-100 bg-white py-20 text-center">
                 <div className="mb-4 rounded-lg bg-purple-50 p-4 text-gray-300 shadow-sm">
                     <PackageSearch size={40} />
@@ -51,7 +50,6 @@ export default function GridOrders({
     }
 
     return (
-        /* CONFIGURACIÓN DE GRILLA RESPONSIVA Y GAP-4 */
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {sortedOrders.map((order, index) => (
                 <OrderCard
