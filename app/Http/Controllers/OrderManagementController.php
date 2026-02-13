@@ -48,16 +48,22 @@ class OrderManagementController extends Controller
         match ($status) {
             OrderStatusEnum::CONFIRMED->value =>
                 $this->notifications->notifyCustomerConfirmed($order),
+
             OrderStatusEnum::READY_FOR_PICKUP->value =>
                 $this->onReadyForPickup($order),
+
             OrderStatusEnum::PICKED_UP->value =>
                 $this->notifications->notifyCustomerPickedUp($order),
+
             OrderStatusEnum::ON_THE_WAY->value =>
                 $this->notifications->notifyCustomerOnTheWay($order),
+
             OrderStatusEnum::DELIVERED->value =>
                 $this->notifications->notifyCustomerDelivered($order),
+
             OrderStatusEnum::CANCELLED->value =>
                 $this->notifications->notifyCustomerCancelled($order),
+                
             OrderStatusEnum::REJECTED->value =>
                 $this->notifications->notifyCustomerRejected($order),
             default => null,

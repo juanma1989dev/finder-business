@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\UserTypeEnum;
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class OrderNotificationService
 {
@@ -122,10 +123,10 @@ class OrderNotificationService
         //     'is_read' => false,
         // ]);
     }
-
      
     public function notifyCustomerConfirmed(Order $order)
     {
+        Log::error('notifyCustomerConfirmed ::' . json_encode($order) );
         $this->sendToUser(
             $order->user,
             'Pedido confirmado ✅',
@@ -135,6 +136,7 @@ class OrderNotificationService
 
     public function notifyCustomerPickedUp(Order $order)
     {
+         Log::error('notifyCustomerPickedUp ::' . json_encode($order) );
         $this->sendToUser(
             $order->user,
             'Pedido recogido 🚴',
@@ -144,6 +146,7 @@ class OrderNotificationService
 
     public function notifyCustomerOnTheWay(Order $order)
     {
+         Log::error('notifyCustomerOnTheWay ::' . json_encode($order) );
         $this->sendToUser(
             $order->user,
             'Pedido en camino 🚚',
@@ -153,6 +156,7 @@ class OrderNotificationService
 
     public function notifyCustomerCancelled(Order $order)
     {
+         Log::error('notifyCustomerCancelled ::' . json_encode($order) );
         $this->sendToUser(
             $order->user,
             'Pedido cancelado ❌',
@@ -162,6 +166,7 @@ class OrderNotificationService
 
     public function notifyCustomerRejected(Order $order)
     {
+         Log::error('notifyCustomerRejected ::' . $order->toArray() );
         $this->sendToUser(
             $order->user,
             'Pedido rechazado ❌',

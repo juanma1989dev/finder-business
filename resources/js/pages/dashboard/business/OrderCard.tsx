@@ -18,7 +18,6 @@ export default function OrderCard({
     const actions = flow[status] ?? [];
 
     const isLate = status === OrderStatus.PENDING && order.minutes_waiting > 10;
-
     return (
         <div
             className={`relative flex flex-col rounded-lg bg-white p-3 shadow-sm transition-all duration-900 ${
