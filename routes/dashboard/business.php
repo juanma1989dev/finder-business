@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BusinessOrdersDeltaController;
 use App\Http\Controllers\Dashboard\Business\GalleryController;
 use App\Http\Controllers\Dashboard\Business\InfoGeneralController;
 use App\Http\Controllers\Dashboard\Business\ProductsController;
@@ -44,6 +45,7 @@ use Illuminate\Support\Facades\Route;
         });
 
         # Ordenes
+        Route::get('orders/delta', [BusinessOrdersDeltaController::class, 'delta']);
         Route::resource('orders', OrderManagementController::class)->only(['index', 'show']);
         Route::patch('orders/{order}/status', [OrderManagementController::class, 'updateStatus'])->name('orders.status');
     });
