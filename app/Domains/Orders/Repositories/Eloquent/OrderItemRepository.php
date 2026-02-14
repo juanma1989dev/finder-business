@@ -1,10 +1,10 @@
 <?php 
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Orders\Repositories\Eloquent;
 
-use App\Models\OrderItem;
-use App\Models\OrderItemExtra;
-use App\Models\OrderItemVariation;
+use App\Domains\Orders\Models\OrderItem;
+use App\Domains\Orders\Models\OrderItemExtra;
+use App\Domains\Orders\Models\OrderItemVariation;
 
 class OrderItemRepository
 {

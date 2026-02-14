@@ -1,16 +1,16 @@
-<?php 
+<?php
 
-namespace App\Models;
+namespace App\Domains\Orders\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderItemVariation extends Model
+class OrderItemExtra extends Model
 {
     protected $fillable = [
         'order_item_id',
-        'variation_id',
-        'variation_name',
+        'extra_id',
+        'extra_name',
         'price',
     ];
 

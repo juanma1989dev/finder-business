@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Services\Public;
+namespace App\Domains\Orders\Services;
 
 use App\Models\BusinessProduct;
 

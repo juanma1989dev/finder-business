@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Orders\Repositories\Eloquent;
 
-use App\Models\Order;
+use App\Domains\Orders\Models\Order;
 
 class OrderRepository
 {

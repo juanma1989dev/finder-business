@@ -1,7 +1,9 @@
 <?php 
 
-namespace App\Models;
+namespace App\Domains\Orders\Models;
 
+use App\Models\Businesses;
+use App\Models\BusinessProduct;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

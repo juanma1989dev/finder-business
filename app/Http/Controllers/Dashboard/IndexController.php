@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Enums\OrderStatusEnum;
+use App\Domains\Orders\Enums\OrderStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Businesses;
 use Illuminate\Http\Request;

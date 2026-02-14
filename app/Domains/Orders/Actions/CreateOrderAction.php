@@ -1,14 +1,14 @@
 <?php 
 
-namespace App\Actions\Orders;
+namespace App\Domains\Orders\Actions;
 
-use App\Enums\OrderStatusEnum;
+use App\Domains\Orders\Enums\OrderStatusEnum;
+use App\Domains\Orders\Models\Order;
+use App\Domains\Orders\Repositories\Eloquent\OrderItemRepository;
+use App\Domains\Orders\Repositories\Eloquent\OrderRepository;
+use App\Domains\Orders\Services\OrderPricingService;
 use App\Models\BusinessProduct;
-use App\Models\Order;
-use App\Repositories\Laravel\OrderItemRepository;
-use App\Repositories\Laravel\OrderRepository;
 use App\Services\FcmNotificationService;
-use App\Services\Public\OrderPricingService;
 use App\Services\Public\ProductAvailabilityService;
 use Illuminate\Support\Facades\DB;
 

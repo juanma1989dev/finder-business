@@ -2,13 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\OrderStatusEnum;
-use App\Enums\UserTypeEnum;
-use App\Flows\BusinessFlow;
-use App\Flows\ClientFlow;
-use App\Flows\DeliveryFlow;
-use App\Flows\OrderFlow;
-use Illuminate\Foundation\Inspiring;
+use App\Domains\Orders\Flows\OrderFlow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;

@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Actions\Orders;
+namespace App\Domains\Orders\Actions;
 
 use App\Flows\OrderFlow;
 use App\Models\Order;

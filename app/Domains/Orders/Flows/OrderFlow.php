@@ -1,8 +1,8 @@
 <?php 
 
-namespace App\Flows;
+namespace App\Domains\Orders\Flows;
 
-use App\Enums\OrderStatusEnum;
+use App\Domains\Orders\Enums\OrderStatusEnum;
 use App\Enums\UserTypeEnum;
 
 class OrderFlow 

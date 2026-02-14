@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Actions\Orders\CreateOrderAction;
+use App\Domains\Orders\Actions\CreateOrderAction;
+use App\Domains\Orders\Models\Order;
 use App\Http\Controllers\Controller;
-use App\Models\Order;
 use Illuminate\Http\Request;
 
 class ShoppingCartController extends Controller
