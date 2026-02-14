@@ -7,6 +7,7 @@ use App\Enums\UserTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\Notifications\OrderStatusNotificationDispatcher;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,12 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private OrderStatusNotificationDispatcher $dispatcher
+    )
+    {
+    }
+
     public function updateStatus(Request $request, Order $order)
     {   
     }
@@ -43,18 +50,18 @@ class OrderController extends Controller
                 return response()->json([]);
             }
 
-            $orders = cache()->remember(
-                'available_orders',
-                30, // segundos (polling ligero)
-                function () {
+            // $orders = cache()->remember(
+            //     'available_orders',
+            //     30, // segundos (polling ligero)
+            //     function () {
                     return Order::query()
                         ->where('status', OrderStatusEnum::READY_FOR_PICKUP->value)
                         ->whereNull('delivery_id')
                         ->orderBy('ready_for_pickup_at')
                         ->limit(10)
                         ->get();
-                }
-            );
+            //     }
+            // );
 
             return response()->json($orders);
         } catch(Exception $e){
@@ -64,7 +71,6 @@ class OrderController extends Controller
 
     public function accept(Order $order)
     {
-
         $delivery = User::with('deliveryProfile.status')->find(Auth::id());
 
 
@@ -102,12 +108,14 @@ class OrderController extends Controller
             }
 
             // 🔒 Intentar asignar pedido (update atómico)
+            $nextStatus = OrderStatusEnum::PICKED_UP->value;
+
             $updated = Order::where('id', $order->id)
                 ->where('status', OrderStatusEnum::READY_FOR_PICKUP->value)
                 ->whereNull('delivery_id')
                 ->update([
                     'delivery_id' => $delivery->id,
-                    'status' => OrderStatusEnum::PICKED_UP->value,
+                    'status' => $nextStatus,
                     'picked_up_at' => now(),
                 ]);
 
@@ -118,15 +126,9 @@ class OrderController extends Controller
                 ], 409);
             }
 
-            // 🚫 Desactivar disponibilidad automáticamente
-            // $delivery->update([
-            //     'is_available' => false
-            // ]);
-
-            // 🧹 Limpiar cache si aplica
-            Cache::forget('available_orders');
-
             DB::commit();
+
+            $this->dispatcher->dispatch($order, $nextStatus);  
 
             return response()->json([
                 'message' => 'Pedido aceptado correctamente',
@@ -163,14 +165,15 @@ class OrderController extends Controller
                 ], 422);
             }
 
+            $nextStatus = OrderStatusEnum::ON_THE_WAY->value;
+
             $order->update([
-                'status'        => OrderStatusEnum::ON_THE_WAY->value,
+                'status'        => $nextStatus,
                 'on_the_way_at' => now(),
             ]);
 
-            // return response()->json([
-            //     'message' => 'Pedido en camino',
-            // ]);
+            $this->dispatcher->dispatch($order, $nextStatus);  
+
             return back();
 
         }catch(Exception $e){
@@ -197,10 +200,14 @@ class OrderController extends Controller
                 ], 422);
             }
 
+            $nextStatus = OrderStatusEnum::DELIVERED->value;
+
             $order->update([
-                'status'        => OrderStatusEnum::DELIVERED->value,
+                'status'        => $nextStatus,
                 'delivered_at'  => now(),
             ]);
+
+            $this->dispatcher->dispatch($order, $nextStatus);
 
             // return response()->json([
             //     'message' => 'Pedido entregado correctamente',
