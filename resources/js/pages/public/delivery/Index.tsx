@@ -9,6 +9,7 @@ import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
 import { OrderStatus, SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import { Timer, User2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -21,6 +22,10 @@ type Order = {
     distance?: number | string;
     [key: string]: any;
 };
+
+interface ApiError {
+    message: string;
+}
 
 interface Props {
     activeOrder: any;
@@ -125,37 +130,31 @@ export default function Index({ activeOrder }: Props) {
             setIsAccepting(true);
 
             try {
-                const response = await fetch(
+                const response = await axios.post(
                     `/delivery/orders/${orderId}/accept`,
+                    {},
                     {
-                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': getCsrfToken(), // Asegúrate de que esta función devuelva el string del token
                         },
+                        withCredentials: true,
                     },
                 );
-
-                const data = await response
-                    .json()
-                    .catch((err) => console.error('ALL ERROR :: ', err));
-
-                if (!response.ok) {
-                    clearIncomingOrder();
-
-                    toast.error(
-                        data?.message ?? 'Este pedido ya no está disponible',
-                    );
-                    return;
-                }
 
                 toast.success('Pedido aceptado 🚴‍♂️');
 
                 clearIncomingOrder();
 
                 router.reload({ only: ['activeOrder'] });
-            } catch (e) {
-                toast.error('Error de conexión');
+            } catch (error) {
+                clearIncomingOrder();
+
+                if (axios.isAxiosError<ApiError>(error)) {
+                    const message =
+                        error.response?.data?.message ?? 'Error inesperado';
+
+                    toast.error(message);
+                }
             } finally {
                 setIsAccepting(false);
             }
@@ -219,7 +218,6 @@ export default function Index({ activeOrder }: Props) {
         };
     }, [incomingOrder, clearIncomingOrder]);
 
-    /* -------------------------- FCM onMessage handler ----------------------- */
     useEffect(() => {
         if (!messaging) return;
 
