@@ -1,6 +1,6 @@
 import { getMetaValue } from '@/helpers';
 import { SharedData } from '@/types';
-import emailjs from '@emailjs/browser';
+// import emailjs from '@emailjs/browser';
 import { router, useForm } from '@inertiajs/react';
 import { ArrowBigLeft, MessageSquare } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -48,22 +48,22 @@ export default function GenerateCode({
                     email: user?.email,
                 };
 
-                emailjs
-                    .send(
-                        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-                        templateParams,
-                        {
-                            publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-                        },
-                    )
-                    .then(
-                        () => {
-                            setStausCodeValidation(true);
-                            setGeneratedCode(code);
-                        },
-                        () => toast.error('Error al enviar el código.'),
-                    );
+                // emailjs
+                //     .send(
+                //         import.meta.env.VITE_EMAILJS_SERVICE_ID,
+                //         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+                //         templateParams,
+                //         {
+                //             publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+                //         },
+                //     )
+                //     .then(
+                //         () => {
+                //             setStausCodeValidation(true);
+                //             setGeneratedCode(code);
+                //         },
+                //         () => toast.error('Error al enviar el código.'),
+                //     );
             },
             onError: () => toast.error('Error al generar el código.'),
         });
