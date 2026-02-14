@@ -236,6 +236,7 @@ export interface Order {
     created_at: string;
     items: OrderItem[];
     user: User;
+    updated_at: string;
 }
 
 export type UserType = 'client' | 'business' | 'delivery';
