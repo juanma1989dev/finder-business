@@ -1,0 +1,1 @@
+import{e as u,r as n,j as o}from"./vendor-core-CVn978f7.js";import{r as a,i as c}from"./firebase-B2pyU7xz.js";function p({children:i}){const{auth:r}=u().props,e=n.useRef(!1);return n.useEffect(()=>{if(e.current)return;const t=r?.user;if(!t?.id)return;e.current=!0;const s=t.fcm_tokens?.token??null;a(s),c(s)},[r?.user?.id]),o.jsx(o.Fragment,{children:i})}export{p as P};

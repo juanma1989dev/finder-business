@@ -1,0 +1,1 @@
+import{j as m}from"./vendor-core-CVn978f7.js";import{A as i}from"./auth-simple-layout-C9pdbu0H.js";function x({children:t,title:o,subTitle:r,description:u,bannerImage:s,...a}){return m.jsx(i,{title:o,description:u,subTitle:r,bannerImage:s,...a,children:t})}export{x as A};
