@@ -22,13 +22,9 @@ class IndexController extends Controller
                 ->with(['items', 'user'])
                 ->latest()
                 ->get(),
+                'final_statuses' =>  OrderStatusEnum::finalStatuses(),
         ];
 
         return inertia('dashboard/business/Index', $data);
-    }
-
-    public function refresh()
-    {
-        
     }
 }
