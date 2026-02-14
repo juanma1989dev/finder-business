@@ -23,12 +23,20 @@ interface Props {
     breadcrumbs: BreadcrumbItem[];
     orders: Order[];
     business: Business;
+    final_statuses: string[];
 }
 
-export default function Index({ breadcrumbs, orders, business }: Props) {
+export default function Index({
+    breadcrumbs,
+    orders,
+    business,
+    final_statuses,
+}: Props) {
     const [isBusinessOpen, setIsBusinessOpen] = useState(
         Boolean(business?.is_open),
     );
+
+    const finalStatuses = final_statuses;
 
     const [activeTab, setActiveTab] = useState<Tabs>(Tabs.Todos);
     const [search, setSearch] = useState('');
@@ -44,6 +52,8 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     const [noteText, setNoteText] = useState('');
 
     const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
@@ -119,7 +129,7 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success('Pedido actualizado');
+                    // toast.success('Pedido actualizado');
                     setReasonDialog({ open: false });
                     setNoteText('');
                     syncOrdersDelta();
@@ -153,35 +163,41 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
     const mergeOrders = (current: Order[], incoming: Order[]) => {
         const map = new Map<number, Order>();
 
-        // 1. Órdenes actuales
         current.forEach((order) => {
             map.set(order.id, order);
         });
 
-        // 2. Nuevas o actualizadas
         incoming.forEach((order) => {
-            map.set(order.id, order); // replace si existe
+            if (finalStatuses.includes(order.status)) {
+                map.delete(order.id);
+            } else {
+                map.set(order.id, order);
+            }
         });
 
-        // 3. Retornar ordenadas (opcional pero recomendado)
         return Array.from(map.values());
     };
 
     const syncOrdersDelta = async () => {
         try {
             const response = await axios.get('/dashboard/orders/delta', {
-                headers: {
-                    Accept: 'application/json',
+                params: {
+                    since: lastSyncAt,
                 },
                 withCredentials: true,
             });
 
             const incomingOrders: Order[] = response.data?.orders ?? [];
 
-            if (!incomingOrders.length) return;
+            if (incomingOrders.length) {
+                const newestDate = incomingOrders
+                    .map((o: Order) => new Date(o.updated_at).getTime())
+                    .sort((a, b) => b - a)[0];
 
-            // setOrdersState((current) => mergeOrders(current, incomingOrders));
-            setOrdersState(incomingOrders);
+                setLastSyncAt(new Date(newestDate).toISOString());
+            }
+
+            setOrdersState((current) => mergeOrders(current, incomingOrders));
         } catch (e) {
             console.error('Error :: ', e);
         }
@@ -270,7 +286,6 @@ export default function Index({ breadcrumbs, orders, business }: Props) {
                 </div>
             </div>
 
-            {/* DIÁLOGO DE NOTAS/MOTIVOS */}
             <NotesDialog
                 open={reasonDialog.open}
                 value={noteText}
