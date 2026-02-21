@@ -1,11 +1,13 @@
 <?php 
 
-namespace App\Models;
+namespace App\Domains\Businesses\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class BusinessUser extends Pivot   
 {
+    // protected $table = 'businesses_user';
+
     public $timestamps = false;
     public $incrementing = false;
 

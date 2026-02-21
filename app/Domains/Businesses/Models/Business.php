@@ -1,18 +1,24 @@
 <?php
 
-namespace App\Models;
+namespace App\Domains\Businesses\Models;
 
 use App\Domains\Orders\Models\Order;
+use App\Domains\Users\Models\User;
+use App\Models\Amenity;
+use App\Models\BusinessProduct;
+use App\Models\Payments;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 
-class Businesses extends Model
+class Business extends Model
 {
     use HasFactory; 
     use HasSpatial;
+
+    protected $table = 'business';  
 
     protected $fillable = [
         'category_id',
@@ -62,12 +68,12 @@ class Businesses extends Model
 
     public function amenities()
     {
-        return $this->belongsToMany(Amenity::class);
+        return $this->belongsToMany(Amenity::class, 'business_amenities');
     }
 
     public function payments()
     {
-        return $this->belongsToMany(Payments::class);
+        return $this->belongsToMany(Payments::class, 'business_payments');
     }
 
     public function socialNetworks()

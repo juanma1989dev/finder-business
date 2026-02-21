@@ -156,7 +156,7 @@ export default function Products({
                                                 className="h-8 w-8 cursor-pointer rounded-lg text-gray-300 transition-colors hover:bg-red-50 hover:text-red-600 active:scale-95"
                                                 onClick={() =>
                                                     handleDeleteService(
-                                                        service.businesses_id,
+                                                        service.business_id,
                                                         service.id,
                                                     )
                                                 }

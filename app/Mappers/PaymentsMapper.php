@@ -2,13 +2,13 @@
 
 namespace App\Mappers;
 
-use App\Models\Businesses;
+use App\Domains\Businesses\Models\Business;
 use App\Models\Payments;
 use Illuminate\Support\Collection;
 
 class PaymentsMapper 
 {
-    public static function toArray(Collection $payments)
+    public static function toArray(Collection $payments): array
     {
         return $payments->map(function(Payments $payment){
             return [

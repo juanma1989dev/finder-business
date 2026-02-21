@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\Notifications\Handlers;
+namespace App\Domains\Orders\Notifications\Handlers;
 
+use App\Domains\Orders\Models\Order;
 use App\Enums\UserTypeEnum;
-use App\Models\Order;
-use App\Models\User;
+use App\Domains\Users\Models\User;
 use App\Services\Notifications\PushNotificationService;
 
 class DeliveryRepository 

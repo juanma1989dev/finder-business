@@ -98,7 +98,7 @@ export interface ProductVariations {
 
 export interface ServicesAndProducts {
     id?: string;
-    businesses_id: string;
+    business_id: string;
     name: string;
     description: string;
     price: number;

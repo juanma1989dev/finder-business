@@ -12,18 +12,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('businesses_user', function (Blueprint $table) {
+        Schema::create('business_user', function (Blueprint $table) { 
             $table->foreignId('user_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('businesses_id')
+            $table->foreignId('business_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
             $table->boolean('is_favorite')->default(true);
 
-            $table->primary(['user_id', 'businesses_id']);
+            $table->primary(['user_id', 'business_id']);
         });
 
     }
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('businesses_user');
+        Schema::drop('business_user');
     }
 };

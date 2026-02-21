@@ -1,24 +1,25 @@
 <?php
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Businesses\Repositories;
 
 use App\DTOs\SchedulesDTO;
-use App\Models\Businesses;
+use App\Domains\Businesses\Models\Business;
 use App\Models\BusinessProductExtra;
 use App\Models\BusinessProductVariation;
-use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Repositories\Laravel\BaseRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class BusinessRepository extends BaseRepository implements BusinessRepositoryInterface
 {
-    public function __construct(Businesses $model)
+    public function __construct(Business $model)
     {
         $this->model = $model;
     }
 
-    public function syncAmenities($id, array $services = []): Businesses
+    public function syncAmenities($id, array $services = []): Business
     {
         $business = $this->findById($id);
         $business->amenities()->sync($services);
@@ -26,7 +27,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         return $business;
     }
 
-    public function syncPayments(string $id, array $payments = []): Businesses
+    public function syncPayments(string $id, array $payments = []): Business
     {
         $business = $this->findById($id);
         $business->payments()->sync($payments);
@@ -34,7 +35,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         return $business;
     }
 
-    public function updateSchedules(string $id, SchedulesDTO $schedules): Businesses
+    public function updateSchedules(string $id, SchedulesDTO $schedules): Business
     {
         $business = $this->findById($id);
 
@@ -45,7 +46,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
             
             foreach($schedules->data ?? [] as $schedule){
                 $newSchedule = $schedule->toArray();
-                $newSchedule['businesses_id'] = $business->id;
+                $newSchedule['business_id'] = $business->id;
                 $hoursData[] = $newSchedule;
             }
 
@@ -65,7 +66,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         $business = $this->findById($id);
 
         $business->socialNetworks()->updateOrCreate(
-            ['businesses_id' => $business->id],
+            ['business_id' => $business->id],
             $data
         );
     }
@@ -180,7 +181,7 @@ class BusinessRepository extends BaseRepository implements BusinessRepositoryInt
         ]);
     }
 
-    public function getDetails(int $businessId, ?int $userId): Businesses
+    public function getDetails(int $businessId, ?int $userId): Business
     {
         $relationships = ['category', 'hours', 'amenities', 'payments', 'socialNetworks', 'images']; // productsAndServices
 

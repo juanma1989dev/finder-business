@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Businesses;
+use App\Domains\Businesses\Models\Business;
 use Illuminate\Http\Request;
 
 class BusinessOrdersDeltaController extends Controller
@@ -11,7 +11,7 @@ class BusinessOrdersDeltaController extends Controller
     {
         $user = $request->user();
 
-        $business = Businesses::where('user_id', $user->id)->first();
+        $business = Business::where('user_id', $user->id)->first();
 
         if (!$business) {
             return response()->json([

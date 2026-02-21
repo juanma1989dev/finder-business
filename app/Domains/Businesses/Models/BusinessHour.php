@@ -1,5 +1,5 @@
 <?php
-namespace App\Models;
+namespace App\Domains\Businesses\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +21,6 @@ class BusinessHour extends Model
 
     public function business()
     {
-        return $this->belongsTo(Businesses::class, 'business_id', 'id');
+        return $this->belongsTo(Business::class, 'business_id', 'id');
     }
 }

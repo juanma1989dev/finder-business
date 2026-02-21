@@ -2,8 +2,8 @@
 
 namespace App\Domains\Orders\Models;
 
-use App\Models\Businesses;
-use App\Models\User;
+use App\Domains\Businesses\Models\Business;
+use App\Domains\Users\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +13,7 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'delivery_id',
-        'businesses_id',
+        'business_id',
         'status',
         'subtotal',
         'shipping',
@@ -44,7 +44,6 @@ class Order extends Model
     
     public function business(): BelongsTo /****** */
     {
-        return $this->belongsTo(Businesses::class, 'businesses_id', 'id');
+        return $this->belongsTo(Business::class);
     }
 }
-

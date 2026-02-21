@@ -72,7 +72,7 @@ class CreateOrderAction
 
             $order = $this->orderRepository->create([
                 'user_id' => $userId,
-                'businesses_id' => $items[0]['businesses_id'],
+                'business_id' => $items[0]['business_id'],
                 'status' => OrderStatusEnum::PENDING,
                 'subtotal' => 0,
                 'total' => 0,
@@ -116,7 +116,7 @@ class CreateOrderAction
                     'quantity' => $item['quantity'],
                     'total_price' => $totalPrice,
                     'notes' => $data['notes'] ?? null,
-                    'business_id' => $item['businesses_id'],
+                    'business_id' => $item['business_id'],
                 ]);
 
                 $this->orderItemRepository->createExtras($orderItem, $extras);

@@ -6,7 +6,7 @@ use App\DTOs\InfoGeneralDTO;
 use App\Mappers\BusinessMapper; 
 use App\Repositories\Contracts\AmenitiesRepositoryInterface;
 use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
-use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
 use App\Repositories\Contracts\PaymentsRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 

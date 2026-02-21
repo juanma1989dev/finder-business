@@ -6,8 +6,8 @@ use App\DTOs\GalleryBusinessDTO;
 use App\DTOs\ImageBusinessDTO;
 use App\DTOs\ImageDTO;
 use App\Mappers\BusinessMapper;
-use App\Models\Businesses;
-use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Domains\Businesses\Models\Business;
+use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
 use App\Repositories\Contracts\GalleryRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +41,7 @@ class GalleryService
 
             $business = $this->businessRepository->findById($businessId);
 
-            $existingImages = $this->galleryRpository->getByBusiness($business);
+            $existingImages = $this->galleryRpository->getGallery($business);
             
             # Si no hay imágenes, eliminar todas
             if($gallery->isEmpty()) {
@@ -64,7 +64,7 @@ class GalleryService
     /**
      * Procesa todas las imágenes (nuevas y existentes)
      */
-    private function processImages(Businesses $business, GalleryBusinessDTO $gallery): array
+    private function processImages(Business $business, GalleryBusinessDTO $gallery): array
     {
         $incomingPaths = [];
 
@@ -75,9 +75,6 @@ class GalleryService
             if (!$path) continue;
             
             $incomingPaths[] = $path;
-
-
-
 
             # Usar repository en lugar de Eloquent directo
             $this->galleryRpository->createOrUpdate(
@@ -136,7 +133,7 @@ class GalleryService
     /**
      * Elimina imágenes que ya no están en el request
      */
-    private function deleteRemovedImages(Businesses $business, array $incomingPaths): void
+    private function deleteRemovedImages(Business $business, array $incomingPaths): void
     {
         $imagesToDelete = $this->galleryRpository->findNotInUrls($business, $incomingPaths);
         
@@ -160,7 +157,7 @@ class GalleryService
     /**
      * Asegura que solo haya una imagen primaria
      */
-    private function ensureSinglePrimaryImage(Businesses $business): void
+    private function ensureSinglePrimaryImage(Business $business): void
     {
         $primaryImages = $this->galleryRpository->getPrimaryImages($business);
 
@@ -170,7 +167,7 @@ class GalleryService
         }
 
         if ($primaryImages->isEmpty() && $this->galleryRpository->hasImages($business)) {
-            $firstImage = $this->galleryRpository->getByBusiness($business)->first();
+            $firstImage = $this->galleryRpository->getGallery($business)->first();
             $this->galleryRpository->setPrimary($firstImage);
         }
     }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('business_social_networks', function(Blueprint $table){
             $table->id();
-            $table->foreignId('businesses_id')
+            $table->foreignId('business_id')
                     ->constrained('businesses')
                     ->cascadeOnDelete()
                     ->unique();

@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Laravel;
 
-use App\Models\User;
+use App\Domains\Users\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Laravel\BaseRepository;
 use Illuminate\Support\Collection;

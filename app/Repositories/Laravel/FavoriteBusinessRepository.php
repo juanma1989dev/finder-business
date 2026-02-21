@@ -2,8 +2,10 @@
 
 namespace App\Repositories\Laravel;
 
-use App\Models\BusinessUser;
-use App\Models\User;
+// use App\Models\BusinessUser;
+
+use App\Domains\Businesses\Models\BusinessUser;
+use App\Domains\Users\Models\User;
 use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
 
 class FavoriteBusinessRepository extends BaseRepository implements FavoriteBusinessRepositoryInterface
@@ -20,7 +22,7 @@ class FavoriteBusinessRepository extends BaseRepository implements FavoriteBusin
         $user = User::findOrFail($userId);
 
         $exists = $user->businesses()
-            ->wherePivot('businesses_id', $businessId)
+            ->wherePivot('business_id', $businessId)
             ->exists();
 
 

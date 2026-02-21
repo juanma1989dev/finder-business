@@ -13,17 +13,17 @@ class ProductsAndServicesMapper
             $image_url = $product->image_url ? "/storage/{$product->image_url}" : null;
 
             return [
-                "id" => $product->id,
-                "businesses_id" => $product->businesses_id,
-                "category" => $product->product_category_id,
-                "name" =>  $product->name,
-                "description" =>  $product->description,
-                "price" =>  $product->price,
-                "duration" =>  $product->duration,
-                "isActive" =>  boolval($product->isActive),
-                "image_url" => $image_url,
-                "extras" => BusinessProductExtrasMapper::toArray($product->extras),
-                "variations" => BusinessProductVariationsMapper::toArray($product->variations)
+                "id"            => $product->id,
+                "business_id"   => $product->business_id,
+                "category"      => $product->product_category_id,
+                "name"          =>  $product->name,
+                "description"   =>  $product->description,
+                "price"         =>  $product->price,
+                "duration"      =>  $product->duration,
+                "isActive"      =>  boolval($product->isActive),
+                "image_url"     => $image_url,
+                "extras"        => BusinessProductExtrasMapper::toArray($product->extras),
+                "variations"    => BusinessProductVariationsMapper::toArray($product->variations)
             ];
         })->toArray();
     }

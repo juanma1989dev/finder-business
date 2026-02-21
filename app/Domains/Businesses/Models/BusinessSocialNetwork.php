@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Domains\Businesses\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +10,7 @@ class BusinessSocialNetwork  extends Model
     use HasFactory;
 
     protected $fillable = [
-        'businesses_id',
+        'business_id',
         'web',
         'instagram',
         'youtube',
@@ -23,6 +23,6 @@ class BusinessSocialNetwork  extends Model
 
     public function business()
     {
-        return $this->belongsTo(Businesses::class);
+        return $this->belongsTo(Business::class);
     }
 }

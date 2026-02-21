@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard\Business;
 use App\DTOs\BusinessDTO;
 use App\DTOs\CoverImageBusinessDTO;
 use App\Http\Controllers\Controller;
-use App\Services\Dashboard\BusinessService;
+use App\Domains\Businesses\Services\BusinessService;
 use Illuminate\Support\Facades\Auth;
 use \Throwable;
 

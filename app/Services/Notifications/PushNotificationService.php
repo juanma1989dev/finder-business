@@ -2,7 +2,7 @@
 
 namespace App\Services\Notifications;
 
-use App\Models\User;
+use App\Domains\Users\Models\User;
 use App\Services\FcmNotificationService;
 
 class PushNotificationService

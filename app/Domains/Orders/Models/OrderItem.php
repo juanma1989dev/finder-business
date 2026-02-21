@@ -2,7 +2,7 @@
 
 namespace App\Domains\Orders\Models;
 
-use App\Models\Businesses;
+use App\Domains\Businesses\Models\Business;
 use App\Models\BusinessProduct;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,6 +48,6 @@ class OrderItem extends Model
 
     public function business(): BelongsTo  
     {
-        return $this->belongsTo(Businesses::class, 'business_id');
+        return $this->belongsTo(Business::class, 'business_id');
     }
 }

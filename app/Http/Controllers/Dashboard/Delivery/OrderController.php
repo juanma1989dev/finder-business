@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Dashboard\Delivery;
 
-use App\Enums\OrderStatusEnum;
-use App\Enums\UserTypeEnum;
+use App\Domains\Orders\Enums\OrderStatusEnum;
+use App\Domains\Orders\Models\Order;
+use App\Domains\Orders\Notifications\OrderStatusNotificationDispatcher;
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\User;
-use App\Services\Notifications\OrderStatusNotificationDispatcher;
+use App\Domains\Users\Models\User;
+use App\Enums\UserTypeEnum;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

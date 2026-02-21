@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\BusinessSearchRequest;
 use App\Http\Requests\Public\SetFavoriteRequest;
-use App\Models\User;
+use App\Domains\Users\Models\User;
 use App\Services\Public\SearchService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Response;

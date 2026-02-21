@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Dashboard\Business;
 
 use App\Http\Controllers\Controller;
-use App\Services\Dashboard\BusinessService;
+use App\Domains\Businesses\Services\BusinessService;
 use Exception;
 use Illuminate\Http\Request;
 

@@ -3,7 +3,7 @@
 namespace App\Services\Dashboard;
 
 use App\DTOs\LocationBusinessDTO;
-use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class LocationService

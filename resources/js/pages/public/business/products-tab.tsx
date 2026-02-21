@@ -27,7 +27,7 @@ export const ProductsBussinessTab = ({ business }: Props) => {
     ) => {
         const itemData = {
             id: product.id!,
-            businesses_id: product.businesses_id,
+            business_id: product.business_id,
             name: product.name,
             price: product.price,
             extras: config.extras,

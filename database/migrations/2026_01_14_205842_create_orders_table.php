@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\OrderStatusEnum;
+use App\Domains\Orders\Enums\OrderStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,7 +20,7 @@ return new class extends Migration
                 ->constrained()
                 ->nullOnDelete();
 
-            $table->foreignId('businesses_id')
+            $table->foreignId('business_id')
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();

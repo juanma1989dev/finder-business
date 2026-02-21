@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Services\Notifications;
+namespace App\Domains\Orders\Notifications;
 
-
-use App\Enums\OrderStatusEnum;
-use App\Models\Order;
-use App\Services\Notifications\Handlers\CancelledHandler;
-use App\Services\Notifications\Handlers\ConfirmedHandler;
-use App\Services\Notifications\Handlers\DeliveredHandler;
-use App\Services\Notifications\Handlers\OnTheWayHandler;
-use App\Services\Notifications\Handlers\PendingHandler;
-use App\Services\Notifications\Handlers\PickupHandler;
-use App\Services\Notifications\Handlers\ReadyForPickupHandler;
-use App\Services\Notifications\Handlers\RejectedHandler;
+use App\Domains\Orders\Enums\OrderStatusEnum;
+use App\Domains\Orders\Models\Order;
+use App\Domains\Orders\Notifications\Handlers\CancelledHandler;
+use App\Domains\Orders\Notifications\Handlers\ConfirmedHandler;
+use App\Domains\Orders\Notifications\Handlers\DeliveredHandler;
+use App\Domains\Orders\Notifications\Handlers\OnTheWayHandler;
+use App\Domains\Orders\Notifications\Handlers\PendingHandler;
+use App\Domains\Orders\Notifications\Handlers\PickupHandler;
+use App\Domains\Orders\Notifications\Handlers\ReadyForPickupHandler;
+use App\Domains\Orders\Notifications\Handlers\RejectedHandler;
 
 class OrderStatusNotificationDispatcher
 {

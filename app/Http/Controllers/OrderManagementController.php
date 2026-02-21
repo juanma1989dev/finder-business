@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Orders\UpdateOrderStatusAction;
-use App\Models\Order;
+use App\Domains\Orders\Actions\UpdateOrderStatusAction;
+use App\Domains\Orders\Models\Order;
 use Illuminate\Http\Request;
 
 class OrderManagementController extends Controller

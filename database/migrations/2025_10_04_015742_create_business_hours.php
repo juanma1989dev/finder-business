@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('business_hours', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('businesses_id')
+            $table->foreignId('business_id')
                 ->constrained('businesses')
                 ->cascadeOnDelete();
 
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->time('close')->nullable();
             $table->boolean('is_open')->default(false);
             $table->timestamps();
-            $table->unique(['businesses_id', 'day']);
+            $table->unique(['business_id', 'day']);
         });
     }
 

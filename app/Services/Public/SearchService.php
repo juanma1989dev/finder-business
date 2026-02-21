@@ -5,7 +5,7 @@ namespace App\Services\Public;
 use App\Http\Requests\Public\BusinessSearchRequest;
 use App\Mappers\BusinessMapper;
 use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
-use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
 use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;

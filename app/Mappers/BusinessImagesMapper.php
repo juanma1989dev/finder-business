@@ -2,7 +2,7 @@
 
 namespace App\Mappers;
 
-use App\Models\BusinessImage;
+use App\Domains\Businesses\Models\BusinessImage;
 use Illuminate\Support\Collection;
 
 class BusinessImagesMapper

@@ -2,7 +2,7 @@
 
 namespace App\Mappers;
 
-use App\Models\BusinessCategory;
+use App\Domains\Businesses\Models\BusinessCategory;
 
 class BusinessCategoryMapper
 {

@@ -5,11 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BusinessProduct;
 use App\Models\BusinessProductExtra;
 use App\Models\BusinessProductVariation;
-use App\Models\Product;
-use App\Models\Extra;
-use App\Models\Variation;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
 class StoreCartItemRequest extends FormRequest
@@ -31,7 +27,6 @@ class StoreCartItemRequest extends FormRequest
     }
 }
 
-
 class CartService
 {
     public function add(array $item, $request): void
@@ -45,6 +40,32 @@ class CartService
         } else {
             $item['key'] = $key;
             $cart[$key] = $item;
+        }
+
+        $request->session()->put('cart', $cart);
+    }
+
+    public function update(string $key, int $quantity, $request): void
+    {
+        $cart = $request->session()->get('cart', []);
+
+        if (isset($cart[$key])) {
+            if ($quantity <= 0) {
+                unset($cart[$key]);
+            } else {
+                $cart[$key]['quantity'] = $quantity;
+            }
+        }
+
+        $request->session()->put('cart', $cart);
+    }
+
+    public function remove(string $key, $request): void
+    {
+        $cart = $request->session()->get('cart', []);
+
+        if (isset($cart[$key])) {
+            unset($cart[$key]);
         }
 
         $request->session()->put('cart', $cart);
@@ -77,7 +98,7 @@ class BuildCartItem
 
         return [
             'id' => $product->id,
-            'businesses_id' => $product->businesses_id,
+            'business_id' => $product->business_id,
             'name' => $product->name,
             'price' => $product->price,
             'extras' => $extras->map(fn ($e) => [
@@ -106,6 +127,24 @@ class CartController extends Controller
         $item = $builder->execute($request->validated());
 
         $cartService->add($item, $request);
+
+        return Redirect::back();
+    }
+
+    public function update($key, \Illuminate\Http\Request $request, CartService $cartService)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:0',
+        ]);
+
+        $cartService->update($key, $request->quantity, $request);
+
+        return Redirect::back();
+    }
+
+    public function destroy($key, \Illuminate\Http\Request $request, CartService $cartService)
+    {
+        $cartService->remove($key, $request);
 
         return Redirect::back();
     }

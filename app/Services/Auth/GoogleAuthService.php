@@ -2,7 +2,7 @@
 
 namespace App\Services\Auth;
 
-use App\Models\User;
+use App\Domains\Users\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -53,17 +53,23 @@ class GoogleAuthService
     /**
      * Crea un nuevo usuario desde los datos de Google
      */
+    /**
+     * Crea un nuevo usuario desde los datos de Google
+     */
     public function createUserFromGoogle(SocialiteUser $googleUser): User
     {
-        return User::create([
+        $action = new \App\Domains\Users\Actions\RegisterUserAction();
+        
+        return $action->execute([
             'name'                => $googleUser->getName(),
             'email'               => $googleUser->getEmail(),
             'type'                => null, 
             'google_id'           => $googleUser->getId(),
-            'password'            => bcrypt(Str::random(16)),
+            'password'            => Str::random(16),
             'privacy_accepted'    => true,
             'privacy_version'     => config('privacy.version'),
             'privacy_accepted_at' => now(),
+            'email_verified_at'   => now(),
         ]);
     }
 
@@ -80,9 +86,13 @@ class GoogleAuthService
     /**
      * Autentica al usuario en la aplicación
      */
+    /**
+     * Autentica al usuario en la aplicación
+     */
     public function loginUser(User $user): void
     {
-        Auth::login($user, true);
+        $action = new \App\Domains\Users\Actions\LoginUserAction();
+        $action->execute($user, true);
     }
 
     /**

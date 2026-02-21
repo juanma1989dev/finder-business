@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Laravel;
 
-use App\Models\BusinessImage;
-use App\Models\Businesses;
+use App\Domains\Businesses\Models\Business;
+use App\Domains\Businesses\Models\BusinessImage;
 use App\Repositories\Contracts\GalleryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -12,7 +12,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Obtiene todas las imágenes de un negocio
      */
-    public function getByBusiness(Businesses $business): Collection
+    public function getGallery(Business $business): Collection
     {
         return $business->images()->get();
     }
@@ -20,7 +20,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Obtiene la imagen primaria de un negocio
      */
-    public function getPrimaryImage(Businesses $business): ?BusinessImage
+    public function getPrimaryImage(Business $business): ?BusinessImage
     {
         return $business->images()->where('is_primary', true)->first();
     }
@@ -28,7 +28,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Obtiene todas las imágenes primarias (para detectar duplicados)
      */
-    public function getPrimaryImages(Businesses $business): Collection
+    public function getPrimaryImages(Business $business): Collection
     {
         return $business->images()->where('is_primary', true)->get();
     }
@@ -39,7 +39,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     public function createOrUpdate(string $businessId, string $url, bool $isPrimary = false): BusinessImage
     {
         return BusinessImage::updateOrCreate(
-            ['businesses_id' => $businessId, 'url' => $url],
+            ['business_id' => $businessId, 'url' => $url],
             ['is_primary' => $isPrimary]
         );
     }
@@ -55,7 +55,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Elimina todas las imágenes de un negocio
      */
-    public function deleteAll(Businesses $business): int
+    public function deleteAll(Business $business): int
     {
         return $business->images()->delete();
     }
@@ -85,7 +85,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Encuentra imágenes por sus URLs
      */
-    public function findByUrls(Businesses $business, array $urls): Collection
+    public function findByUrls(Business $business, array $urls): Collection
     {
         return $business->images()->whereIn('url', $urls)->get();
     }
@@ -93,7 +93,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Encuentra imágenes que NO están en una lista de URLs
      */
-    public function findNotInUrls(Businesses $business, array $urls): Collection
+    public function findNotInUrls(Business $business, array $urls): Collection
     {
         return $business->images()->whereNotIn('url', $urls)->get();
     }
@@ -101,7 +101,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Cuenta las imágenes de un negocio
      */
-    public function count(Businesses $business): int
+    public function count(Business $business): int
     {
         return $business->images()->count();
     }
@@ -109,7 +109,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Verifica si un negocio tiene imágenes
      */
-    public function hasImages(Businesses $business): bool
+    public function hasImages(Business $business): bool
     {
         return $business->images()->exists();
     }
@@ -117,7 +117,7 @@ class GalleryRepository implements GalleryRepositoryInterface
     /**
      * Obtiene imágenes ordenadas (primaria primero)
      */
-    public function getOrderedImages(Businesses $business): Collection
+    public function getOrderedImages(Business $business): Collection
     {
         return $business->images()
             ->orderByDesc('is_primary')

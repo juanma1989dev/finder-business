@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domains\Businesses\Models\Business;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,9 +23,9 @@ class Payments extends Model
     public function businesses()
     {
         return $this->belongsToMany(
-            Businesses::class,
-            'services_by_business',
-            'id_payment',
+            Business::class,
+            'business_payments',
+            'id_payments',
             'id_business'
         );
     }

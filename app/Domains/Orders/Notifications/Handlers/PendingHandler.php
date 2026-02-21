@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services\Notifications\Handlers;
+namespace App\Domains\Orders\Notifications\Handlers;
 
-use App\Models\Order;
+use App\Domains\Orders\Models\Order as ModelsOrder;
 
 class PendingHandler
 {
-    public function handle(Order $order): void
+    public function handle(ModelsOrder $order): void
     {
         dd(1);
     }

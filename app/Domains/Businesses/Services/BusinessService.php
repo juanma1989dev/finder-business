@@ -1,12 +1,12 @@
 <?php 
 
-namespace App\Services\Dashboard;
+namespace App\Domains\Businesses\Services;
 
 use App\DTOs\BusinessDTO;
 use App\DTOs\CoverImageBusinessDTO;
-use App\Models\Businesses;
+use App\Domains\Businesses\Models\Business;
 use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
-use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 
 class BusinessService
@@ -35,6 +35,10 @@ class BusinessService
         return $this->businessRepository->create( $data );
     }
 
+    public function createBusiness(BusinessDTO $dto): Business
+    {
+        return $this->businessRepository->store($dto->toArray());
+    }        
     public function update(BusinessDTO $businessDTO, $idBusiness)
     {
         $business = $this->businessRepository->findById($idBusiness);
@@ -71,7 +75,7 @@ class BusinessService
 
     public function manageOpening(array $data)
     {
-        $model = Businesses::query();
+        $model = Business::query();
         
         $business = $model->findOrFail($data['id']);
         $business->update(['is_open' => $data['status']]);

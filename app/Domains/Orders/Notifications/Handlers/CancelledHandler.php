@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services\Notifications\Handlers;
+namespace App\Domains\Orders\Notifications\Handlers;
 
-use App\Models\Order;
+use App\Domains\Orders\Models\Order;
 
 class CancelledHandler
 {

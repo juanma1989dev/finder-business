@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Domains\Users\Models\User;
 
 test('guests are redirected to the login page', function () {
     $this->get(route('dashboard'))->assertRedirect(route('login'));

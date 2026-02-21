@@ -4,43 +4,46 @@ namespace App\Mappers;
 
 use App\Mappers\PaymentsMapper;
 use App\Mappers\ProductsAndServicesMapper;
-use App\Models\Businesses;
-use App\Models\BusinessSocialNetwork;
-use Illuminate\Support\Str;
+use App\Domains\Businesses\Models\Business;
+use App\Domains\Businesses\Models\BusinessSocialNetwork;
 
 class BusinessMapper
 {
-    public static function toArray(Businesses $bussines)
+    public static function toArray(Business $business): array
     {
-        return [
-            'id'                => $bussines->id,
-            'category_id'       => $bussines->category_id,
-            'name'              => $bussines->name,
-            'slug'              => $bussines->slug, 
-            'is_open'           => $bussines->is_open,
-            'phone'             => $bussines->phone,
-            'use_whatsapp'      => $bussines->use_whatsapp,
-            'slogan'            => $bussines->slogan,
-            'description'       => $bussines->description,
-            'address'           => $bussines->address,
-            'cover_image'       => $bussines->cover_image,
-            'tags'              => self::tags($bussines->tags),
-            'social_networks'   => self::socialNetworks($bussines->socialNetworks),
-            'distance'          => $bussines->distance,
 
-            'products'          => ProductsAndServicesMapper::toArray( $bussines->productsAndServices),
-            'amenities'         => AmenitiesMapper::toArray($bussines->amenities),
-            'payments'          => PaymentsMapper::toArray($bussines->payments) ,
-            'schedules'         => SchedulesMapper::toArray($bussines->hours),
-            'category'          => BusinessCategoryMapper::toArray($bussines->category),
-            'images'            => BusinessImagesMapper::toArray($bussines->images)
+        
+
+        return [
+            'id'                => $business->id,
+            'category_id'       => $business->category_id,
+            'name'              => $business->name,
+            'slug'              => $business->slug, 
+            'is_open'           => $business->is_open,
+            'phone'             => $business->phone,
+            'use_whatsapp'      => $business->use_whatsapp,
+            'slogan'            => $business->slogan,
+            'description'       => $business->description,
+            'address'           => $business->address,
+            'cover_image'       => $business->cover_image,
+            'cords'             => $business->cords,
+            'tags'              => self::tags($business->tags),
+            'social_networks'   => [],self::socialNetworks($business->socialNetworks),
+           // 'distance'          => $business->distance,
+
+            'products'          => ProductsAndServicesMapper::toArray( $business->productsAndServices),
+            'amenities'         => AmenitiesMapper::toArray($business->amenities),
+            'payments'          => PaymentsMapper::toArray($business->payments) ,
+            'schedules'         => SchedulesMapper::toArray($business->hours),
+            'category'          => BusinessCategoryMapper::toArray($business->category),
+            'images'            => BusinessImagesMapper::toArray($business->images)
         ];
     }
 
     public static function toCollection(iterable $businesses)
     {
         return collect($businesses)
-            ->map(fn (Businesses $b) => self::toArray($b))
+            ->map(fn (Business $b) => self::toArray($b))
             ->toArray();
     }
 

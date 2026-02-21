@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Domains\Businesses\Repositories\Contracts;
 
 use App\DTOs\SchedulesDTO;
-use App\Models\Businesses;
+use App\Domains\Businesses\Models\Business;
+use App\Repositories\Contracts\BaseRepositoryInterface;
 
 interface BusinessRepositoryInterface extends BaseRepositoryInterface
 {
@@ -19,7 +20,7 @@ interface BusinessRepositoryInterface extends BaseRepositoryInterface
 
     public function search(array $filters);
 
-    public function getDetails(int $businessId, int $userId): Businesses;
+    public function getDetails(int $businessId, int $userId): Business;
 
     public function createProductVariation(string $productId, array $variation);
 

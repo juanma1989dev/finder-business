@@ -55,7 +55,7 @@ async function registerFCMToken(currentToken: string | null) {
         if (!token) return;
 
         if (currentToken === token) {
-            console.warn('Token ya sincronizado.');
+            // console.warn('Token ya sincronizado.');
             return;
         }
 

@@ -23,7 +23,7 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             $table->foreignId('business_id')
-                ->constrained('businesses')
+                ->constrained('business')
                 ->restrictOnDelete();
 
             $table->string('product_name'); // snapshot

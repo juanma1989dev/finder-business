@@ -2,10 +2,10 @@
 
 namespace App\Domains\Orders\Actions;
 
-use App\Flows\OrderFlow;
-use App\Models\Order;
-use App\Models\User;
-use App\Services\Notifications\OrderStatusNotificationDispatcher;
+use App\Domains\Orders\Flows\OrderFlow;
+use App\Domains\Orders\Models\Order;
+use App\Domains\Orders\Notifications\OrderStatusNotificationDispatcher;
+use App\Domains\Users\Models\User;
 use DomainException;
 
 class UpdateOrderStatusAction

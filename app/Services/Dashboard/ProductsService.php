@@ -5,8 +5,8 @@ namespace App\Services\Dashboard;
 use App\DTOs\ImageDTO;
 use App\DTOs\ProductsDTO;
 use App\Mappers\ProductsAndServicesMapper;
-use App\Models\Businesses;
-use App\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Domains\Businesses\Models\Business;
+use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -184,7 +184,7 @@ class ProductsService
     /**
      * Busca un servicio dentro de un negocio.
      */
-    private function findByBusiness(Businesses $business, string $id)
+    private function findByBusiness(Business $business, string $id)
     {
         return $business->productsAndServices()->find($id);
     }
