@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Laravel;
 
-use App\Models\Amenity;
+use App\Domains\Businesses\Models\Amenity;
 use App\Repositories\Contracts\AmenitiesRepositoryInterface;
 
 class AmenitiesRepository extends BaseRepository implements AmenitiesRepositoryInterface

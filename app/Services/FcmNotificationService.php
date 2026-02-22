@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\FcmToken;
+use App\Domains\Users\Models\FcmToken;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\MulticastSendReport;

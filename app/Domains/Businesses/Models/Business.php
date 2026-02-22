@@ -4,9 +4,6 @@ namespace App\Domains\Businesses\Models;
 
 use App\Domains\Orders\Models\Order;
 use App\Domains\Users\Models\User;
-use App\Models\Amenity;
-use App\Models\BusinessProduct;
-use App\Models\Payments;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

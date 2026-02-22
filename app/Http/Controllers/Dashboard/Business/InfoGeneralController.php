@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
-use App\DTOs\InfoGeneralDTO;
+use App\Domains\Businesses\Dtos\InfoGeneralDTO;
 use App\Http\Controllers\Controller;
-use App\Services\Dashboard\GeneralInfoService;
+use App\Domains\Businesses\Services\GeneralInfoService;
 use Illuminate\Http\Request;
 
 class InfoGeneralController extends Controller {

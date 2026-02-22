@@ -2,7 +2,7 @@
 
 namespace App\Domains\Businesses\Repositories\Contracts;
 
-use App\DTOs\SchedulesDTO;
+use App\Domains\Businesses\Dtos\SchedulesDTO;
 use App\Domains\Businesses\Models\Business;
 use App\Repositories\Contracts\BaseRepositoryInterface;
 

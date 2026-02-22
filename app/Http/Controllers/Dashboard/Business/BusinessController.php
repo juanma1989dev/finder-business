@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
-use App\DTOs\BusinessDTO;
-use App\DTOs\CoverImageBusinessDTO;
+use App\Domains\Businesses\Dtos\BusinessDTO;
+use App\Domains\Businesses\Dtos\CoverImageBusinessDTO;
 use App\Http\Controllers\Controller;
 use App\Domains\Businesses\Services\BusinessService;
 use Illuminate\Support\Facades\Auth;

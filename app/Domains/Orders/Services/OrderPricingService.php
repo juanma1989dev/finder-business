@@ -2,7 +2,7 @@
 
 namespace App\Domains\Orders\Services;
 
-use App\Models\BusinessProduct;
+use App\Domains\Businesses\Models\BusinessProduct;
 
 class OrderPricingService
 {

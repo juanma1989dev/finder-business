@@ -2,10 +2,10 @@
 
 namespace App\Domains\Businesses\Repositories;
 
-use App\DTOs\SchedulesDTO;
+use App\Domains\Businesses\Dtos\SchedulesDTO;
 use App\Domains\Businesses\Models\Business;
-use App\Models\BusinessProductExtra;
-use App\Models\BusinessProductVariation;
+use App\Domains\Businesses\Models\BusinessProductExtra;
+use App\Domains\Businesses\Models\BusinessProductVariation;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
 use App\Repositories\Laravel\BaseRepository;
 use Illuminate\Database\Eloquent\Collection;

@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Laravel;
 
-use App\Models\ProductCategory;
+use App\Domains\Businesses\Models\ProductCategory;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 
 class ProductCategoryRepository implements ProductCategoryRepositoryInterface

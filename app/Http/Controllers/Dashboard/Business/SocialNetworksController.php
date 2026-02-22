@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
-use App\DTOs\NetworksDTO;
+use App\Domains\Businesses\Dtos\NetworksDTO;
 use App\Http\Controllers\Controller;
-use App\Services\Dashboard\NetworksService;
+use App\Domains\Businesses\Services\NetworksService;
 use Illuminate\Http\Request;
 
 class SocialNetworksController extends Controller

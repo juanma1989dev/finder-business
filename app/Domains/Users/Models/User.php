@@ -6,8 +6,6 @@ use App\Domains\Orders\Enums\OrderStatusEnum;
 use App\Domains\Orders\Models\Order;
 use App\Domains\Businesses\Models\Business;
 use App\Domains\Businesses\Models\BusinessUser;
-use App\Models\DeliveryProfile;
-use App\Models\FcmToken;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;

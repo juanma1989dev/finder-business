@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FcmToken;
+use App\Domains\Users\Models\FcmToken;
 use Illuminate\Http\Request;
 
 class FcmTokenController extends Controller

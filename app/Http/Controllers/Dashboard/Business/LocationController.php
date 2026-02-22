@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
-use App\DTOs\LocationBusinessDTO;
+use App\Domains\Businesses\Dtos\LocationBusinessDTO;
 use App\Http\Controllers\Controller;
-use App\Services\Dashboard\LocationService;
+use App\Domains\Businesses\Services\LocationService;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller 

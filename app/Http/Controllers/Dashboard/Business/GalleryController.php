@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
-use App\DTOs\GalleryBusinessDTO;
-use App\DTOs\GalleryImagesDTO;
+use App\Domains\Businesses\Dtos\GalleryBusinessDTO;
+use App\Domains\Businesses\Dtos\ImageBusinessDTO;
 use App\Http\Controllers\Controller;
-use App\Services\Dashboard\GalleryService;
+use App\Domains\Businesses\Services\GalleryService;
 use Illuminate\Http\Request;
 
 class GalleryController extends Controller

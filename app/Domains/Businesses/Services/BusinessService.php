@@ -2,8 +2,8 @@
 
 namespace App\Domains\Businesses\Services;
 
-use App\DTOs\BusinessDTO;
-use App\DTOs\CoverImageBusinessDTO;
+use App\Domains\Businesses\Dtos\BusinessDTO;
+use App\Domains\Businesses\Dtos\CoverImageBusinessDTO;
 use App\Domains\Businesses\Models\Business;
 use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;

@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Domains\Businesses\Mappers;
+
+use App\Domains\Businesses\Models\BusinessCategory;
+
+class BusinessCategoryMapper
+{
+    public static function toArray(BusinessCategory $category)
+    {
+        return [
+            "id" => $category->id,
+            "name" => $category->name,
+            "image" => $category->image
+        ];
+    }
+}

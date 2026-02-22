@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Dashboard\Business;
 
-use App\DTOs\ProductsDTO;
+use App\Domains\Businesses\Dtos\ProductsDTO;
 use App\Http\Controllers\Controller;
-use App\Services\Dashboard\ProductsService;
+use App\Domains\Businesses\Services\ProductsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Throwable;

@@ -7,7 +7,7 @@ use App\Domains\Orders\Models\Order;
 use App\Domains\Orders\Repositories\Eloquent\OrderItemRepository;
 use App\Domains\Orders\Repositories\Eloquent\OrderRepository;
 use App\Domains\Orders\Services\OrderPricingService;
-use App\Models\BusinessProduct;
+use App\Domains\Businesses\Models\BusinessProduct;
 use App\Services\FcmNotificationService;
 use App\Services\Public\ProductAvailabilityService;
 use Illuminate\Support\Facades\DB;

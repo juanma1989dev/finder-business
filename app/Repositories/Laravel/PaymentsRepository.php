@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Laravel;
 
-use App\Models\Payments;
+use App\Domains\Businesses\Models\Payments;
 use App\Repositories\Contracts\PaymentsRepositoryInterface;
 
 class PaymentsRepository extends BaseRepository implements PaymentsRepositoryInterface

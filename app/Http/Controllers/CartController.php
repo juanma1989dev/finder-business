@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BusinessProduct;
-use App\Models\BusinessProductExtra;
-use App\Models\BusinessProductVariation;
+use App\Domains\Businesses\Models\BusinessProduct;
+use App\Domains\Businesses\Models\BusinessProductExtra;
+use App\Domains\Businesses\Models\BusinessProductVariation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Redirect;
 

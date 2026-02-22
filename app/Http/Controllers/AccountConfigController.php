@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserTypeEnum;
-use App\Models\DeliveryProfile;
+use App\Domains\Users\Models\DeliveryProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;

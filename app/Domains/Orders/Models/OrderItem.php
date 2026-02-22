@@ -3,7 +3,7 @@
 namespace App\Domains\Orders\Models;
 
 use App\Domains\Businesses\Models\Business;
-use App\Models\BusinessProduct;
+use App\Domains\Businesses\Models\BusinessProduct;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

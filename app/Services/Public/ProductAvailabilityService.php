@@ -2,7 +2,7 @@
 
 namespace App\Services\Public;
 
-use App\Models\BusinessProduct;
+use App\Domains\Businesses\Models\BusinessProduct;
 use Illuminate\Validation\ValidationException;
 
 class ProductAvailabilityService 

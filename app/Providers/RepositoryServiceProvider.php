@@ -10,14 +10,14 @@ use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
 use App\Repositories\Contracts\GalleryRepositoryInterface;
 use App\Repositories\Contracts\PaymentsRepositoryInterface;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
-use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Domains\Users\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Laravel\AmenitiesRepository;
 use App\Repositories\Laravel\BusinessCategoryRepository;
 use App\Repositories\Laravel\FavoriteBusinessRepository;
 use App\Repositories\Laravel\GalleryRepository;
 use App\Repositories\Laravel\PaymentsRepository;
 use App\Repositories\Laravel\ProductCategoryRepository;
-use App\Repositories\Laravel\UserRepository;
+use App\Domains\Users\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
