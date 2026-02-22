@@ -6,6 +6,7 @@ use App\Domains\Businesses\Dtos\BusinessDTO;
 use App\Domains\Businesses\Dtos\CoverImageBusinessDTO;
 use App\Http\Controllers\Controller;
 use App\Domains\Businesses\Services\BusinessService;
+use App\Http\Requests\Dashboard\Business\CreateBusinessRequest;
 use Illuminate\Support\Facades\Auth;
 use \Throwable;
 
@@ -26,9 +27,9 @@ class BusinessController extends Controller
         return inertia('admin/Business', $data);
     }
 
-    public function store()
+    public function store(CreateBusinessRequest $request)
     {
-        $businessDTO = BusinessDTO::fromRequest(request());
+        $businessDTO = BusinessDTO::fromRequest($request);
 
         try { 
             $this->businessService->create($businessDTO);

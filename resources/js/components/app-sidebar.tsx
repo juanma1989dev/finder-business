@@ -129,9 +129,9 @@ export function AppSidebar() {
         <Sidebar
             collapsible="icon"
             variant="inset"
-            className="border-purple-100 bg-white"
+            className="bg-withe m-0 border-purple-100 p-0"
         >
-            <SidebarHeader className="pt-6">
+            <SidebarHeader className="m-0 pt-6">
                 <SidebarMenu>
                     <SidebarMenuItem className="flex flex-col items-center gap-4">
                         {user.type === TypeUser.BUSINESS && (
@@ -235,15 +235,15 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent className="px-2">
+            <SidebarContent>
                 <SidebarGroup>
                     <NavMain items={deliveryNavItems} />
-                    <div className="my-2 border-t border-purple-50" />
+                    <div className="my-2 border-purple-50" />
                     <NavMain items={mainNavItems} />
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-purple-50 p-4">
+            <SidebarFooter className="border-purple-50 p-4">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

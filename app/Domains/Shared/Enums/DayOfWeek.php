@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Enums;
+namespace App\Domains\Shared\Enums;
 
 enum DayOfWeek: string
 {
@@ -27,7 +27,7 @@ enum DayOfWeek: string
 
     public static function all(): array
     {
-        return array_map(fn($case) => $case->value, self::cases());
+        return array_map(fn($case) => $case->value, self::Cases());
     }
 
     public static function allValues(): array
@@ -37,7 +37,7 @@ enum DayOfWeek: string
 
     public static function toOptions(): array
     {
-        
+        $options = [];
         foreach (self::cases() as $case) {
             $options[] = [
                 'label' => $case->label(),

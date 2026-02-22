@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Enums;
+namespace App\Domains\Businesses\Enums;
 
 enum PlanTypeEnum: string{
     case NORMAL = 'normal';

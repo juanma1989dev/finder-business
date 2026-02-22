@@ -3,7 +3,7 @@
 namespace App\Domains\Orders\Notifications\Handlers;
 
 use App\Domains\Orders\Models\Order;
-use App\Enums\UserTypeEnum;
+use App\Domains\Users\Enums\UserTypeEnum;
 use App\Domains\Users\Models\User;
 use App\Domains\Users\Services\PushNotificationService;
 

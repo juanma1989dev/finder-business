@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard\Business;
 use App\Domains\Businesses\Dtos\InfoGeneralDTO;
 use App\Http\Controllers\Controller;
 use App\Domains\Businesses\Services\GeneralInfoService;
+use App\Http\Requests\Dashboard\Business\InfoGeneralRequest;
 use Illuminate\Http\Request;
 
 class InfoGeneralController extends Controller {
@@ -22,7 +23,7 @@ class InfoGeneralController extends Controller {
         return inertia('admin/Business/InfoGeneral', $data);
     }   
     
-    public function update(Request $request, $idBusiness)
+    public function update(InfoGeneralRequest $request, $idBusiness)
     {
         $info = InfoGeneralDTO::fromRequest($request);
 

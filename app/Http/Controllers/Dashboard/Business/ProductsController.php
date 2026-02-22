@@ -6,6 +6,7 @@ use App\Domains\Businesses\Dtos\ProductsDTO;
 use App\Http\Controllers\Controller;
 use App\Domains\Businesses\Services\ProductsService;
 use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Dashboard\Business\ProductsRequest;
 use Illuminate\Http\Request;
 use Throwable;
 
@@ -22,7 +23,7 @@ class ProductsController extends Controller
         return inertia('admin/Business/Products', $data);
     }
 
-    public function store(Request $request, string $idBusiness, string $slug): RedirectResponse
+    public function store(ProductsRequest $request, string $idBusiness, string $slug): RedirectResponse
     {
         $product = ProductsDTO::fromRequest($request);
         
@@ -35,7 +36,7 @@ class ProductsController extends Controller
         }
     }
 
-    public function update(Request $request, string $idBusiness, string $slug, string $id): RedirectResponse
+    public function update(ProductsRequest $request, string $idBusiness, string $slug, string $id): RedirectResponse
     {
         $product = ProductsDTO::fromRequest($request);
 

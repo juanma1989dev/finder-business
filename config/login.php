@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\UserTypeEnum;
+use App\Domains\Users\Enums\UserTypeEnum;
 
 return [
     UserTypeEnum::CLIENT->value => [

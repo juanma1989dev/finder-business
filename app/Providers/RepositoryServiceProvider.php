@@ -16,6 +16,10 @@ use App\Domains\Businesses\Repositories\Contracts\GalleryRepositoryInterface;
 use App\Domains\Businesses\Repositories\Contracts\PaymentsRepositoryInterface;
 use App\Domains\Businesses\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
+use App\Domains\Orders\Repositories\Contracts\OrderItemRepositoryInterface;
+use App\Domains\Orders\Repositories\Contracts\OrderRepositoryInterface;
+use App\Domains\Orders\Repositories\Eloquent\OrderItemRepository;
+use App\Domains\Orders\Repositories\Eloquent\OrderRepository;
 use App\Domains\Users\Repositories\Contracts\UserRepositoryInterface;
 use App\Domains\Users\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\ServiceProvider;
@@ -32,5 +36,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PaymentsRepositoryInterface::class, PaymentsRepository::class);
         $this->app->bind(ProductCategoryRepositoryInterface::class, ProductCategoryRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
+        $this->app->bind(OrderItemRepositoryInterface::class, OrderItemRepository::class);
     }
 } 

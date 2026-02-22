@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Enums;
+namespace App\Domains\Users\Enums;
 
 enum UserTypeEnum: string {
     case CLIENT = 'client';

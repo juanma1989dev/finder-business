@@ -3,7 +3,7 @@
 namespace App\Domains\Orders\Flows;
 
 use App\Domains\Orders\Enums\OrderStatusEnum;
-use App\Enums\UserTypeEnum;
+use App\Domains\Users\Enums\UserTypeEnum;
 
 class OrderFlow 
 {

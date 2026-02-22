@@ -5,12 +5,14 @@ namespace App\Domains\Orders\Repositories\Eloquent;
 use App\Domains\Orders\Models\OrderItem;
 use App\Domains\Orders\Models\OrderItemExtra;
 use App\Domains\Orders\Models\OrderItemVariation;
+use App\Domains\Orders\Repositories\Contracts\OrderItemRepositoryInterface;
+use App\Domains\Shared\Repositories\Eloquent\BaseRepository;
 
-class OrderItemRepository
+class OrderItemRepository extends BaseRepository implements OrderItemRepositoryInterface
 {
-    public function create(array $data)
+    public function __construct(OrderItem $model)
     {
-        return OrderItem::create($data);
+        $this->model = $model;
     }
 
     public function createExtras(OrderItem $item, $extras): void

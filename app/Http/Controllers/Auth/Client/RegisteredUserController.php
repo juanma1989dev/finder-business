@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth\Client;
 
-use App\Enums\UserTypeEnum;
+use App\Domains\Users\Enums\UserTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Domains\Users\Models\User;
 use Illuminate\Auth\Events\Registered;

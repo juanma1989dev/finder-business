@@ -3,12 +3,14 @@
 namespace App\Domains\Orders\Repositories\Eloquent;
 
 use App\Domains\Orders\Models\Order;
+use App\Domains\Orders\Repositories\Contracts\OrderRepositoryInterface;
+use App\Domains\Shared\Repositories\Eloquent\BaseRepository;
 
-class OrderRepository
+class OrderRepository extends BaseRepository implements OrderRepositoryInterface
 {
-    public function create(array $data): Order 
+    public function __construct(Order $model)
     {
-        return Order::create($data);
+        $this->model = $model;
     }
 
     public function updateTotals(

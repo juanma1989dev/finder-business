@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Public\Delivery;
 
-use App\Enums\OrderStatusEnum;
-use App\Enums\UserTypeEnum;
+use App\Domains\Orders\Enums\OrderStatusEnum;
+use App\Domains\Users\Enums\UserTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;

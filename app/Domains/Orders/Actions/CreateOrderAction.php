@@ -4,8 +4,8 @@ namespace App\Domains\Orders\Actions;
 
 use App\Domains\Orders\Enums\OrderStatusEnum;
 use App\Domains\Orders\Models\Order;
-use App\Domains\Orders\Repositories\Eloquent\OrderItemRepository;
-use App\Domains\Orders\Repositories\Eloquent\OrderRepository;
+use App\Domains\Orders\Repositories\Contracts\OrderItemRepositoryInterface;
+use App\Domains\Orders\Repositories\Contracts\OrderRepositoryInterface;
 use App\Domains\Orders\Services\OrderPricingService;
 use App\Domains\Businesses\Models\BusinessProduct;
 use App\Domains\Users\Services\FcmNotificationService;
@@ -57,8 +57,8 @@ class BusinessNotificationService
 class CreateOrderAction
 {
     public function __construct(
-        protected OrderRepository $orderRepository,
-        protected OrderItemRepository $orderItemRepository,
+        protected OrderRepositoryInterface $orderRepository,
+        protected OrderItemRepositoryInterface $orderItemRepository,
         protected OrderPricingService $orderPricingService,
         protected ProductAvailabilityService $productAvailabilityService,
         protected BusinessNotificationService $businessNotificationService

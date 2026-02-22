@@ -4,7 +4,7 @@ namespace App\Domains\Businesses\Mappers;
 
 use App\Domains\Businesses\Models\BusinessHour;
 use Illuminate\Support\Collection;
-use App\Enums\DayOfWeek;
+use App\Domains\Shared\Enums\DayOfWeek;
 
 class SchedulesMapper
 {
