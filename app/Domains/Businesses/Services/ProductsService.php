@@ -7,7 +7,7 @@ use App\Domains\Businesses\Dtos\ProductsDTO;
 use App\Domains\Businesses\Mappers\ProductsAndServicesMapper;
 use App\Domains\Businesses\Models\Business;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
-use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;

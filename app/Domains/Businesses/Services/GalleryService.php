@@ -8,7 +8,7 @@ use App\Domains\Businesses\Dtos\ImageDTO;
 use App\Domains\Businesses\Mappers\BusinessMapper;
 use App\Domains\Businesses\Models\Business;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
-use App\Repositories\Contracts\GalleryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\GalleryRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

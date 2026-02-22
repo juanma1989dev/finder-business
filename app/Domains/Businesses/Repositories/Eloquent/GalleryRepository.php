@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Businesses\Repositories\Eloquent;
 
 use App\Domains\Businesses\Models\Business;
 use App\Domains\Businesses\Models\BusinessImage;
-use App\Repositories\Contracts\GalleryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\GalleryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
 class GalleryRepository implements GalleryRepositoryInterface

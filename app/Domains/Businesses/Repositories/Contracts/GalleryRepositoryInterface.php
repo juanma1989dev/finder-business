@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Domains\Businesses\Repositories\Contracts;
 
 use App\Domains\Businesses\Models\Business;
 use App\Domains\Businesses\Models\BusinessImage;

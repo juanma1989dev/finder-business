@@ -4,7 +4,7 @@ namespace App\Domains\Businesses\Repositories\Contracts;
 
 use App\Domains\Businesses\Dtos\SchedulesDTO;
 use App\Domains\Businesses\Models\Business;
-use App\Repositories\Contracts\BaseRepositoryInterface;
+use App\Domains\Shared\Repositories\Contracts\BaseRepositoryInterface;
 
 interface BusinessRepositoryInterface extends BaseRepositoryInterface
 {

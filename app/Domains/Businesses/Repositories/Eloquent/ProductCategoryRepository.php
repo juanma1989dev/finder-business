@@ -1,9 +1,9 @@
 <?php 
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Businesses\Repositories\Eloquent;
 
 use App\Domains\Businesses\Models\ProductCategory;
-use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\ProductCategoryRepositoryInterface;
 
 class ProductCategoryRepository implements ProductCategoryRepositoryInterface
 {

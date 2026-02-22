@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Repositories\Laravel;
-
-// use App\Models\BusinessUser;
+namespace App\Domains\Businesses\Repositories\Eloquent;
 
 use App\Domains\Businesses\Models\BusinessUser;
 use App\Domains\Users\Models\User;
-use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
+use App\Domains\Shared\Repositories\Eloquent\BaseRepository;
 
 class FavoriteBusinessRepository extends BaseRepository implements FavoriteBusinessRepositoryInterface
 {

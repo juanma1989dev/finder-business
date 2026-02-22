@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Businesses\Repositories\Eloquent;
 
 use App\Domains\Businesses\Models\Payments;
-use App\Repositories\Contracts\PaymentsRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\PaymentsRepositoryInterface;
+use App\Domains\Shared\Repositories\Eloquent\BaseRepository;
 
 class PaymentsRepository extends BaseRepository implements PaymentsRepositoryInterface
 {

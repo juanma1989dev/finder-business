@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Services\Public;
+namespace App\Domains\Businesses\Services;
 
 use App\Domains\Businesses\Models\BusinessProduct;
 use Illuminate\Validation\ValidationException;

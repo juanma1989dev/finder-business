@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Services\Notifications;
+namespace App\Domains\Users\Services;
 
 use App\Domains\Users\Models\User;
-use App\Services\FcmNotificationService;
 
 class PushNotificationService
 {

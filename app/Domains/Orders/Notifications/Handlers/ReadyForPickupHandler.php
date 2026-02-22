@@ -5,7 +5,7 @@ namespace App\Domains\Orders\Notifications\Handlers;
 use App\Domains\Orders\Models\Order;
 use App\Enums\UserTypeEnum;
 use App\Domains\Users\Models\User;
-use App\Services\Notifications\PushNotificationService;
+use App\Domains\Users\Services\PushNotificationService;
 
 class DeliveryRepository 
 {

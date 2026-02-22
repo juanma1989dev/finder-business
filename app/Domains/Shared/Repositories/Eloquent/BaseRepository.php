@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Shared\Repositories\Eloquent;
 
-use App\Repositories\Contracts\BaseRepositoryInterface;
+use App\Domains\Shared\Repositories\Contracts\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseRepository implements BaseRepositoryInterface

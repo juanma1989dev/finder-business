@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Domains\Businesses\Repositories;
+namespace App\Domains\Businesses\Repositories\Eloquent;
 
 use App\Domains\Businesses\Dtos\SchedulesDTO;
 use App\Domains\Businesses\Models\Business;
 use App\Domains\Businesses\Models\BusinessProductExtra;
 use App\Domains\Businesses\Models\BusinessProductVariation;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
-use App\Repositories\Laravel\BaseRepository;
+use App\Domains\Shared\Repositories\Eloquent\BaseRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use MatanYadaev\EloquentSpatial\Objects\Point;

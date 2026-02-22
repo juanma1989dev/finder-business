@@ -4,7 +4,7 @@ namespace App\Domains\Users\Repositories\Eloquent;
 
 use App\Domains\Users\Models\User;
 use App\Domains\Users\Repositories\Contracts\UserRepositoryInterface;
-use App\Repositories\Laravel\BaseRepository;
+use App\Domains\Shared\Repositories\Eloquent\BaseRepository;
 use Illuminate\Support\Collection;
 
 class UserRepository extends BaseRepository implements UserRepositoryInterface

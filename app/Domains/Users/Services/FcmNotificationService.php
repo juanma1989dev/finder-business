@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Services;
+namespace App\Domains\Users\Services;
 
 use App\Domains\Users\Models\FcmToken;
 use Illuminate\Support\Facades\Log;

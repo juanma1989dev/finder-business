@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Businesses\Repositories\Eloquent;
 
 use App\Domains\Businesses\Models\Amenity;
-use App\Repositories\Contracts\AmenitiesRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\AmenitiesRepositoryInterface;
+use App\Domains\Shared\Repositories\Eloquent\BaseRepository;
 
 class AmenitiesRepository extends BaseRepository implements AmenitiesRepositoryInterface
 {

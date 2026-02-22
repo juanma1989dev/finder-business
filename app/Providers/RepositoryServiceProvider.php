@@ -2,21 +2,21 @@
 
 namespace  App\Providers;
 
-use App\Domains\Businesses\Repositories\BusinessRepository;
+use App\Domains\Businesses\Repositories\Eloquent\AmenitiesRepository;
+use App\Domains\Businesses\Repositories\Eloquent\BusinessCategoryRepository;
+use App\Domains\Businesses\Repositories\Eloquent\FavoriteBusinessRepository;
+use App\Domains\Businesses\Repositories\Eloquent\GalleryRepository;
+use App\Domains\Businesses\Repositories\Eloquent\PaymentsRepository;
+use App\Domains\Businesses\Repositories\Eloquent\ProductCategoryRepository;
+use App\Domains\Businesses\Repositories\Eloquent\BusinessRepository;
+use App\Domains\Businesses\Repositories\Contracts\AmenitiesRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessCategoryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\GalleryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\PaymentsRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
-use App\Repositories\Contracts\AmenitiesRepositoryInterface;
-use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
-use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
-use App\Repositories\Contracts\GalleryRepositoryInterface;
-use App\Repositories\Contracts\PaymentsRepositoryInterface;
-use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use App\Domains\Users\Repositories\Contracts\UserRepositoryInterface;
-use App\Repositories\Laravel\AmenitiesRepository;
-use App\Repositories\Laravel\BusinessCategoryRepository;
-use App\Repositories\Laravel\FavoriteBusinessRepository;
-use App\Repositories\Laravel\GalleryRepository;
-use App\Repositories\Laravel\PaymentsRepository;
-use App\Repositories\Laravel\ProductCategoryRepository;
 use App\Domains\Users\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\ServiceProvider;
 

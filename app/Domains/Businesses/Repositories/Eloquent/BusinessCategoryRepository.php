@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Repositories\Laravel;
+namespace App\Domains\Businesses\Repositories\Eloquent;
 
 use App\Domains\Businesses\Models\BusinessCategory;
-use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessCategoryRepositoryInterface;
+use App\Domains\Shared\Repositories\Eloquent\BaseRepository;
 
 class BusinessCategoryRepository extends BaseRepository implements BusinessCategoryRepositoryInterface
 {

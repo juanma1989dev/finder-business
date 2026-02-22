@@ -4,10 +4,10 @@ namespace App\Domains\Businesses\Services;
 
 use App\Domains\Businesses\Dtos\InfoGeneralDTO;
 use App\Domains\Businesses\Mappers\BusinessMapper; 
-use App\Repositories\Contracts\AmenitiesRepositoryInterface;
-use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\AmenitiesRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessCategoryRepositoryInterface;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
-use App\Repositories\Contracts\PaymentsRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\PaymentsRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class GeneralInfoService

@@ -8,8 +8,8 @@ use App\Domains\Orders\Repositories\Eloquent\OrderItemRepository;
 use App\Domains\Orders\Repositories\Eloquent\OrderRepository;
 use App\Domains\Orders\Services\OrderPricingService;
 use App\Domains\Businesses\Models\BusinessProduct;
-use App\Services\FcmNotificationService;
-use App\Services\Public\ProductAvailabilityService;
+use App\Domains\Users\Services\FcmNotificationService;
+use App\Domains\Businesses\Services\ProductAvailabilityService;
 use Illuminate\Support\Facades\DB;
 
 class BusinessNotificationService

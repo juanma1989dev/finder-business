@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services\Public;
+namespace App\Domains\Businesses\Services;
 
 use App\Http\Requests\Public\BusinessSearchRequest;
 use App\Domains\Businesses\Mappers\BusinessMapper;
-use App\Repositories\Contracts\BusinessCategoryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\BusinessCategoryRepositoryInterface;
 use App\Domains\Businesses\Repositories\Contracts\BusinessRepositoryInterface;
-use App\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
-use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\FavoriteBusinessRepositoryInterface;
+use App\Domains\Businesses\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use App\Domains\Users\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Support\Collection;
 

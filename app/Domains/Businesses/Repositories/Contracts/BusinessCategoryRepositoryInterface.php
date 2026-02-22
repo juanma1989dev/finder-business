@@ -1,6 +1,8 @@
 <?php 
 
-namespace App\Repositories\Contracts;
+namespace App\Domains\Businesses\Repositories\Contracts;
+
+use App\Domains\Shared\Repositories\Contracts\BaseRepositoryInterface;
 
 interface BusinessCategoryRepositoryInterface extends BaseRepositoryInterface
 {
