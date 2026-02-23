@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\Dashboard\Client\IndexController;
-use App\Http\Controllers\Settings\PasswordController;
-use App\Http\Controllers\Settings\ProfileController;
-use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
-use App\Http\Controllers\AccountConfigController;
-use App\Http\Controllers\Public\BusinessController;
-use App\Http\Controllers\Public\ShoppingCartController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\Public\Client\OrderController;
-use App\Http\Controllers\Public\Client\OrderStatusController;
-use App\Http\Controllers\FcmTokenController;
+use App\Http\Controllers\App\Client\DashboardController as IndexController;
+use App\Http\Controllers\App\Client\Settings\PasswordController;
+use App\Http\Controllers\App\Client\Settings\ProfileController;
+use App\Http\Controllers\App\Client\Settings\TwoFactorAuthenticationController;
+use App\Http\Controllers\App\Client\AccountConfigController;
+use App\Http\Controllers\App\Public\BusinessController;
+use App\Http\Controllers\App\Client\ShoppingCartController;
+use App\Http\Controllers\App\Client\CartController;
+use App\Http\Controllers\App\Client\OrderController;
+use App\Http\Controllers\App\Client\OrderStatusController;
+use App\Http\Controllers\App\Client\FcmTokenController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

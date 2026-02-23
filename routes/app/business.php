@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Controllers\BusinessOrdersDeltaController;
-use App\Http\Controllers\Dashboard\Business\GalleryController;
-use App\Http\Controllers\Dashboard\Business\InfoGeneralController;
-use App\Http\Controllers\Dashboard\Business\ProductsController;
-use App\Http\Controllers\Dashboard\Business\SocialNetworksController;
-use App\Http\Controllers\OrderManagementController;  
-use App\Http\Controllers\Dashboard\Business\BusinessController;
-use App\Http\Controllers\Dashboard\Business\BusinessOpeningController;
-use App\Http\Controllers\Dashboard\Business\LocationController;
-use App\Http\Controllers\Dashboard\IndexController; 
+use App\Http\Controllers\App\Business\OrdersDeltaController as BusinessOrdersDeltaController;
+use App\Http\Controllers\App\Business\GalleryController;
+use App\Http\Controllers\App\Business\InfoGeneralController;
+use App\Http\Controllers\App\Business\ProductsController;
+use App\Http\Controllers\App\Business\SocialNetworksController;
+use App\Http\Controllers\App\Business\OrderManagementController;  
+use App\Http\Controllers\App\Business\BusinessController;
+use App\Http\Controllers\App\Business\BusinessOpeningController;
+use App\Http\Controllers\App\Business\LocationController;
+use App\Http\Controllers\App\Business\DashboardController as IndexController; 
 use Illuminate\Support\Facades\Route; 
 
 /*

@@ -1,8 +1,8 @@
 <?php
  
-use App\Http\Controllers\Auth\GoogleController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\App\Public\Auth\GoogleController;
+use App\Http\Controllers\App\Public\Auth\LoginController;
+use App\Http\Controllers\App\Public\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

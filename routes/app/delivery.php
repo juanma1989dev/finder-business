@@ -1,17 +1,12 @@
 <?php
 
-use App\Http\Controllers\Dashboard\Delivery\IndexController;
-use App\Http\Controllers\Dashboard\Delivery\OrderController;
-use App\Http\Controllers\Public\Delivery\IndexController as DeliveryIndexController;
-use App\Http\Controllers\Public\Delivery\LocationController;
-use App\Http\Controllers\Public\DeliveryContoller as PublicDeliveryController;
+use App\Http\Controllers\App\Delivery\DashboardController as IndexController;
+use App\Http\Controllers\App\Delivery\OrderController;
+use App\Http\Controllers\App\Delivery\IndexController as DeliveryIndexController;
+use App\Http\Controllers\App\Delivery\LocationController;
+use App\Http\Controllers\App\Delivery\DeliveryController as PublicDeliveryController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Delivery Domain Routes
-|--------------------------------------------------------------------------
-*/
 
 # Delivery Dashboard
 Route::middleware(['auth', 'verified', 'account.configured', 'delivery'])->prefix('dashboard/delivery')->name('dashboard.')->group(function () {
