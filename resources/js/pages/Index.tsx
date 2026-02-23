@@ -21,20 +21,12 @@ import {
 
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
-import { BusinessSearchFilters } from '@/types';
+import { BusinessSearchFilters, OrderStatus } from '@/types';
 import { router } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const MainFilters = lazy(() => import('@/components/app/MainFilters'));
 const BusinessCard = lazy(() => import('@/components/app/BusinessCard'));
-
-type OrderStatus =
-    | 'pending'
-    | 'confirmed'
-    | 'ready_for_pickup'
-    | 'picked_up'
-    | 'on_the_way'
-    | 'delivered';
 
 interface OrderItem {
     id: string | number;
@@ -57,10 +49,10 @@ interface Props {
 }
 
 const STEPS: { key: OrderStatus; label: string }[] = [
-    { key: 'confirmed', label: 'Confirmado' },
-    { key: 'ready_for_pickup', label: 'Por recoger' },
-    { key: 'picked_up', label: 'Recogido' },
-    { key: 'on_the_way', label: 'En camino' },
+    { key: OrderStatus.CONFIRMED, label: 'Confirmado' },
+    { key: OrderStatus.READY_FOR_PICKUP, label: 'Por recoger' },
+    { key: OrderStatus.PICKED_UP, label: 'Recogido' },
+    { key: OrderStatus.ON_THE_WAY, label: 'En camino' },
 ];
 
 const STORAGE_KEY = 'active-order-expanded';
@@ -154,6 +146,30 @@ export default function Index({
         const debounce = setTimeout(handleSearch, 120);
         return () => clearTimeout(debounce);
     }, [filtersUser, latitude, longitude, loadingLocation]);
+
+    useEffect(() => {
+        const handler = (event: any) => {
+            const payload = event.detail;
+
+            const order = payload.data?.order
+                ? JSON.parse(payload.data.order)
+                : null;
+
+            if (order) {
+                setOrderDetail((prev) => {
+                    if (!prev) return prev;
+                    if (String(prev.id) !== String(order.id)) return prev;
+                    return order;
+                });
+            }
+        };
+
+        window.addEventListener('firebase-message', handler);
+
+        return () => {
+            window.removeEventListener('firebase-message', handler);
+        };
+    }, []);
 
     return (
         <MainLayout>
@@ -337,7 +353,7 @@ const ActiveOrderBar = memo(({ order }: { order: Order }) => {
     }, [expanded]);
 
     useEffect(() => {
-        if (order.status === 'delivered') {
+        if (order.status === OrderStatus.DELIVERED) {
             const t = setTimeout(() => setVisible(false), 1200);
             return () => clearTimeout(t);
         }

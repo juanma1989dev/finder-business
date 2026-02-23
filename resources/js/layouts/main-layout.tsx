@@ -32,10 +32,15 @@ export default function MainLayout({
         if (!messaging) return;
 
         const unsubscribe = onMessage(messaging, (payload) => {
+            window.dispatchEvent(
+                new CustomEvent('firebase-message', { detail: payload }),
+            );
+
             const title =
                 payload.notification?.title ||
                 payload.data?.title ||
                 'Nuevo pedido';
+
             const body = payload.notification?.body || payload.data?.body || '';
 
             toast.success(

@@ -16,10 +16,15 @@ class OnTheWayHandler
     {
         $tokens = $this->getTokens($order);
 
+        $extra = [
+            'order' => $order,
+        ];
+
         $this->push->notify(
             $tokens,
-            'Pedido confirmado ✅',
-            "Tu pedido #{$order->id} fue confirmado." 
+            'Pedido en camino 🚚',
+            "El pedido #{$order->id} esta en camino.",
+            $extra
         );
     }
 

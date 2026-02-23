@@ -43,9 +43,13 @@ class ReadyForPickupHandler
         $clientToken     = $this->getTokens($order);
         $deliveriesToken = $this->deliveries->available();
 
+        // $extra = [
+        //     'order_id'      => $order->id,
+        //     'order_status'  => $order->status
+        // ];
+
         $extra = [
-            'order_id'      => $order->id,
-            'order_status'  => $order->status
+            'order' => $order,
         ];
 
         $tokens = array_merge($clientToken, $deliveriesToken);

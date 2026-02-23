@@ -16,10 +16,15 @@ class DeliveredHandler
     {
         $tokens = $this->getTokens($order);
 
+        $extra = [
+            'order' => $order,
+        ];
+
         $this->push->notify(
             $tokens,
-            'Pedido confirmado ✅',
-            "Tu pedido #{$order->id} fue confirmado." 
+            'Pedido entregado ✅',
+            "El pedido #{$order->id} fue entregado.",
+            $extra
         );
     }
 

@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { messaging, onMessage } from '@/firebase';
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
 import { OrderStatus, SharedData } from '@/types';
@@ -219,23 +218,14 @@ export default function Index({ activeOrder }: Props) {
     }, [incomingOrder, clearIncomingOrder]);
 
     useEffect(() => {
-        if (!messaging) return;
+        const handler = (event: any) => {
+            const payload = event.detail;
 
-        const unsubscribe = onMessage(messaging, (payload: any) => {
-            if (!deliveryAvailableRef.current) return;
+            const order = payload.data?.order
+                ? JSON.parse(payload.data.order)
+                : null;
 
-            toast.success(
-                <div className="flex flex-col gap-1">
-                    <p className="font-bold">
-                        {payload.data?.title ?? 'Nuevo Pedido'}
-                    </p>
-                    {payload.data?.body && (
-                        <p className="text-xs">{payload.data.body}</p>
-                    )}
-                </div>,
-            );
-
-            const status = payload.data?.order_status;
+            const status = order.status ?? null;
 
             if (
                 status === OrderStatus.READY_FOR_PICKUP &&
@@ -244,22 +234,24 @@ export default function Index({ activeOrder }: Props) {
                 deliveryAvailableRef.current
             ) {
                 const newIncoming: Order = {
-                    id: Number(payload.data?.order_id),
-                    delivery_fee: payload.data?.delivery_fee,
-                    store_name: payload.data?.store_name,
-                    distance: payload.data?.distance,
+                    id: Number(order.id),
+                    delivery_fee: payload.data?.delivery_fee ?? '', // tarifa de entrega
+                    store_name: payload.data?.store_name ?? '', // nombre del comercio
+                    distance: payload.data?.distance ?? '', // distancia al comercio (si viene en la notificación)
                 };
-                const orderId = Number(payload.data?.order_id);
+                const orderId = Number(order.id);
                 if (!orderId) return;
 
                 setIncomingOrder(newIncoming);
                 setCountdown(AUTO_REJECT_SECONDS);
                 notificationAudioRef.current?.play().catch(() => {});
             }
-        });
+        };
+
+        window.addEventListener('firebase-message', handler);
 
         return () => {
-            if (typeof unsubscribe === 'function') unsubscribe();
+            window.removeEventListener('firebase-message', handler);
         };
     }, []);
 

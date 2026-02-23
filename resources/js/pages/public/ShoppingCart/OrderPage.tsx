@@ -5,9 +5,10 @@ import { Home, Printer } from 'lucide-react';
 
 interface Props {
     order: Order;
+    statusLabel: string;
 }
 
-export default function OrderPage({ order }: Props) {
+export default function OrderPage({ order, statusLabel }: Props) {
     const formattedDateTime = new Date(order.created_at).toLocaleString(
         undefined,
         {
@@ -51,7 +52,7 @@ export default function OrderPage({ order }: Props) {
                             <p className="text-[10px] tracking-widest uppercase opacity-80">
                                 Orden #{order.id}
                             </p>
-                            <p className="mt-2 text-3xl font-semibold tracking-tight">
+                            <p className="mt-2 text-2xl font-semibold tracking-tight">
                                 ${formatPrice(order.total)}
                             </p>
                         </div>
@@ -65,7 +66,7 @@ export default function OrderPage({ order }: Props) {
                                     order.status,
                                 )}`}
                             >
-                                {order.status}
+                                {statusLabel}
                             </span>
                         </div>
 
@@ -134,7 +135,7 @@ export default function OrderPage({ order }: Props) {
 
                             <div className="mt-4 flex justify-between text-base font-semibold text-gray-900">
                                 <span className="text-[11px] tracking-widest uppercase">
-                                    Total Final
+                                    Total
                                 </span>
                                 <span className="text-xl text-purple-900">
                                     ${formatPrice(order.total)}
@@ -158,9 +159,9 @@ export default function OrderPage({ order }: Props) {
                             Imprimir ticket
                         </button>
 
-                        <div className="mt-6 text-center text-[10px] tracking-widest text-gray-400 uppercase">
+                        {/* <div className="mt-6 text-center text-[10px] tracking-widest text-gray-400 uppercase">
                             Gracias por su compra
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

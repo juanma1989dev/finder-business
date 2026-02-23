@@ -16,10 +16,15 @@ class RejectedHandler
     {
         $tokens = $this->getTokens($order);
 
+        $extra = [
+            'order' => $order,
+        ];
+
         $this->push->notify(
             $tokens,
             'Peido Rechazado  ❌',
-            "Tu pedido #{$order->id} fue rechazazdo." 
+            "Tu pedido #{$order->id} fue rechazazdo.",
+            $extra
         );
     }
 

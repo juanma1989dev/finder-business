@@ -16,10 +16,15 @@ class PickupHandler
     {
         $tokens = $this->getTokens($order);
 
+        $extra = [
+            'order' => $order,
+        ];
+
         $this->push->notify(
             $tokens,
-            'Pedido Confirmado por el repartidor ✅',
-            "Tu pedido #{$order->id} fue confirmado." 
+            'Pedido Confirmado por el repartidor 🚚',
+            "Tu pedido #{$order->id} fue confirmado." ,
+            $extra
         );
     }
 

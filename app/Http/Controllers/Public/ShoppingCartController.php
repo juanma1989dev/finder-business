@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Public;
 
 use App\Domains\Orders\Actions\CreateOrderAction;
+use App\Domains\Orders\Enums\OrderStatusEnum;
 use App\Domains\Orders\Models\Order;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ShoppingCartController extends Controller
 {
@@ -30,12 +32,19 @@ class ShoppingCartController extends Controller
 
     public function show(int $orderId)
     {
-        $order = Order::findOrFail($orderId);
-        
-        $order->load('items.extras', 'items.variations');
+        $order = Order::query()
+            ->with(['items.extras', 'items.variations'])
+            ->where('id', $orderId)
+            ->where('user_id', Auth::id())
+            ->first();
 
+        if (!$order) {
+            abort(404, 'Orden no encontrada');
+        }
+        
         $data = [
-            'order' => $order
+            'order' => $order,
+            'statusLabel' => OrderStatusEnum::labels()[$order->status] ?? $order->status,
         ];
 
         return inertia('public/ShoppingCart/OrderPage', $data);
