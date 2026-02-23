@@ -23,7 +23,7 @@ class InfoGeneralController extends Controller {
         return inertia('admin/Business/InfoGeneral', $data);
     }   
     
-    public function update(InfoGeneralRequest $request, $idBusiness)
+    public function update(Request $request, $idBusiness)
     {
         $info = InfoGeneralDTO::fromRequest($request);
 

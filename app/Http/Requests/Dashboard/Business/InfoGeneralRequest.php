@@ -23,7 +23,7 @@ class InfoGeneralRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            "id_category" => ['required'], /// 'id_category' => ['required', 'integer', 'exists:categories,id'],
+            "category_id" => ['required'], /// 'id_category' => ['required', 'integer', 'exists:categories,id'],
             'description' => ['required', 'string'],
             'long_description' => ['required', 'string'],
             "address" => ['required'],

@@ -6,23 +6,26 @@ use App\Http\Controllers\Dashboard\Business\InfoGeneralController;
 use App\Http\Controllers\Dashboard\Business\ProductsController;
 use App\Http\Controllers\Dashboard\Business\SocialNetworksController;
 use App\Http\Controllers\OrderManagementController;  
-
 use App\Http\Controllers\Dashboard\Business\BusinessController;
 use App\Http\Controllers\Dashboard\Business\BusinessOpeningController;
 use App\Http\Controllers\Dashboard\Business\LocationController;
 use App\Http\Controllers\Dashboard\IndexController; 
 use Illuminate\Support\Facades\Route; 
 
- Route::middleware(['auth', 'verified', 'account.configured'])->prefix('dashboard')->name('dashboard.')->group(function () { 
-    # /business 
+/*
+|--------------------------------------------------------------------------
+| Business Domain Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified', 'account.configured'])->prefix('dashboard')->name('dashboard.')->group(function () { 
     Route::middleware('business')->group(function () {
         # Dashboard home
         Route::resource('/business', BusinessController::class)->only(['index', 'store', 'update']);
 
-        #
+        # Business basic config
         Route::prefix('business/{business}')->as('business.')->group(function () {
             Route::patch('opening-hours', [BusinessOpeningController::class, 'update'])->name('opening.update');
-            # Route::patch('cover-image', [BusinessCoverController::class, 'update'])->name('cover.update'); /// mover
         });
 
         # Secciones
@@ -50,8 +53,3 @@ use Illuminate\Support\Facades\Route;
         Route::patch('orders/{order}/status', [OrderManagementController::class, 'updateStatus'])->name('orders.status');
     });
 });
-//    /******************************* */
-//     Route::get('/dashboard/profile/business/confirm-code', [BusinessController::class, 'codes'])->name('dashboard.business.codes');
-//     Route::post('/dashboard/profile/business/validate-code', [BusinessController::class, 'codeValidate'])->name('dashboard.business.code.validate');
-//     Route::post('/dashboard/profile/business/code-to-create', [BusinessController::class, 'codeCreate'])->name('dashboard.business.code.create');
- 
