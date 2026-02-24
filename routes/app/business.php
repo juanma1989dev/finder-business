@@ -1,17 +1,19 @@
 <?php
 
+use App\Http\Controllers\App\Business\IndexController;
+
 use App\Http\Controllers\App\Business\OrdersDeltaController as BusinessOrdersDeltaController;
-use App\Http\Controllers\App\Business\GalleryController;
-use App\Http\Controllers\App\Business\InfoGeneralController;
-use App\Http\Controllers\App\Business\ProductsController;
-use App\Http\Controllers\App\Business\SocialNetworksController;
 use App\Http\Controllers\App\Business\OrderManagementController;  
-use App\Http\Controllers\App\Business\BusinessController;
-use App\Http\Controllers\App\Business\BusinessOpeningController;
-use App\Http\Controllers\App\Business\LocationController;
-use App\Http\Controllers\App\Business\DashboardController as IndexController; 
 use Illuminate\Support\Facades\Route; 
 
+#
+use App\Http\Controllers\App\Business\Management\DashboardController; 
+use App\Http\Controllers\App\Business\Management\InfoGeneralController;
+use App\Http\Controllers\App\Business\Management\LocationController;
+use App\Http\Controllers\App\Business\Management\ProductsController;
+use App\Http\Controllers\App\Business\Management\GalleryController;
+use App\Http\Controllers\App\Business\Management\SocialNetworksController;
+use App\Http\Controllers\App\Business\Management\AvailabilityController;
 /*
 |--------------------------------------------------------------------------
 | Business Domain Routes
@@ -20,17 +22,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'account.configured'])->prefix('dashboard')->name('dashboard.')->group(function () { 
     Route::middleware('business')->group(function () {
-        # Dashboard home
-        Route::resource('/business', BusinessController::class)->only(['index', 'store', 'update']);
+        # Business
+        Route::resource('/business', IndexController::class)->only(['index', 'store', 'update']);
 
-        # Business basic config
+        # Business basic config // *** Despues se puede mover a la seccion de gestion del negocio ****
         Route::prefix('business/{business}')->as('business.')->group(function () {
-            Route::patch('opening-hours', [BusinessOpeningController::class, 'update'])->name('opening.update');
-        });
+            Route::patch('opening-hours', [AvailabilityController::class, 'update'])->name('opening.update');
+        }); 
 
-        # Secciones
+        # Gestion
         Route::prefix('business/{business}-{slug}')->name('business.')->group(function () {
-            Route::get('/home', [IndexController::class, 'index'])->name('business.dashboard');
+            Route::get('/home', [DashboardController::class, 'index'])->name('business.dashboard');
 
             Route::get('info-general', [InfoGeneralController::class, 'edit'])->name('info-general.edit');
             Route::put('info-general', [InfoGeneralController::class, 'update'])->name('info-general.update');
