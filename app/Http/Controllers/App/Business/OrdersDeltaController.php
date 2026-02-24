@@ -5,14 +5,13 @@ namespace App\Http\Controllers\App\Business;
 use App\Domains\Businesses\Models\Business;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrdersDeltaController extends Controller
 {
     public function delta(Request $request)
     {
-        $user = $request->user();
-
-        $business = Business::where('user_id', $user->id)->first();
+        $business = Business::where('user_id', Auth::id())->first();
 
         if (!$business) {
             return response()->json([
@@ -23,11 +22,7 @@ class OrdersDeltaController extends Controller
         $since = $request->query('since');
         $orderId = $request->query('orderId');
 
- 
         $orders = $business->orders()
-            // ->when($since, function ($query) use ($since) {
-            //     $query->where('updated_at', '>', $since);
-            // })
             ->when($orderId, function ($query) use ($orderId) {
                 $query->where('id', $orderId);
             })

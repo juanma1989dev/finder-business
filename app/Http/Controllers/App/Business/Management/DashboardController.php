@@ -5,26 +5,33 @@ namespace App\Http\Controllers\App\Business\Management;
 use App\Domains\Orders\Enums\OrderStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Domains\Businesses\Models\Business;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
-{   
-    public function index(Request $request)
+{
+    public function index(int $businessId, string $slug)
     {
-        $user = $request->user();
- 
-        $data = [
-            'business' => fn () => Business::where('user_id', $user->id)->first(),
-            'orders' => fn () => Business::where('user_id', $user->id)
-                ->first()
-                ?->orders()
-                ->whereNotIn('status', OrderStatusEnum::finalStatuses())
-                ->with(['items', 'user'])
-                ->latest()
-                ->get(),
-                'final_statuses' =>  OrderStatusEnum::finalStatuses(),
-        ];
+        $business = Business::query()
+            ->where('id', $businessId)
+            ->where('user_id', Auth::id())
+            ->where('slug', $slug)
+            ->first();
 
-        return inertia('Business/Management/Dashboard', $data);
+        if (! $business) {
+            abort(404, 'El negocio no existe o no te pertenece.');
+        }
+
+        $orders = $business->orders()
+            ->whereNotIn('status', OrderStatusEnum::finalStatuses())
+            ->with(['items', 'user'])
+            ->latest()
+            ->limit(25) // evita problemas de rendimiento
+            ->get();
+
+        return inertia('Business/Management/Dashboard', [
+            'business' => $business,
+            'orders' => $orders,
+            'final_statuses' => OrderStatusEnum::finalStatuses(),
+        ]);
     }
 }
