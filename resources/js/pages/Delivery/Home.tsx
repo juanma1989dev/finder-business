@@ -140,7 +140,7 @@ export default function Index({ activeOrder }: Props) {
                     },
                 );
 
-                toast.success('Pedido aceptado 🚴‍♂️');
+                // toast.success('Pedido aceptado 🚴‍♂️');
 
                 clearIncomingOrder();
 
@@ -167,7 +167,6 @@ export default function Index({ activeOrder }: Props) {
             {},
             {
                 onSuccess: () => {
-                    toast.success(msg);
                     router.reload({ only: ['activeOrder'] });
                 },
                 onError: (e: any) => toast.error(e?.message ?? 'Error'),
@@ -189,14 +188,12 @@ export default function Index({ activeOrder }: Props) {
         });
     }, [playBlockedSound]);
 
-    /* --------------------------- Geolocation effect ------------------------- */
     useEffect(() => {
         if (latitude && longitude) {
             setDeliveryLocation([latitude, longitude]);
         }
     }, [latitude, longitude]);
 
-    /* --------------------------- Incoming timer ----------------------------- */
     useEffect(() => {
         let timer: number | undefined;
         if (incomingOrder) {
@@ -339,7 +336,6 @@ export default function Index({ activeOrder }: Props) {
                                     </div>
                                 )}
 
-                                {/* ================= ACTIVE ORDER ================= */}
                                 {hasActiveOrder && (
                                     <div className="space-y-3 border-t pt-4">
                                         <div className="flex items-center justify-between">

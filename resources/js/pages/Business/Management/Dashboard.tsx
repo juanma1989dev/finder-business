@@ -194,8 +194,6 @@ export default function Index({
                 withCredentials: true,
             });
 
-            console.log('DELTA RESPONSE :: ', response.data.orders);
-
             const incomingOrders: Order[] = response.data?.orders ?? [];
 
             if (incomingOrders.length) {
