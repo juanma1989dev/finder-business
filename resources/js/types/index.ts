@@ -260,11 +260,14 @@ export interface LoginConfig {
 
 export enum OrderStatus {
     PENDING = 'pending',
+
     CONFIRMED = 'confirmed',
     READY_FOR_PICKUP = 'ready_for_pickup',
+
+    DELIVERY_ASSIGNED = 'delivery_assigned',
     PICKED_UP = 'picked_up',
-    ON_THE_WAY = 'on_the_way',
     DELIVERED = 'delivered',
+
     CANCELLED = 'cancelled',
     REJECTED = 'rejected',
 }

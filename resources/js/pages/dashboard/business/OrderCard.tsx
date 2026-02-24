@@ -22,7 +22,7 @@ export default function OrderCard({
         <div
             className={`relative flex flex-col rounded-lg bg-white p-3 shadow-sm transition-all duration-900 ${
                 priority
-                    ? 'animate-pulse border-2 border-purple-600 ring-4 ring-purple-50 hover:animate-none'
+                    ? 'animate-pulse border-1 border-purple-600 ring-4 ring-purple-50 hover:animate-none'
                     : 'border border-purple-100'
             }`}
         >

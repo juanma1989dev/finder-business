@@ -6,13 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useGeolocation } from '@/hooks/use-Geolocation';
 import MainLayout from '@/layouts/main-layout';
+import { DollarSign, Package, PackageSearch } from '@/lib/icons';
 import { OrderStatus, SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { Timer, User2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { DollarSign, Package, PackageSearch } from '@/lib/icons';
 
 type Order = {
     id: number;
@@ -31,10 +31,10 @@ interface Props {
 }
 
 /* ----------------------------- Configuration ----------------------------- */
-const AUTO_REJECT_SECONDS = 20;
-const SOUND_NOTIFICATION = '/sounds/notification.mp3';
-const SOUND_BLOCKED = '/sounds/blocked.mp3';
-const SOUND_BLOCKED_VOLUME = 0.6;
+const AUTO_REJECT_SECONDS = 20_000;
+// const SOUND_NOTIFICATION = '/sounds/notification.mp3';
+// const SOUND_BLOCKED = '/sounds/blocked.mp3';
+// const SOUND_BLOCKED_VOLUME = 0.6;
 
 /* ---------------------------- Small utilities ---------------------------- */
 const cls = (...parts: Array<string | false | null | undefined>) =>
@@ -90,9 +90,9 @@ export default function Index({ activeOrder }: Props) {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        notificationAudioRef.current = new Audio(SOUND_NOTIFICATION);
-        blockedAudioRef.current = new Audio(SOUND_BLOCKED);
-        blockedAudioRef.current.volume = SOUND_BLOCKED_VOLUME;
+        // notificationAudioRef.current = new Audio(SOUND_NOTIFICATION);
+        // blockedAudioRef.current = new Audio(SOUND_BLOCKED);
+        // blockedAudioRef.current.volume = SOUND_BLOCKED_VOLUME;
         // ensure we don't hold onto audio objects if page unloads
         return () => {
             notificationAudioRef.current = null;
@@ -176,7 +176,7 @@ export default function Index({ activeOrder }: Props) {
     }, []);
 
     const playBlockedSound = useCallback(() => {
-        blockedAudioRef.current?.play().catch(() => { });
+        blockedAudioRef.current?.play().catch(() => {});
     }, []);
 
     const toggleAvailability = useCallback(() => {
@@ -244,7 +244,7 @@ export default function Index({ activeOrder }: Props) {
 
                 setIncomingOrder(newIncoming);
                 setCountdown(AUTO_REJECT_SECONDS);
-                notificationAudioRef.current?.play().catch(() => { });
+                notificationAudioRef.current?.play().catch(() => {});
             }
         };
 
@@ -263,131 +263,143 @@ export default function Index({ activeOrder }: Props) {
 
     return (
         <MainLayout>
-            <div className="min-h-screen space-y-2 bg-purple-50/50 p-2">
-                {incomingOrder && (
-                    <div className="fixed inset-x-0 bottom-0 z-50 duration-300 animate-in slide-in-from-bottom">
-                        <Card className="rounded-t-2xl border-t border-purple-200 bg-white shadow-2xl">
-                            <CardContent className="space-y-3 p-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <p className="text-xs font-bold tracking-widest text-purple-600 uppercase">
-                                            Pedido listo
-                                        </p>
-                                        <div className="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600">
-                                            <Timer className="h-3 w-3" />
-                                            <span>{countdown}s</span>
+            <div className="min-h-screen space-y-0 bg-purple-50/50 p-2">
+                {(incomingOrder || hasActiveOrder) && (
+                    <div className="fixed inset-x-0 bottom-0 z-50 animate-in slide-in-from-bottom">
+                        <Card className="rounded-t-2xl border-0 bg-white shadow-2xl">
+                            <CardContent className="space-y-4 p-4">
+                                {/* ================= INCOMING ORDER ================= */}
+                                {incomingOrder && (
+                                    <div className="space-y-3">
+                                        {/* Header */}
+                                        <div className="flex items-start justify-between">
+                                            <div className="space-y-1">
+                                                <p className="text-[11px] font-bold tracking-widest text-purple-600 uppercase">
+                                                    Nuevo pedido disponible
+                                                </p>
+                                                <p className="text-base font-semibold text-gray-900">
+                                                    {incomingOrder.store_name ??
+                                                        'Nuevo comercio'}
+                                                </p>
+                                            </div>
+
+                                            <div className="space-y-1 text-right">
+                                                <p className="text-xs font-medium text-gray-400">
+                                                    #{incomingOrder?.id}
+                                                </p>
+
+                                                <div className="flex items-center justify-end gap-1 text-xs font-bold text-red-600">
+                                                    <Timer className="h-3 w-3" />
+                                                    {countdown}s
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Meta info */}
+                                        <div className="flex items-center justify-between text-sm">
+                                            <p className="text-gray-500">
+                                                Distancia: —
+                                            </p>
+
+                                            <div className="flex items-center gap-1 font-bold text-green-600">
+                                                <DollarSign className="h-4 w-4" />
+                                                {incomingOrder.delivery_fee}
+                                            </div>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="flex gap-2 pt-2">
+                                            <Button
+                                                variant="ghost"
+                                                className="flex-1 border border-red-200 text-red-600 hover:bg-red-50"
+                                                onClick={() =>
+                                                    clearIncomingOrder(
+                                                        'Pedido rechazado',
+                                                    )
+                                                }
+                                                disabled={isAccepting}
+                                            >
+                                                Rechazar
+                                            </Button>
+
+                                            <Button
+                                                className="flex-1 bg-purple-600 hover:bg-purple-700"
+                                                onClick={() =>
+                                                    handleAcceptOrder(
+                                                        incomingOrder?.id ?? 0,
+                                                    )
+                                                }
+                                                disabled={isAccepting}
+                                            >
+                                                {isAccepting
+                                                    ? 'Aceptando...'
+                                                    : 'Aceptar'}
+                                            </Button>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-semibold text-gray-400">
-                                        #{incomingOrder.id}
-                                    </span>
-                                </div>
+                                )}
 
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-900">
-                                            {incomingOrder.store_name ??
-                                                'Nuevo comercio'}
-                                        </p>
-                                        <p className="text-[11px] text-gray-500">
-                                            Distancia:{' '}
-                                            {incomingOrder.distance ?? '—'} km
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-1 font-bold text-green-600">
-                                        <DollarSign className="h-4 w-4" />
-                                        <span>
-                                            {incomingOrder.delivery_fee}
-                                        </span>
-                                    </div>
-                                </div>
+                                {/* ================= ACTIVE ORDER ================= */}
+                                {hasActiveOrder && (
+                                    <div className="space-y-3 border-t pt-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <Package className="h-4 w-4 text-purple-600" />
+                                                <p className="text-sm font-semibold text-gray-900">
+                                                    Pedido en curso
+                                                </p>
+                                            </div>
 
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="outline"
-                                        className="flex-1"
-                                        onClick={() =>
-                                            clearIncomingOrder(
-                                                'Pedido rechazado',
-                                            )
-                                        }
-                                        disabled={isAccepting}
-                                        aria-label="Rechazar pedido"
-                                    >
-                                        Rechazar
-                                    </Button>
-                                    <Button
-                                        className="flex-1 bg-purple-600 font-bold"
-                                        onClick={() =>
-                                            handleAcceptOrder(incomingOrder.id)
-                                        }
-                                        disabled={isAccepting}
-                                        aria-label="Aceptar pedido"
-                                    >
-                                        {isAccepting
-                                            ? 'Procesando...'
-                                            : 'Aceptar pedido'}
-                                    </Button>
-                                </div>
+                                            <span className="text-xs font-medium text-gray-400">
+                                                #{activeOrder.id}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            {activeOrder.status ===
+                                                OrderStatus.DELIVERY_ASSIGNED && (
+                                                <Button
+                                                    className="flex-1 bg-green-600 hover:bg-green-700"
+                                                    onClick={() =>
+                                                        updateStatus(
+                                                            `/delivery/orders/${activeOrder.id}/on-the-way`,
+                                                            'En camino 🚴‍♂️',
+                                                        )
+                                                    }
+                                                >
+                                                    Iniciar ruta
+                                                </Button>
+                                            )}
+
+                                            {activeOrder.status ===
+                                                OrderStatus.PICKED_UP && (
+                                                <>
+                                                    {/* <Button
+                                                        variant="outline"
+                                                        className="flex-1"
+                                                    >
+                                                        Llegué
+                                                    </Button> */}
+
+                                                    <Button
+                                                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                                                        onClick={() =>
+                                                            updateStatus(
+                                                                `/delivery/orders/${activeOrder.id}/delivered`,
+                                                                'Entregado 📦',
+                                                            )
+                                                        }
+                                                    >
+                                                        Entregar
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
-                )}
-
-                {hasActiveOrder && (
-                    <Card className="border-purple-200 bg-white">
-                        <CardContent className="space-y-2 p-2">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Package className="h-4 w-4 text-purple-600" />
-                                    <p className="text-sm font-semibold text-purple-900">
-                                        Pedido en curso
-                                    </p>
-                                </div>
-                                <span className="text-[10px] font-bold text-purple-500">
-                                    #{activeOrder.id}
-                                </span>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button
-                                    className="flex-1 bg-purple-600 text-xs"
-                                    aria-label="Marcar llegada"
-                                >
-                                    Llegué
-                                </Button>
-
-                                {activeOrder.status === 'picked_up' && (
-                                    <Button
-                                        className="flex-1 bg-green-600 text-xs"
-                                        onClick={() =>
-                                            updateStatus(
-                                                `/delivery/orders/${activeOrder.id}/on-the-way`,
-                                                'En camino 🚴‍♂️',
-                                            )
-                                        }
-                                        aria-label="Iniciar ruta"
-                                    >
-                                        Iniciar Ruta
-                                    </Button>
-                                )}
-
-                                {activeOrder.status === 'on_the_way' && (
-                                    <Button
-                                        className="flex-1 bg-blue-600 text-xs"
-                                        onClick={() =>
-                                            updateStatus(
-                                                `/delivery/orders/${activeOrder.id}/delivered`,
-                                                'Entregado 📦',
-                                            )
-                                        }
-                                        aria-label="Entregar pedido"
-                                    >
-                                        Entregar
-                                    </Button>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
                 )}
 
                 {/* --- Profile & availability --- */}

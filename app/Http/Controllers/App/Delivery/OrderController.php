@@ -39,10 +39,11 @@ class OrderController extends Controller
                 return response()->json([]);
             }
 
+            // 
             $hasActiveOrder = Order::where('delivery_id', $delivery->id)
                 ->whereIn('status', [
+                    OrderStatusEnum::DELIVERY_ASSIGNED->value,
                     OrderStatusEnum::PICKED_UP->value,
-                    OrderStatusEnum::ON_THE_WAY->value,
                 ])->exists();
             
             if( $hasActiveOrder ) {
@@ -72,7 +73,6 @@ class OrderController extends Controller
     {
         $delivery = User::with('deliveryProfile.status')->find(Auth::id());
 
-
         if ($delivery->type !== UserTypeEnum::DELIVERY->value) {
             return response()->json([
                 'message' => 'No tienes permisos para realizar esta acción.'
@@ -94,7 +94,7 @@ class OrderController extends Controller
             $hasActiveOrder = Order::where('delivery_id', $delivery->id)
                 ->whereIn('status', [
                     OrderStatusEnum::PICKED_UP->value,
-                    OrderStatusEnum::ON_THE_WAY->value,
+                    OrderStatusEnum::DELIVERY_ASSIGNED->value,
                 ])
                 ->lockForUpdate()
                 ->exists();
@@ -107,7 +107,7 @@ class OrderController extends Controller
             }
 
             // 🔒 Intentar asignar pedido (update atómico)
-            $nextStatus = OrderStatusEnum::PICKED_UP->value;
+            $nextStatus = OrderStatusEnum::DELIVERY_ASSIGNED->value;
 
             $updated = Order::where('id', $order->id)
                 ->where('status', OrderStatusEnum::READY_FOR_PICKUP->value)
@@ -126,6 +126,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
+
 
             $this->dispatcher->dispatch($order, $nextStatus);  
 
@@ -150,21 +151,24 @@ class OrderController extends Controller
 
         try{
 
+            // Verificaciones básicas
             if($delivery->type !== UserTypeEnum::DELIVERY->value){
                 return response()->json(['message' => 'No autorizado']);
             }
-
+            
+            // Verificar que el pedido esté asignado al repartidor
             if ($order->delivery_id !== $delivery->id) {
                 return response()->json(['message' => 'No es tu pedido'], 403);
             }
 
-            if ($order->status !== OrderStatusEnum::PICKED_UP->value) {
+            // 
+            if ($order->status !== OrderStatusEnum::DELIVERY_ASSIGNED->value) {
                 return response()->json([
                     'message' => 'Estado inválido',
                 ], 422);
             }
 
-            $nextStatus = OrderStatusEnum::ON_THE_WAY->value;
+            $nextStatus = OrderStatusEnum::PICKED_UP->value;
 
             $order->update([
                 'status'        => $nextStatus,
@@ -193,7 +197,7 @@ class OrderController extends Controller
                 return response()->json(['message' => 'No es tu pedido'], 403);
             }
 
-            if ($order->status !== OrderStatusEnum::ON_THE_WAY->value) {
+            if ($order->status !== OrderStatusEnum::PICKED_UP->value) {
                 return response()->json([
                     'message' => 'El pedido no está en camino',
                 ], 422);

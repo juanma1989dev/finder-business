@@ -20,7 +20,7 @@ class LocationController extends Controller
         }
 
         $order = Order::where('delivery_id', $delivery->id)
-            ->where('status', OrderStatusEnum::ON_THE_WAY->value)
+            ->where('status', OrderStatusEnum::PICKED_UP->value)
             ->first();
 
         if (!$order) {

@@ -79,9 +79,7 @@ export default function Index({
         return onMessage(messaging, (payload) => {
             toast.success(
                 <div className="flex flex-col gap-1">
-                    <p className="font-bold">
-                        {payload.data?.title || 'Nuevo Pedido'}
-                    </p>
+                    <p className="font-bold">{payload.data?.title}</p>
                     <p className="text-xs">{payload.data?.body}</p>
                 </div>,
             );
@@ -94,9 +92,11 @@ export default function Index({
                 : null;
 
             if (order) {
-                setOrdersState((prev) => mergeOrders(prev, [order]));
+                syncOrdersDelta(order.id);
+                console.log('SYNCING ORDER :: ', order.id);
             } else {
                 syncOrdersDelta();
+                console.log('SYNCING ALL ORDERS');
             }
         });
     }, []);
@@ -194,11 +194,7 @@ export default function Index({
                 withCredentials: true,
             });
 
-            console.log('Sync Orders Delta :: ', {
-                lastSyncAt,
-                orderId,
-            });
-            console.log('Delta Sync :: ', response.data);
+            console.log('DELTA RESPONSE :: ', response.data.orders);
 
             const incomingOrders: Order[] = response.data?.orders ?? [];
 

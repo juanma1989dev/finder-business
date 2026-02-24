@@ -5,20 +5,20 @@ namespace App\Domains\Orders\Enums;
 enum OrderStatusEnum: string
 {
     # Cliente
-    case PENDING            = 'pending';             # Pedido creado
+    case PENDING            = 'pending';            // Esperando confirmación del negocio
 
     # Negocio
-    case CONFIRMED          = 'confirmed';           # Negocio acepta
-    case READY_FOR_PICKUP   = 'ready_for_pickup';    # Pedido listo
+    case CONFIRMED          = 'confirmed';          // Negocio confirmó el pedido y está preparando el pedido
+    case READY_FOR_PICKUP   = 'ready_for_pickup';   // El pedido está listo para ser recogido por el repartidor
 
     # Repartidor
-    case PICKED_UP          = 'picked_up';           # Repartidor recoge
-    case ON_THE_WAY         = 'on_the_way';           # En camino
-    case DELIVERED          = 'delivered';            # Entregado
+    case DELIVERY_ASSIGNED  = 'delivery_assigned';   // Un repartidor ha sido asignado al pedido
+    case PICKED_UP          = 'picked_up';           // El repartidor ha recogido el pedido del negocio
+    case DELIVERED          = 'delivered';           // El repartidor ha entregado el pedido al cliente
 
-    # Finales / Excepciones
-    case CANCELLED          = 'cancelled';            # Cancelado
-    case REJECTED           = 'rejected';             # Rechazado por negocio
+    # Finales
+    case CANCELLED          = 'cancelled';          // El pedido ha sido cancelado por el cliente o el negocio
+    case REJECTED           = 'rejected';           // El pedido ha sido rechazado por el negocio (por ejemplo, por falta de stock) 
 
     public static function values(): array
     {
@@ -31,14 +31,14 @@ enum OrderStatusEnum: string
     public static function labels(): array
     {
         return [
-            self::PENDING->value          => 'Pendiente',
-            self::CONFIRMED->value        => 'Confirmado',
-            self::READY_FOR_PICKUP->value => 'Listo para recoger',
-            self::PICKED_UP->value        => 'Pedido recogido',
-            self::ON_THE_WAY->value       => 'En camino',
-            self::DELIVERED->value        => 'Entregado',
-            self::CANCELLED->value        => 'Cancelado',
-            self::REJECTED->value         => 'Rechazado',
+            self::PENDING->value           => 'Pendiente',
+            self::CONFIRMED->value         => 'Confirmado',
+            self::READY_FOR_PICKUP->value  => 'Listo para recoger',
+            self::DELIVERY_ASSIGNED->value => 'Repartidor asignado',
+            self::PICKED_UP->value         => 'Pedido recogido',
+            self::DELIVERED->value         => 'Entregado',
+            self::CANCELLED->value         => 'Cancelado',
+            self::REJECTED->value          => 'Rechazado',
         ];
     }
 

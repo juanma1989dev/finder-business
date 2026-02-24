@@ -52,7 +52,7 @@ const STEPS: { key: OrderStatus; label: string }[] = [
     { key: OrderStatus.CONFIRMED, label: 'Confirmado' },
     { key: OrderStatus.READY_FOR_PICKUP, label: 'Por recoger' },
     { key: OrderStatus.PICKED_UP, label: 'Recogido' },
-    { key: OrderStatus.ON_THE_WAY, label: 'En camino' },
+    { key: OrderStatus.DELIVERY_ASSIGNED, label: 'En camino' },
 ];
 
 const STORAGE_KEY = 'active-order-expanded';

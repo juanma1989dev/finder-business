@@ -17,7 +17,7 @@ class IndexController extends Controller
             ->where('delivery_id', $user->id)
             ->whereIn('status', [
                 OrderStatusEnum::PICKED_UP->value,
-                OrderStatusEnum::ON_THE_WAY->value,
+                OrderStatusEnum::DELIVERY_ASSIGNED->value,
             ])
             ->latest()
             ->first();

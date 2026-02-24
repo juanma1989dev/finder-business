@@ -16,25 +16,31 @@ class PickupHandler
     {
         $tokens = $this->getTokens($order);
 
-        $extra = [
-            'order' => $order,
-        ];
-
         $this->push->notify(
             $tokens,
-            'Pedido Confirmado por el repartidor 🚚',
+            'Pedido Confirmado por el repartidor 🚚 ' ,
             "Tu pedido #{$order->id} fue confirmado." ,
-            $extra
+            [
+                'order' => $order,
+            ]
         );
     }
 
-
     private function getTokens(Order $order)
     {
-        $user = User::with(['fcmTokens'])->find($order->user_id);
-        
-        $token = $user->fcmTokens->token;
+        $order->loadMissing([
+            'user.fcmTokens',
+            'business.owner.fcmTokens'
+        ]);
 
-        return [$token];
+        $clientTokens = $order->user?->fcmTokens?->pluck('token')->toArray() ?? [];
+        $ownerTokens = $order->business?->owner?->fcmTokens?->pluck('token')->toArray() ?? [];
+
+        $tokens =  array_values(array_unique([
+            ...$clientTokens,
+            ...$ownerTokens,
+        ]));
+
+        return $tokens;
     }
 }

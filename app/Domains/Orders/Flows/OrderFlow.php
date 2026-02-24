@@ -9,32 +9,39 @@ class OrderFlow
 {
     public static function flow(): array
     {
-        return  [
+         return [
             UserTypeEnum::CLIENT->value => [
                 OrderStatusEnum::PENDING->value => [
                     OrderStatusEnum::CANCELLED->value,
                 ],
             ],
-            UserTypeEnum::DELIVERY->value => [
-                OrderStatusEnum::READY_FOR_PICKUP->value => [
-                    OrderStatusEnum::PICKED_UP->value,
-                ],
-                OrderStatusEnum::PICKED_UP->value => [
-                    OrderStatusEnum::ON_THE_WAY->value,
-                ],
-                OrderStatusEnum::ON_THE_WAY->value => [
-                    OrderStatusEnum::DELIVERED->value,
-                ],
-            ],
+
             UserTypeEnum::BUSINESS->value => [
                 OrderStatusEnum::PENDING->value => [
                     OrderStatusEnum::REJECTED->value,
                     OrderStatusEnum::CONFIRMED->value,
                 ],
+
                 OrderStatusEnum::CONFIRMED->value => [
                     OrderStatusEnum::READY_FOR_PICKUP->value,
+                    // OrderStatusEnum::CANCELLED->value, // opcional si permites cancelar aquí
                 ],
-            ]
+            ],
+
+            UserTypeEnum::DELIVERY->value => [
+                OrderStatusEnum::READY_FOR_PICKUP->value => [
+                    OrderStatusEnum::DELIVERY_ASSIGNED->value,
+                ],
+
+                OrderStatusEnum::DELIVERY_ASSIGNED->value => [
+                    OrderStatusEnum::PICKED_UP->value,
+                ],
+
+                OrderStatusEnum::PICKED_UP->value => [
+                    OrderStatusEnum::DELIVERED->value,
+                ],
+            ],
+
         ];
     }
 

@@ -28,13 +28,21 @@ class DeliveredHandler
         );
     }
 
-    # al negocio
     private function getTokens(Order $order)
     {
-        $user = User::with(['fcmTokens'])->find($order->user_id);
-        
-        $token = $user->fcmTokens->token;
+        $order->loadMissing([
+            'user.fcmTokens',
+            'business.owner.fcmTokens'
+        ]);
 
-        return [$token];
+        $clientTokens = $order->user?->fcmTokens?->pluck('token')->toArray() ?? [];
+        $ownerTokens = $order->business?->owner?->fcmTokens?->pluck('token')->toArray() ?? [];
+
+        $tokens =  array_values(array_unique([
+            ...$clientTokens,
+            ...$ownerTokens,
+        ]));
+
+        return $tokens;
     }
 }
