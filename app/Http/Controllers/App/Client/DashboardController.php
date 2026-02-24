@@ -26,7 +26,7 @@ class DashboardController extends Controller
             ->get();
 
 
-        return inertia('client/dashboard/Index', [
+        return inertia('Client/Dashboard', [
             'orders' => $orders,
             'filters' => [
                 'date' => $date->toDateString(),

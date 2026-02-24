@@ -24,7 +24,7 @@ class BusinessController extends Controller
         $userId = Auth::id();
         $data = $this->businessService->getDataListBusinessByuser($userId);
 
-        return inertia('admin/Business', $data);
+        return inertia('Business/BusinessList', $data);
     }
 
     public function store(CreateBusinessRequest $request)

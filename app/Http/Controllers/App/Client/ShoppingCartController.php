@@ -13,7 +13,7 @@ class ShoppingCartController extends Controller
 {
     public function index()
     {
-        return inertia('public/ShoppingCart/DetailsPage');
+        return inertia('Client/ShoppingCart/DetailsPage');
     }
 
     public function create(Request $request, CreateOrderAction $action)
@@ -47,6 +47,6 @@ class ShoppingCartController extends Controller
             'statusLabel' => OrderStatusEnum::labels()[$order->status] ?? $order->status,
         ];
 
-        return inertia('public/ShoppingCart/OrderPage', $data);
+        return inertia('Client/ShoppingCart/OrderPage', $data);
     }
 }

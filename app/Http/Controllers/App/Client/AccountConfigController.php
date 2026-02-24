@@ -20,7 +20,7 @@ class AccountConfigController extends Controller
             'suggestedType' => UserTypeEnum::CLIENT->value
         ];
         
-        return inertia('AccountConfig', $data);
+        return inertia('Client/AccountConfig', $data);
     }
 
     public function store(Request $request)

@@ -103,7 +103,7 @@ export default function SocialNetworks({ business }: Props) {
             titleHead="Redes Sociales"
             headerTitle="Presencia Digital"
             headerDescription="Gestiona los enlaces a tus redes sociales y sitio web oficial."
-            buttonText="Guardar Enlaces"
+            buttonText="Guardar"
             icon={Share2}
             onSubmit={handleSubmit}
             processing={processing}

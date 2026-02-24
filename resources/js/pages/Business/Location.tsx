@@ -65,7 +65,7 @@ export default function Location({ business }: Props) {
             titleHead="Localización"
             headerTitle="Ubicación"
             headerDescription="Configura la localización física del negocio"
-            buttonText="Guardar cambios"
+            buttonText="Guardar"
             icon={MapPin}
             onSubmit={handleSave}
             processing={processing}

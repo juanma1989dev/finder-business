@@ -6,8 +6,8 @@ import Header from '@/components/app/Header';
 import MobileSidebar from '@/components/app/MobileSidebar';
 import { messaging, onMessage } from '@/firebase';
 import { usePwaUpdate } from '@/hooks/usePwaUpdate';
-import { CartFloatButton } from '@/pages/public/business/CartFloatButton';
-import { CartDrawer } from '@/pages/public/business/drawer-cart';
+import { CartFloatButton } from '@/pages/Public/Business/CartFloatButton';
+import { CartDrawer } from '@/pages/Public/Business/drawer-cart';
 import { SharedData } from '@/types';
 import ProviderLayout from './ProviderLayout';
 

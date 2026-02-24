@@ -18,7 +18,7 @@ class GalleryController extends Controller
     {
         $data = $this->galleryService->getData($idBusiness);
 
-        return inertia('admin/Business/Gallery', $data);
+        return inertia('Business/Gallery', $data);
     }
 
     public function store(Request $request, string $businessId, string $slug)

@@ -17,7 +17,7 @@ class SocialNetworksController extends Controller
     {
         $data = $this->networksService->getData($idBusiness);
 
-        return inertia('admin/Business/SocialNetworks', $data);
+        return inertia('Business/SocialNetworks', $data);
     }
 
     public function update(Request $request, $id, string $slug)

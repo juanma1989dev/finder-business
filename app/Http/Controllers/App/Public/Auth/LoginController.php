@@ -11,7 +11,7 @@ class LoginController extends Controller
     {
         $data = [];
 
-        return inertia('auth/LoginPage', $data);
+        return inertia('Public/Auth/Login', $data);
     }
 
     // public function destroy(Request $request): RedirectResponse

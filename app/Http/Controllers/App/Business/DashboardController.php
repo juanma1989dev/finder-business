@@ -25,6 +25,6 @@ class DashboardController extends Controller
                 'final_statuses' =>  OrderStatusEnum::finalStatuses(),
         ];
 
-        return inertia('dashboard/business/Index', $data);
+        return inertia('Business/Dashboard', $data);
     }
 }

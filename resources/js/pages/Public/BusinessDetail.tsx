@@ -18,8 +18,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { InfoBusinessTab } from './info-tab';
-import { ProductsBussinessTab } from './products-tab';
+import { InfoBusinessTab } from './Business/info-tab';
+import { ProductsBussinessTab } from './Business/products-tab';
 
 interface Props {
     business: Business;

@@ -11,6 +11,6 @@ class RegisterController extends Controller
     {
          $data = [];
 
-        return inertia('auth/RegisterPage', $data);
+        return inertia('Public/Auth/Register', $data);
     }
 }

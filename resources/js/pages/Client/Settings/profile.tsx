@@ -1,5 +1,3 @@
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-// import { send } from '@/routes/verification';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head, usePage } from '@inertiajs/react';
@@ -42,7 +40,6 @@ export default function Profile({
                     />
 
                     <Form
-                        {...ProfileController.update.form()}
                         options={{
                             preserveScroll: true,
                         }}

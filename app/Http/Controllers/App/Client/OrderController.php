@@ -17,6 +17,6 @@ class OrderController extends Controller
             'order' => $order
         ];
 
-        return inertia('public/client/Order', $data);
+        return inertia('Client/Order', $data);
     }
 }

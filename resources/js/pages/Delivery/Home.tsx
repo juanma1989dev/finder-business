@@ -12,7 +12,7 @@ import axios from 'axios';
 import { Timer, User2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { DollarSign, Package, PackageSearch } from './../../../lib/icons';
+import { DollarSign, Package, PackageSearch } from '@/lib/icons';
 
 type Order = {
     id: number;
@@ -176,7 +176,7 @@ export default function Index({ activeOrder }: Props) {
     }, []);
 
     const playBlockedSound = useCallback(() => {
-        blockedAudioRef.current?.play().catch(() => {});
+        blockedAudioRef.current?.play().catch(() => { });
     }, []);
 
     const toggleAvailability = useCallback(() => {
@@ -244,7 +244,7 @@ export default function Index({ activeOrder }: Props) {
 
                 setIncomingOrder(newIncoming);
                 setCountdown(AUTO_REJECT_SECONDS);
-                notificationAudioRef.current?.play().catch(() => {});
+                notificationAudioRef.current?.play().catch(() => { });
             }
         };
 

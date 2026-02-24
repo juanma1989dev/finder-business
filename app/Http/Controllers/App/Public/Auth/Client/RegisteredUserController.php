@@ -21,7 +21,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return inertia('auth/client/register', [
+        return inertia('Public/Auth/Client/register', [
             'typeUser' => UserTypeEnum::CLIENT,
         ]);
     }

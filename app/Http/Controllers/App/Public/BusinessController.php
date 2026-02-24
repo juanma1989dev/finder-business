@@ -26,7 +26,7 @@ final class BusinessController extends Controller
         $user = Auth::user()->id ?? null;
         $user = User::find($user);
 
-        return inertia('Index', [
+        return inertia('Public/Index', [
             ...$data,
             'activeOrder' => $user->activeOrder ?? null
         ]);
@@ -39,7 +39,7 @@ final class BusinessController extends Controller
     {
         $data = $this->searchService->getBusinessDetails($id, Auth::id());
 
-        return inertia('public/business/detail', $data);
+        return inertia('Public/BusinessDetail', $data);
     }
 
     /**
@@ -47,7 +47,7 @@ final class BusinessController extends Controller
      */
     public function favorites(): Response
     {
-        return inertia('public/Favorites', [
+        return inertia('Public/Favorites', [
             'businesses' => $this->searchService->getFavoritesByUser(Auth::id()),
         ]);
     }

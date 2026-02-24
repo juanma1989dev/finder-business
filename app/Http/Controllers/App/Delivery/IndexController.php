@@ -22,7 +22,7 @@ class IndexController extends Controller
             ->latest()
             ->first();
 
-        return inertia('public/delivery/Index', [
+        return inertia('Delivery/Home', [
             'activeOrder' => $activeOrder,
         ]);
     }

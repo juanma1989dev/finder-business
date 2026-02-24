@@ -20,7 +20,7 @@ class ProductsController extends Controller
     {
         $data = $this->productsService->getData($idBusiness);
 
-        return inertia('admin/Business/Products', $data);
+        return inertia('Business/Products', $data);
     }
 
     public function store(ProductsRequest $request, string $idBusiness, string $slug): RedirectResponse

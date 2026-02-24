@@ -19,7 +19,7 @@ class LocationController extends Controller
     {
         $data = $this->locationService->getData($idBusiness);
 
-        return inertia('admin/Business/Location', $data);
+        return inertia('Business/Location', $data);
     }
 
     public function update(Request $request, $id)

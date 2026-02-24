@@ -20,7 +20,7 @@ class InfoGeneralController extends Controller {
     {
         $data = $this->generalInfoService->getInfo($idBusiness);
 
-        return inertia('admin/Business/InfoGeneral', $data);
+        return inertia('Business/InfoGeneral', $data);
     }   
     
     public function update(Request $request, $idBusiness)

@@ -1,7 +1,7 @@
 import { useOrderStatus } from '@/hooks/useOrderStatus';
 import { OrderStatus } from '@/types';
 import { PackageSearch } from 'lucide-react';
-import OrderCard from './OrderCard';
+import OrderCard from '../dashboard/business/OrderCard';
 
 interface Props {
     orders: any[];
