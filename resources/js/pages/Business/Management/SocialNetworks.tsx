@@ -15,7 +15,7 @@ import {
     Youtube,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { LayoutBusinessModules } from './LayoutBusinessModules';
+import { LayoutBusinessModules } from '../LayoutBusinessModules';
 
 interface Props {
     business: Business;

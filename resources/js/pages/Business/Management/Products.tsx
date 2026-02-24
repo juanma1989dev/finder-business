@@ -12,8 +12,8 @@ import {
     ProductsTypes,
     ServicesAndProducts,
 } from '@/types';
-import { LayoutBusinessModules } from './LayoutBusinessModules';
-import ProductServiceModal from './ProductServiceModal';
+import { LayoutBusinessModules } from '../LayoutBusinessModules';
+import ProductServiceModal from '../ProductServiceModal';
 
 interface Props {
     business: Business;

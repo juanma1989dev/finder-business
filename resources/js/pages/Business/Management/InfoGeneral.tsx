@@ -14,7 +14,7 @@ import {
 import { useForm } from '@inertiajs/react';
 import { Coffee, LayoutGrid, ShieldCheck, Wallet } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { LayoutBusinessModules } from './LayoutBusinessModules';
+import { LayoutBusinessModules } from '../LayoutBusinessModules';
 import {
     AvailabilitySection,
     CardBase,
@@ -23,7 +23,7 @@ import {
     Field,
     SectionHeader,
     useToggleList,
-} from './components';
+} from '../components';
 
 interface Props {
     business: Business;

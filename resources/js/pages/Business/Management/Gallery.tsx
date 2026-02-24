@@ -7,7 +7,7 @@ import { useForm } from '@inertiajs/react';
 import { ImageIcon, Plus, Star, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { LayoutBusinessModules } from './LayoutBusinessModules';
+import { LayoutBusinessModules } from '../LayoutBusinessModules';
 
 interface Props {
     business: any;

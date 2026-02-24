@@ -6,9 +6,9 @@ import axios from 'axios';
 import { Power, PowerOff, Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import GridOrders from './GridOrders';
-import NotesDialog from './NotesDialog';
-import Stat from './Stat';
+import GridOrders from '../GridOrders';
+import NotesDialog from '../NotesDialog';
+import Stat from '../Stat';
 
 enum Tabs {
     Todos = 'Todos',
@@ -89,7 +89,15 @@ export default function Index({
             if (reloadTimeoutRef.current) {
                 clearTimeout(reloadTimeoutRef.current);
             }
-            syncOrdersDelta();
+            const order = payload.data?.order
+                ? JSON.parse(payload.data.order)
+                : null;
+
+            if (order) {
+                setOrdersState((prev) => mergeOrders(prev, [order]));
+            } else {
+                syncOrdersDelta();
+            }
         });
     }, []);
 
@@ -129,10 +137,9 @@ export default function Index({
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    // toast.success('Pedido actualizado');
                     setReasonDialog({ open: false });
                     setNoteText('');
-                    syncOrdersDelta();
+                    syncOrdersDelta(orderId);
                 },
                 onError: () => toast.error('Error al actualizar pedido'),
                 onFinish: () => setLoadingOrderId(null),
@@ -178,14 +185,20 @@ export default function Index({
         return Array.from(map.values());
     };
 
-    const syncOrdersDelta = async () => {
+    const syncOrdersDelta = async (orderId?: number) => {
         try {
             const response = await axios.get('/dashboard/orders/delta', {
                 params: {
-                    since: lastSyncAt,
+                    orderId: orderId,
                 },
                 withCredentials: true,
             });
+
+            console.log('Sync Orders Delta :: ', {
+                lastSyncAt,
+                orderId,
+            });
+            console.log('Delta Sync :: ', response.data);
 
             const incomingOrders: Order[] = response.data?.orders ?? [];
 
