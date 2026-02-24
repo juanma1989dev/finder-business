@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\App\Business;
+namespace App\Http\Controllers\App\Business\Management;
 
 use App\Domains\Businesses\Dtos\NetworksDTO;
 use App\Http\Controllers\Controller;
@@ -17,7 +17,7 @@ class SocialNetworksController extends Controller
     {
         $data = $this->networksService->getData($idBusiness);
 
-        return inertia('Business/SocialNetworks', $data);
+        return inertia('Business/Management/SocialNetworks', $data);
     }
 
     public function update(Request $request, $id, string $slug)

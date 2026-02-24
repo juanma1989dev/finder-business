@@ -10,7 +10,7 @@ use App\Http\Requests\Dashboard\Business\CreateBusinessRequest;
 use Illuminate\Support\Facades\Auth;
 use \Throwable;
 
-class BusinessController extends Controller
+class IndexController extends Controller
 {
 
     public function __construct(

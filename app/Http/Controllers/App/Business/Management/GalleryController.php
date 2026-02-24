@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\App\Business;
+namespace App\Http\Controllers\App\Business\Management;
 
 use App\Domains\Businesses\Dtos\GalleryBusinessDTO;
 use App\Domains\Businesses\Dtos\ImageBusinessDTO;
@@ -18,7 +18,7 @@ class GalleryController extends Controller
     {
         $data = $this->galleryService->getData($idBusiness);
 
-        return inertia('Business/Gallery', $data);
+        return inertia('Business/Management/Gallery', $data);
     }
 
     public function store(Request $request, string $businessId, string $slug)

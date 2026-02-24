@@ -40,11 +40,10 @@ class BusinessNotificationService
                 $data = [
                     'title' => '🛍️ ¡Nuevo Pedido Recibido!',
                     'body'  => "Has recibido el pedido #{$order->id}. ¡Empieza a prepararlo!",
-                    'order_id' => (string) $order->id,
-                    'type' => 'new_order_business'
+                    'order' => $order, 
                 ];
 
-                $this->fcmNotificationService->send(
+                $this->fcmNotificationService->send( /// Migrar a manejador de estados global <<<<******
                     $data,
                     [$owner->fcmTokens->token]
                 );

@@ -21,10 +21,15 @@ class OrdersDeltaController extends Controller
         }
 
         $since = $request->query('since');
+        $orderId = $request->query('orderId');
 
+ 
         $orders = $business->orders()
-            ->when($since, function ($query) use ($since) {
-                $query->where('updated_at', '>', $since);
+            // ->when($since, function ($query) use ($since) {
+            //     $query->where('updated_at', '>', $since);
+            // })
+            ->when($orderId, function ($query) use ($orderId) {
+                $query->where('id', $orderId);
             })
             ->with(['items', 'user'])
             ->latest()

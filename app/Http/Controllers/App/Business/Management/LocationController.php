@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\App\Business;
+namespace App\Http\Controllers\App\Business\Management;
 
 use App\Domains\Businesses\Dtos\LocationBusinessDTO;
 use App\Http\Controllers\Controller;
@@ -19,7 +19,7 @@ class LocationController extends Controller
     {
         $data = $this->locationService->getData($idBusiness);
 
-        return inertia('Business/Location', $data);
+        return inertia('Business/Management/Location', $data);
     }
 
     public function update(Request $request, $id)

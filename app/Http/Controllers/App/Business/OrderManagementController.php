@@ -29,17 +29,15 @@ class OrderManagementController extends Controller
         } catch (\DomainException $e) {
             return back()->with('error', $e->getMessage());
         }
-
-        return back()->with('success', 'Pedido actualizado');
     }
 
-    private function generateCode(): string
-    {
-       return str_pad(
-            random_int(0, 99999),
-            5,
-            '0',
-            STR_PAD_LEFT
-        );
-    }
+    // private function generateCode(): string
+    // {
+    //    return str_pad(
+    //         random_int(0, 99999),
+    //         5,
+    //         '0',
+    //         STR_PAD_LEFT
+    //     );
+    // }
 }

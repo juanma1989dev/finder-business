@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\App\Business;
+namespace App\Http\Controllers\App\Business\Management;
 
-use App\Http\Controllers\Controller;
-use App\Domains\Businesses\Services\BusinessService;
 use Exception;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Domains\Businesses\Services\BusinessService;
 
-class BusinessOpeningController extends Controller
+class AvailabilityController extends Controller
 {
     public function __construct(
         private readonly BusinessService $businessService

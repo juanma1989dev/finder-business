@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\App\Business;
+namespace App\Http\Controllers\App\Business\Management;
 
 use App\Domains\Orders\Enums\OrderStatusEnum;
 use App\Http\Controllers\Controller;
@@ -25,6 +25,6 @@ class DashboardController extends Controller
                 'final_statuses' =>  OrderStatusEnum::finalStatuses(),
         ];
 
-        return inertia('Business/Dashboard', $data);
+        return inertia('Business/Management/Dashboard', $data);
     }
 }

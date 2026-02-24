@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\App\Business;
+namespace App\Http\Controllers\App\Business\Management;
 
 use App\Domains\Businesses\Dtos\ProductsDTO;
 use App\Http\Controllers\Controller;
@@ -20,7 +20,7 @@ class ProductsController extends Controller
     {
         $data = $this->productsService->getData($idBusiness);
 
-        return inertia('Business/Products', $data);
+        return inertia('Business/Management/Products', $data);
     }
 
     public function store(ProductsRequest $request, string $idBusiness, string $slug): RedirectResponse

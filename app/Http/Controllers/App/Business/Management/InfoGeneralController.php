@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\App\Business;
+namespace App\Http\Controllers\App\Business\Management;
 
-use App\Domains\Businesses\Dtos\InfoGeneralDTO;
 use App\Http\Controllers\Controller;
+use App\Domains\Businesses\Dtos\InfoGeneralDTO;
 use App\Domains\Businesses\Services\GeneralInfoService;
-use App\Http\Requests\Dashboard\Business\InfoGeneralRequest;
 use Illuminate\Http\Request;
 
 class InfoGeneralController extends Controller {
@@ -20,7 +19,7 @@ class InfoGeneralController extends Controller {
     {
         $data = $this->generalInfoService->getInfo($idBusiness);
 
-        return inertia('Business/InfoGeneral', $data);
+        return inertia('Business/Management/InfoGeneral', $data);
     }   
     
     public function update(Request $request, $idBusiness)
