@@ -40,7 +40,7 @@ export default function GridOrders({
                     <PackageSearch size={40} />
                 </div>
                 <h3 className="text-base font-semibold text-gray-700 uppercase">
-                    No hay pedidos en cola
+                    No hay pedidos por atender
                 </h3>
                 <p className="mt-1 text-[10px] font-normal tracking-widest text-gray-500 uppercase">
                     Los nuevos pedidos aparecerán automáticamente aquí

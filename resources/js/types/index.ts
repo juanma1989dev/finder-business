@@ -229,7 +229,7 @@ export interface OrderItem {
 
 export interface Order {
     id: number;
-    status: string;
+    status: OrderStatus;
     subtotal: string;
     shipping: string;
     total: string;

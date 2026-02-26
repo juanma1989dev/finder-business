@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Client\ActiveOrderController;
 use App\Http\Controllers\App\Client\DashboardController as IndexController;
 use App\Http\Controllers\App\Client\Settings\PasswordController;
 use App\Http\Controllers\App\Client\Settings\ProfileController;
@@ -74,3 +75,9 @@ Route::delete('/cart/{key}', [CartController::class, 'destroy'])->name('cart.des
 
 Route::get('/orders/{order}/status', [OrderStatusController::class, 'show'])->middleware('auth');
 Route::get('/orders/{order}', [ OrderController::class, 'show' ]);
+
+
+/**
+ * Api Routes 
+ */
+Route::middleware(['auth'])->get('/api/v1/me/active-order', [ActiveOrderController::class, 'show']);
