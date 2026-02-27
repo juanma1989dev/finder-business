@@ -150,14 +150,17 @@ export default function Index({ activeOrder }: Props) {
         );
     }, []);
 
-    const clearIncomingOrder = useCallback((message?: string) => {
-        stopNotification();
+    const clearIncomingOrder = useCallback(
+        (message?: string) => {
+            stopNotification();
 
-        setIncomingOrder(null);
-        setCountdown(AUTO_REJECT_SECONDS);
+            setIncomingOrder(null);
+            setCountdown(AUTO_REJECT_SECONDS);
 
-        if (message) toast.info(message);
-    }, [stopNotification]);
+            if (message) toast.info(message);
+        },
+        [stopNotification],
+    );
 
     const handleAcceptOrder = useCallback(
         async (orderId: number) => {
@@ -206,7 +209,10 @@ export default function Index({ activeOrder }: Props) {
                 {},
                 {
                     onSuccess: () => {
-                        playNotification({ withSound: false, vibrationType: 'short' });
+                        playNotification({
+                            withSound: false,
+                            vibrationType: 'short',
+                        });
                         router.reload({ only: ['activeOrder'] });
                     },
                     onError: (e: any) => toast.error(e?.message ?? 'Error'),
@@ -218,7 +224,7 @@ export default function Index({ activeOrder }: Props) {
     );
 
     const playBlockedSound = useCallback(() => {
-        blockedAudioRef.current?.play().catch(() => { });
+        blockedAudioRef.current?.play().catch(() => {});
     }, []);
 
     const toggleAvailability = useCallback(() => {
@@ -366,10 +372,11 @@ export default function Index({ activeOrder }: Props) {
                                 </div>
                                 <button
                                     onClick={toggleAvailability}
-                                    className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-4 py-2 text-[10px] font-black tracking-wider uppercase transition-all duration-300 active:scale-95 ${deliveryAvailable
-                                        ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                        } ${hasActiveOrder && 'cursor-not-allowed opacity-50'}`}
+                                    className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-4 py-2 text-[10px] font-black tracking-wider uppercase transition-all duration-300 active:scale-95 ${
+                                        deliveryAvailable
+                                            ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                    } ${hasActiveOrder && 'cursor-not-allowed opacity-50'}`}
                                 >
                                     {deliveryAvailable ? (
                                         <>
@@ -505,7 +512,7 @@ export default function Index({ activeOrder }: Props) {
                                                     onClick={() =>
                                                         handleAcceptOrder(
                                                             incomingOrder?.id ??
-                                                            0,
+                                                                0,
                                                         )
                                                     }
                                                     disabled={isAccepting}
@@ -543,7 +550,7 @@ export default function Index({ activeOrder }: Props) {
                                                         style={{
                                                             width:
                                                                 activeOrder.status ===
-                                                                    OrderStatus.PICKED_UP
+                                                                OrderStatus.PICKED_UP
                                                                     ? '100%'
                                                                     : '50%',
                                                         }}
@@ -554,54 +561,54 @@ export default function Index({ activeOrder }: Props) {
                                             <div className="flex gap-3">
                                                 {activeOrder.status ===
                                                     OrderStatus.DELIVERY_ASSIGNED && (
-                                                        <button
-                                                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-green-200 transition-all hover:bg-green-700 active:scale-95 disabled:opacity-50"
-                                                            onClick={() =>
-                                                                updateStatus(
-                                                                    `/delivery/orders/${activeOrder.id}/on-the-way`,
-                                                                    'En camino 🚴‍♂️',
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                isUpdatingStatus
-                                                            }
-                                                        >
-                                                            {isUpdatingStatus ? (
-                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                            ) : (
-                                                                <>
-                                                                    Recoger Pedido
-                                                                    <ChevronRight className="h-4 w-4" />
-                                                                </>
-                                                            )}
-                                                        </button>
-                                                    )}
+                                                    <button
+                                                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-green-200 transition-all hover:bg-green-700 active:scale-95 disabled:opacity-50"
+                                                        onClick={() =>
+                                                            updateStatus(
+                                                                `/delivery/orders/${activeOrder.id}/on-the-way`,
+                                                                'En camino 🚴‍♂️',
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            isUpdatingStatus
+                                                        }
+                                                    >
+                                                        {isUpdatingStatus ? (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        ) : (
+                                                            <>
+                                                                Recoger Pedido
+                                                                <ChevronRight className="h-4 w-4" />
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                )}
 
                                                 {activeOrder.status ===
                                                     OrderStatus.PICKED_UP && (
-                                                        <button
-                                                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50"
-                                                            onClick={() =>
-                                                                updateStatus(
-                                                                    `/delivery/orders/${activeOrder.id}/delivered`,
-                                                                    'Entregado 📦',
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                isUpdatingStatus
-                                                            }
-                                                        >
-                                                            {isUpdatingStatus ? (
-                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                            ) : (
-                                                                <>
-                                                                    Confirmar
-                                                                    Entrega
-                                                                    <PackageCheck className="h-4 w-4" />
-                                                                </>
-                                                            )}
-                                                        </button>
-                                                    )}
+                                                    <button
+                                                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50"
+                                                        onClick={() =>
+                                                            updateStatus(
+                                                                `/delivery/orders/${activeOrder.id}/delivered`,
+                                                                'Entregado 📦',
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            isUpdatingStatus
+                                                        }
+                                                    >
+                                                        {isUpdatingStatus ? (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        ) : (
+                                                            <>
+                                                                Confirmar
+                                                                Entrega
+                                                                <PackageCheck className="h-4 w-4" />
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     )}

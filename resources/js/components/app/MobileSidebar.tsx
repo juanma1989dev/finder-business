@@ -8,15 +8,27 @@ import {
     LogIn,
     LogOut,
     Menu,
-    User,
     X,
 } from 'lucide-react';
 import { useState } from 'react';
+
+const URLS = {
+    DASHBOARD: {
+        business: '/dashboard/business',
+        client: '/dashboard/client',
+        delivery: '/dashboard/delivery',
+    },
+    FAVORITES: '/favorites',
+    PROFILE: '/profile',
+};
 
 export default function MobileSidebar() {
     const { auth } = usePage().props as any;
     const { user } = auth;
     const { url } = usePage();
+
+    const URL_DASHBOARD =
+        URLS.DASHBOARD[user?.type as keyof typeof URLS.DASHBOARD] || '/';
 
     const [isOpen, setIsOpen] = useState(false);
     const [isSigningOut, setIsSigningOut] = useState(false);
@@ -96,45 +108,45 @@ export default function MobileSidebar() {
                         {user && (
                             <>
                                 <NavItem
-                                    href="/dashboard"
+                                    href={URL_DASHBOARD}
                                     icon={<LayoutDashboard size={16} />}
                                     label="Panel de Control"
                                     active={isPageActive('/dashboard')}
                                     onClick={() => setIsOpen(false)}
                                 />
                                 <NavItem
-                                    href="/favorites"
+                                    href={URLS.FAVORITES}
                                     icon={<Heart size={16} />}
                                     label="Mis Favoritos"
                                     active={isPageActive('/favorites')}
                                     onClick={() => setIsOpen(false)}
                                     variant="orange"
                                 />
-                                <NavItem
+                                {/* <NavItem
                                     href="/profile"
                                     icon={<User size={16} />}
                                     label="Ajustes Perfil"
                                     active={isPageActive('/profile')}
                                     onClick={() => setIsOpen(false)}
-                                />
+                                /> */}
                             </>
                         )}
                     </div>
 
-                    <div className="border-t border-gray-100 p-4">
+                    <div className="border-t border-gray-100 p-2">
                         {user ? (
                             <button
                                 onClick={handleSignOut}
                                 disabled={isSigningOut}
-                                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-orange-200 transition-all active:scale-[0.97] disabled:opacity-70"
+                                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-2 py-1.5 text-sm font-bold text-white shadow-lg shadow-orange-200 transition-all active:scale-[0.97] disabled:opacity-70"
                             >
                                 {isSigningOut ? (
                                     <Loader2
-                                        size={18}
+                                        size={16}
                                         className="animate-spin"
                                     />
                                 ) : (
-                                    <LogOut size={18} />
+                                    <LogOut size={16} />
                                 )}
                                 <span>
                                     {isSigningOut

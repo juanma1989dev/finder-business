@@ -243,12 +243,12 @@ export default function Index({
                             <span className="relative z-10 flex items-center gap-2">
                                 {isBusinessOpen ? (
                                     <>
-                                        Negocio Abierto
+                                        Abierto
                                         <Power className="h-4 w-4 animate-pulse" />
                                     </>
                                 ) : (
                                     <>
-                                        Negocio Cerrado
+                                        Cerrado
                                         <PowerOff className="h-4 w-4" />
                                     </>
                                 )}
@@ -267,7 +267,7 @@ export default function Index({
                     </div>
                 </div>
 
-                <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto pb-2">
+                <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto pb-1">
                     {Object.values(Tabs).map((tab) => {
                         const isActive = activeTab === tab;
                         return (
@@ -302,7 +302,7 @@ export default function Index({
                     })}
                 </div>
 
-                <div className="relative min-h-[500px] duration-700 animate-in fade-in slide-in-from-bottom-4">
+                <div className="relative min-h-[500px]">
                     <GridOrders
                         orders={filteredOrders}
                         loadingOrderId={loadingOrderId}

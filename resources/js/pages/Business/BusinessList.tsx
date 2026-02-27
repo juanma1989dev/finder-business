@@ -42,7 +42,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 interface Props {
     businesses: BusinessType[];
@@ -50,6 +50,8 @@ interface Props {
         categories: any[];
     };
 }
+
+const LIMIT_BUSINESSES = 1;
 
 export default function Business({ businesses, catalogs }: Props) {
     const { auth } = usePage<SharedData>().props;
@@ -165,7 +167,7 @@ export default function Business({ businesses, catalogs }: Props) {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {businesses.length < 10 && (
+                        {businesses.length < LIMIT_BUSINESSES && (
                             <Button
                                 onClick={openForCreate}
                                 className="rounded-lg bg-purple-600 px-4 text-[10px] font-semibold tracking-widest text-white uppercase shadow-sm transition-all hover:bg-purple-700 active:scale-95"
@@ -510,7 +512,7 @@ export default function Business({ businesses, catalogs }: Props) {
                     <DialogTitle className="text-base font-semibold tracking-tight text-gray-800 uppercase">
                         ¿Estás seguro?
                     </DialogTitle>
-                    <DialogDescription className="text-[10px] leading-tight font-normal tracking-widest text-gray-500 uppercase">
+                    <DialogDescription className="text-[14px] leading-tight font-normal tracking-widest text-gray-900 uppercase">
                         Esta acción borrará permanentemente el negocio.
                     </DialogDescription>
                     <div className="mt-6 flex flex-col gap-2">
@@ -532,11 +534,11 @@ export default function Business({ businesses, catalogs }: Props) {
                 </DialogContent>
             </Dialog>
 
-            <ToastContainer
+            {/* <ToastContainer
                 position="bottom-right"
                 hideProgressBar
                 theme="light"
-            />
+            /> */}
         </div>
     );
 }

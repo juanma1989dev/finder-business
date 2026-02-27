@@ -6,9 +6,10 @@ import { ProductConfigModal } from './ProductConfigModal';
 
 interface Props {
     business: Business;
+    typeFood: any[];
 }
 
-export const ProductsBussinessTab = ({ business }: Props) => {
+export const ProductsBussinessTab = ({ business, typeFood }: Props) => {
     const { auth, cart } = usePage<SharedData>().props;
     const user = auth.user;
 
@@ -44,6 +45,46 @@ export const ProductsBussinessTab = ({ business }: Props) => {
     return (
         <div className="w-full py-0">
             <section className="mb-4">
+                {(business.products?.length ?? 0) > 0 && (
+                    // <div className="no-scrollbar flex gap-6 overflow-x-auto scroll-smooth px-4 pb-4">
+                    //     {typeFood.map((cat) => (
+                    //         <button
+                    //             key={cat.id}
+                    //             // onClick={() =>
+                    //             //     handleFilterChange('foodType', cat.id)
+                    //             // }
+                    //             className="flex min-w-[38px] flex-col items-center gap-2"
+                    //         >
+                    //             <div
+                    //                 className="flex h-9 w-9 items-center justify-center rounded-2xl text-xl transition-all duration-300"
+                    //                 // className={`flex h-10 w-10 items-center justify-center rounded-2xl text-2xl transition-all duration-300 ${
+                    //                 //     filters.foodType === cat.id
+                    //                 //         ? 'scale-105 bg-orange-500 text-white shadow-lg ring-4 shadow-orange-200 ring-orange-100'
+                    //                 //         : 'border border-gray-100 bg-white shadow-sm hover:scale-105'
+                    //                 // } `}
+                    //             >
+                    //                 <span
+                    //                 // className={
+                    //                 //     filters.foodType === cat.id
+                    //                 //         ? 'brightness-125'
+                    //                 //         : 'grayscale-[0.4]'
+                    //                 // }
+                    //                 >
+                    //                     {cat.icon}
+                    //                 </span>
+                    //             </div>
+                    //             <span
+                    //                 className="text-[10px] font-bold text-gray-500"
+                    //                 // className={`text-[11px] font-bold ${filters.foodType === cat.id ? 'text-orange-700' : 'text-gray-500'}`}
+                    //             >
+                    //                 {cat.name}
+                    //             </span>
+                    //         </button>
+                    //     ))}
+                    // </div>
+                    <></>
+                )}
+
                 {business.products?.length ? (
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {business.products.map((product) => {

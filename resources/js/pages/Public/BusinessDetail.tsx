@@ -24,6 +24,7 @@ import { ProductsBussinessTab } from './Business/products-tab';
 interface Props {
     business: Business;
     favorite: boolean;
+    products: { categories: any[] };
 }
 
 const getStatusLabel = (business: Business) => {
@@ -45,7 +46,11 @@ const getStatusLabel = (business: Business) => {
     return `${currentSchedule.open} hrs - ${currentSchedule.close} hrs`;
 };
 
-export default function BusinessDetail({ business, favorite }: Props) {
+export default function BusinessDetail({
+    business,
+    favorite,
+    products,
+}: Props) {
     const [stateFavorite, setStateFavorite] = useState(favorite);
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
@@ -58,7 +63,6 @@ export default function BusinessDetail({ business, favorite }: Props) {
         schedul: getStatusLabel(business),
     };
 
-    // business/la-cafe/1
     const copyUlrDetailBusiness = () => {
         navigator.clipboard
             .writeText(
@@ -79,7 +83,11 @@ export default function BusinessDetail({ business, favorite }: Props) {
                 id_business: business.id,
                 favorite: next,
             },
-            { onError: () => setStateFavorite(!next) },
+            {
+                onError: () => setStateFavorite(!next),
+                preserveState: true,
+                preserveScroll: true,
+            },
         );
     };
 
@@ -95,7 +103,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
                         <div className="lg:col-span-4">
                             <div className="space-y-5 lg:sticky lg:top-20">
-                                <div className="relative h-32 w-full overflow-hidden rounded-lg border border-purple-200 shadow-sm sm:h-64 lg:aspect-[4/3] lg:h-auto">
+                                <div className="relative hidden h-32 w-full overflow-hidden rounded-lg border border-purple-200 shadow-sm sm:block sm:h-64 lg:aspect-[4/3] lg:h-auto">
                                     <img
                                         src={
                                             business.cover_image
@@ -154,9 +162,36 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         </div>
 
                                         <div className="flex gap-2 pt-1">
+                                            <a
+                                                href={
+                                                    business.use_whatsapp
+                                                        ? `https://wa.me/${santizePhoneNumber(
+                                                              business.phone,
+                                                          )}`
+                                                        : `tel:${business.phone}`
+                                                }
+                                                className="flex h-9 w-9 items-center justify-center gap-2 rounded-lg bg-green-600 p-1 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
+                                                title="WhastApp"
+                                            >
+                                                {business.use_whatsapp ? (
+                                                    <MessageCircle className="h-4 w-4" />
+                                                ) : (
+                                                    <PhoneCall className="h-4 w-4" />
+                                                )}
+                                            </a>
+                                            <a
+                                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                                    business.address,
+                                                )}`}
+                                                className="flex h-9 w-9 items-center justify-center gap-2 rounded-lg bg-blue-700 p-1 text-sm font-semibold text-white shadow-sm transition-transform active:scale-95"
+                                                title="Mapa"
+                                            >
+                                                <MapPinned className="h-4 w-4" />
+                                            </a>
                                             <button
                                                 onClick={copyUlrDetailBusiness}
                                                 className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-gray-700 shadow-sm transition-all active:scale-95"
+                                                title="Compartir"
                                             >
                                                 <Share2 className="h-4 w-4" />
                                             </button>
@@ -166,9 +201,14 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                                     onClick={toggleFavorite}
                                                     className={`flex h-9 w-9 items-center justify-center rounded-lg shadow-sm transition-all active:scale-95 ${
                                                         stateFavorite
-                                                            ? 'bg-purple-600 text-white'
+                                                            ? 'bg-red-600 text-white'
                                                             : 'bg-white text-gray-700'
                                                     }`}
+                                                    title={
+                                                        stateFavorite
+                                                            ? 'Quitar de mis favoritos'
+                                                            : 'Agregar a favoritos'
+                                                    }
                                                 >
                                                     <Heart
                                                         className={`h-4 w-4 ${
@@ -192,14 +232,12 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                     </h1>
                                 </div>
 
-                                <div className="space-y-3 px-1">
+                                <div className="space-y-2 px-1">
                                     <div className="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
                                         <Clock className="h-5 w-5 text-amber-600" />
                                         <div>
                                             <p className="text-xs font-semibold text-amber-700 uppercase">
-                                                Horario de referencia
-                                            </p>
-                                            <p className="text-xs text-amber-700">
+                                                Horario de referencia -{' '}
                                                 {LEGENDS.schedul}
                                             </p>
                                             <p className="mt-2 flex items-center gap-2 text-xs text-amber-700">
@@ -219,7 +257,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-3 rounded-lg border border-purple-200 bg-purple-50 p-3">
+                                    <div className="flex gap-2 rounded-lg border border-purple-200 bg-purple-50 p-3">
                                         <CreditCard className="h-5 w-5 text-purple-700" />
                                         <div>
                                             <p className="text-[10px] font-semibold text-purple-800 uppercase">
@@ -231,7 +269,7 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 pt-1">
+                                    <div className="hidden grid-cols-2 gap-2 pt-1 sm:grid">
                                         <a
                                             href={
                                                 business.use_whatsapp
@@ -284,7 +322,10 @@ export default function BusinessDetail({ business, favorite }: Props) {
                                 </TabsList>
 
                                 <TabsContent value="products">
-                                    <ProductsBussinessTab business={business} />
+                                    <ProductsBussinessTab
+                                        business={business}
+                                        typeFood={products?.categories ?? []}
+                                    />
                                 </TabsContent>
 
                                 <TabsContent value="main">

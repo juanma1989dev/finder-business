@@ -88,7 +88,10 @@ final class SearchService
 
         return [
             'business' => BusinessMapper::toArray($business), 
-            'favorite' => (bool) ($business->is_favorite ?? false)  
+            'favorite' => (bool) ($business->is_favorite ?? false) ,
+            'products' => [
+                'categories' => $this->productCategoryRepository->getActives(),
+            ],
         ];
     }
 
