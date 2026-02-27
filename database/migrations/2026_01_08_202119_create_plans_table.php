@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\PlanTypeEnum;
+use App\Domains\Businesses\Enums\PlanTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('description')->nullable();
 
-            $table->unsignedInteger('max_businesses')->default(1);
+            $table->unsignedInteger('max_business')->default(1);
 
             $table->boolean('advanced_stats')->default(false);
             $table->boolean('featured')->default(false);
@@ -34,7 +34,7 @@ return new class extends Migration
              [
                 'name' => PlanTypeEnum::NORMAL,
                 'description' => 'Plan básico para administrar un negocio.',
-                'max_businesses' => 1,
+                'max_business' => 1,
                 'advanced_stats' => false,
                 'featured' => false,
                 'created_at' => now(),
@@ -43,7 +43,7 @@ return new class extends Migration
             [
                 'name' => PlanTypeEnum::PREMIUM,
                 'description' => 'Plan premium para administrar múltiples negocios.',
-                'max_businesses' => 5,
+                'max_business' => 5,
                 'advanced_stats' => true,
                 'featured' => true,
                 'created_at' => now(),

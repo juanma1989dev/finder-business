@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->foreignId('business_id')
                 ->nullable()
-                ->constrained()
+                ->constrained('business')
                 ->nullOnDelete();
 
             $table->string('status')->default(OrderStatusEnum::PENDING->value);

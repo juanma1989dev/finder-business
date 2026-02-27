@@ -1,9 +1,9 @@
 <?php
 
+use App\Domains\Shared\Enums\DayOfWeek as EnumsDayOfWeek;
 use App\Enums\DayOfWeek;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -17,10 +17,10 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('business_id')
-                ->constrained('businesses')
+                ->constrained('business')
                 ->cascadeOnDelete();
 
-            $table->enum('day', DayOfWeek::allValues());
+            $table->enum('day', EnumsDayOfWeek::allValues());
             $table->time('open')->nullable();
             $table->time('close')->nullable();
             $table->boolean('is_open')->default(false);

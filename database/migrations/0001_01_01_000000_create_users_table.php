@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\UserTypeEnum;
+use App\Domains\Users\Enums\UserTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

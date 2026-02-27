@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('business_social_networks', function(Blueprint $table){
             $table->id();
             $table->foreignId('business_id')
-                    ->constrained('businesses')
+                    ->constrained('business')
                     ->cascadeOnDelete()
                     ->unique();
             $table->string('web')->nullable(); 

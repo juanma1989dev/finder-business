@@ -18,7 +18,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->foreignId('business_id')
-                ->constrained()
+                ->constrained('business')
                 ->cascadeOnDelete();
 
             $table->boolean('is_favorite')->default(true);
