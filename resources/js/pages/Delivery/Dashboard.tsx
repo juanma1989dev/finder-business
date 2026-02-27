@@ -11,7 +11,8 @@ import { BreadcrumbItem, Order } from '@/types';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Bike, CalendarIcon, Loader2, PackageSearch } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Bike, CalendarIcon, ChevronRight, Loader2, PackageSearch } from 'lucide-react';
 import { useState } from 'react';
 
 export default function DeliveryDashboard({
@@ -115,49 +116,59 @@ function DeliveryOrderCard({
     const status = pedido.status;
 
     return (
-        <div
-            className={`relative flex flex-col rounded-lg border border-purple-200 bg-white shadow-sm transition-all hover:shadow-md ${
-                isProcessing ? 'animate-pulse' : ''
-            }`}
+        <motion.div
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -4 }}
+            className={`relative flex flex-col overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] backdrop-blur-xl transition-all hover:bg-white/90 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] ${isProcessing ? 'animate-pulse' : ''
+                }`}
         >
             {isProcessing && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/60 backdrop-blur-sm">
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/40 backdrop-blur-sm">
                     <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
                 </div>
             )}
 
-            <div className="space-y-4 p-3">
-                <div className="flex items-start justify-between">
-                    <div className="flex gap-3">
-                        <div className="rounded-lg border border-purple-100 bg-purple-50 p-2">
-                            <Bike className="h-4 w-4 text-purple-700" />
-                        </div>
-                        <div>
-                            <span className="text-[10px] font-semibold text-gray-500 uppercase">
-                                ID #{pedido.id}
-                            </span>
-                            <p className="text-sm font-semibold text-purple-800">
-                                {pedido.user?.name ?? 'Cliente'}
-                            </p>
-                        </div>
+            <div className="flex items-start justify-between">
+                <div className="flex gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 shadow-inner border border-purple-100/50">
+                        <Bike className="h-6 w-6" />
                     </div>
-
-                    <span className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700 uppercase">
-                        {labels[status]}
-                    </span>
+                    <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            Orden #{pedido.id}
+                        </span>
+                        <h3 className="text-base font-bold text-slate-800 line-clamp-1">
+                            {pedido.user?.name ?? 'Cliente Registrado'}
+                        </h3>
+                    </div>
                 </div>
 
-                <div className="flex items-end justify-between">
-                    {/* <div className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-600">
-                        <Clock className="h-3.5 w-3.5 text-purple-600" />
-                        <span>{pedido.minutes_waiting ?? 0} MIN ESPERA</span>
-                    </div> */}
-                    <span className="text-base font-semibold text-gray-700">
+                <div className="flex flex-col items-end gap-1.5">
+                    <span className="rounded-full bg-amber-50 px-3 py-1 text-[9px] font-black text-amber-600 border border-amber-100 uppercase tracking-tighter">
+                        {labels[status]}
+                    </span>
+                    <span className="text-lg font-black text-slate-900">
                         ${pedido.total}
                     </span>
                 </div>
             </div>
-        </div>
+
+            <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">Listo para entrega</span>
+                </div>
+
+                <button
+                    onClick={() => router.get(`/delivery/history/${pedido.id}`)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-purple-600 hover:text-white"
+                >
+                    <ChevronRight size={16} />
+                </button>
+            </div>
+        </motion.div>
     );
 }
 

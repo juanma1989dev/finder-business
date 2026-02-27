@@ -1,14 +1,16 @@
 import { messaging, onMessage } from '@/firebase';
+import { useNotification } from '@/hooks/use-notification';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { BreadcrumbItem, Business, Order, OrderStatus } from '@/types';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
-import { Power, PowerOff, Search } from 'lucide-react';
+import { Bell, Power, PowerOff } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import GridOrders from '../GridOrders';
 import NotesDialog from '../NotesDialog';
-import Stat from '../Stat';
+
+const SOUND_NOTIFICATION = '/sounds/notification.mp3';
 
 enum Tabs {
     Todos = 'Todos',
@@ -39,7 +41,6 @@ export default function Index({
     const finalStatuses = final_statuses;
 
     const [activeTab, setActiveTab] = useState<Tabs>(Tabs.Todos);
-    const [search, setSearch] = useState('');
     const [loadingOrderId, setLoadingOrderId] = useState<number | null>(null);
     const [ordersState, setOrdersState] = useState<Order[]>(orders);
 
@@ -50,10 +51,8 @@ export default function Index({
     }>({ open: false });
 
     const [noteText, setNoteText] = useState('');
-
     const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
+    const { playNotification } = useNotification();
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
@@ -77,13 +76,6 @@ export default function Index({
         if (!messaging) return;
 
         return onMessage(messaging, (payload) => {
-            toast.success(
-                <div className="flex flex-col gap-1">
-                    <p className="font-bold">{payload.data?.title}</p>
-                    <p className="text-xs">{payload.data?.body}</p>
-                </div>,
-            );
-
             if (reloadTimeoutRef.current) {
                 clearTimeout(reloadTimeoutRef.current);
             }
@@ -91,15 +83,21 @@ export default function Index({
                 ? JSON.parse(payload.data.order)
                 : null;
 
+            setActiveTab(Tabs.Todos);
+
             if (order) {
+                if (order.status === OrderStatus.PENDING) {
+                    playNotification({
+                        withSound: true,
+                        vibrationType: 'pulse',
+                    });
+                }
                 syncOrdersDelta(order.id);
-                console.log('SYNCING ORDER :: ', order.id);
             } else {
                 syncOrdersDelta();
-                console.log('SYNCING ALL ORDERS');
             }
         });
-    }, []);
+    }, [playNotification]);
 
     const toggleBusiness = () => {
         const old = isBusinessOpen;
@@ -137,6 +135,10 @@ export default function Index({
             {
                 preserveScroll: true,
                 onSuccess: () => {
+                    playNotification({
+                        withSound: false,
+                        vibrationType: 'short',
+                    });
                     setReasonDialog({ open: false });
                     setNoteText('');
                     syncOrdersDelta(orderId);
@@ -149,36 +151,47 @@ export default function Index({
 
     const filteredOrders = useMemo(() => {
         return ordersState.filter((order: any) => {
-            if (search) {
-                const q = search.toLowerCase();
-                if (
-                    !order.id.toString().includes(q) &&
-                    !order.user?.name?.toLowerCase().includes(q)
-                )
-                    return false;
-            }
             if (activeTab === Tabs.Pendiente)
                 return order.status === OrderStatus.PENDING;
             if (activeTab === Tabs.Confirmado)
                 return order.status === OrderStatus.CONFIRMED;
             if (activeTab === Tabs.Entregado)
                 return order.status === OrderStatus.DELIVERED;
-            return true;
+            return order.status !== OrderStatus.DELIVERED;
         });
-    }, [ordersState, search, activeTab]);
+    }, [ordersState, activeTab]);
+
+    const globalLateCount = useMemo(() => {
+        const now = new Date().getTime();
+        return ordersState.filter((order) => {
+            const created = new Date(order.created_at).getTime();
+            const minutes = (now - created) / 60000;
+            return order.status === OrderStatus.PENDING && minutes > 1;
+        }).length;
+    }, [ordersState]);
+
+    const pendingOrdersCount = useMemo(() => {
+        return ordersState.filter(
+            (order) => order.status === OrderStatus.PENDING,
+        ).length;
+    }, [ordersState]);
 
     const mergeOrders = (current: Order[], incoming: Order[]) => {
         const map = new Map<number, Order>();
 
         current.forEach((order) => {
-            map.set(order.id, order);
+            map.set(Number(order.id), order);
         });
 
         incoming.forEach((order) => {
-            if (finalStatuses.includes(order.status)) {
-                map.delete(order.id);
+            const id = Number(order.id);
+            if (
+                finalStatuses.includes(order.status) &&
+                order.status !== OrderStatus.DELIVERED
+            ) {
+                map.delete(id);
             } else {
-                map.set(order.id, order);
+                map.set(id, order);
             }
         });
 
@@ -196,95 +209,100 @@ export default function Index({
 
             const incomingOrders: Order[] = response.data?.orders ?? [];
 
-            if (incomingOrders.length) {
-                const newestDate = incomingOrders
-                    .map((o: Order) => new Date(o.updated_at).getTime())
-                    .sort((a, b) => b - a)[0];
-
-                setLastSyncAt(new Date(newestDate).toISOString());
-            }
-
             setOrdersState((current) => mergeOrders(current, incomingOrders));
         } catch (e) {
             console.error('Error :: ', e);
         }
     };
 
-    const pendingCount = ordersState.filter(
-        (o) => o.status === OrderStatus.PENDING,
-    ).length;
-    const lateCount = ordersState.filter(
-        (o) => o.status === OrderStatus.PENDING,
-    ).length;
-
     return (
         <DashboardLayout breadcrumbs={breadcrumbs}>
-            <div className="flex min-h-screen flex-col gap-3 bg-purple-50/30 p-2 sm:p-2 lg:p-4">
-                <div className="sticky top-14 z-40 rounded-lg border border-purple-200 bg-white p-2 shadow-sm sm:static">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-base font-semibold tracking-tight text-purple-800 uppercase">
-                                Pedidos
+            <div className="flex min-h-screen flex-col gap-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-50 via-white to-purple-50/20 p-2 sm:p-6 lg:p-4">
+                <div className="sticky top-2 z-40 overflow-hidden rounded-2xl border border-white/40 bg-white/70 p-2 shadow-xl shadow-purple-900/5 backdrop-blur-xl sm:static sm:p-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="relative">
+                            <h1 className="bg-gradient-to-r from-purple-800 to-indigo-700 bg-clip-text text-xl font-extrabold tracking-tight text-transparent uppercase">
+                                Panel de Pedidos
                             </h1>
-                            <p className="text-[10px] font-normal tracking-widest text-gray-500 uppercase">
-                                Gestión de tus pedidos.
-                            </p>
+                            <div className="mt-1 flex items-center gap-2">
+                                <span className="h-1 w-8 rounded-full bg-purple-600"></span>
+                                <p className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                                    {business.name} • Gestión en tiempo real
+                                </p>
+                            </div>
                         </div>
 
                         <button
                             onClick={toggleBusiness}
-                            className={`flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-[10px] font-semibold uppercase transition-all active:scale-95 ${
+                            className={`group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl px-4 py-2 text-xs font-bold uppercase transition-all duration-300 active:scale-95 ${
                                 isBusinessOpen
-                                    ? 'bg-purple-600 text-white shadow-sm'
-                                    : 'border border-amber-200 bg-amber-50 text-amber-700'
+                                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-200 hover:bg-purple-700 hover:shadow-purple-300'
+                                    : 'border-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
                             }`}
                         >
-                            {isBusinessOpen ? (
-                                <>
-                                    Abierto <Power className="h-3.5 w-3.5" />
-                                </>
-                            ) : (
-                                <>
-                                    Cerrado <PowerOff className="h-3.5 w-3.5" />
-                                </>
-                            )}
+                            <span className="relative z-10 flex items-center gap-2">
+                                {isBusinessOpen ? (
+                                    <>
+                                        Negocio Abierto
+                                        <Power className="h-4 w-4 animate-pulse" />
+                                    </>
+                                ) : (
+                                    <>
+                                        Negocio Cerrado
+                                        <PowerOff className="h-4 w-4" />
+                                    </>
+                                )}
+                            </span>
                         </button>
+                        {isBusinessOpen ? (
+                            <p className="ml-2 text-sm text-purple-600">
+                                Estás recibiendo pedidos en este momento.
+                            </p>
+                        ) : (
+                            <p className="ml-2 text-sm text-amber-600">
+                                No puedes recibir pedidos mientras el negocio no
+                                esta activo.
+                            </p>
+                        )}
                     </div>
-
-                    <div className="mt-3 grid grid-cols-3 gap-2">
-                        <Stat label="Pendientes" value={pendingCount} />
-                        <Stat label="Retrasados" value={lateCount} danger />
-                        <Stat label="Filtrados" value={filteredOrders.length} />
-                    </div>
                 </div>
 
-                <div className="relative">
-                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <input
-                        className="w-full rounded-lg border border-purple-200 bg-white py-3 pr-4 pl-10 text-sm font-normal text-gray-700 shadow-sm transition-all focus:border-purple-600 focus:ring-1 focus:ring-purple-600 focus:outline-none"
-                        placeholder="Buscar pedido o cliente…"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+                <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto pb-2">
+                    {Object.values(Tabs).map((tab) => {
+                        const isActive = activeTab === tab;
+                        return (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`relative flex items-center gap-2 rounded-xl px-5 py-2.5 text-[11px] font-bold whitespace-nowrap uppercase transition-all duration-300 hover:scale-105 active:scale-95 ${
+                                    isActive
+                                        ? 'bg-purple-600 text-white shadow-md shadow-purple-200'
+                                        : 'border border-purple-50 bg-white text-gray-500 shadow-sm hover:bg-purple-50/50'
+                                }`}
+                            >
+                                {tab === Tabs.Todos && (
+                                    <>
+                                        {pendingOrdersCount > 0 ? (
+                                            <Bell
+                                                className={`h-3.5 w-3.5 ${globalLateCount > 0 ? 'text-red-400' : 'text-amber-400'}`}
+                                                style={{
+                                                    animation:
+                                                        'ring 0.5s infinite',
+                                                }}
+                                            />
+                                        ) : null}
+                                    </>
+                                )}
+                                {tab}
+                                {isActive && (
+                                    <span className="flex h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span>
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
 
-                <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-1">
-                    {Object.values(Tabs).map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`rounded-lg px-4 py-2 text-[10px] font-semibold whitespace-nowrap uppercase transition-all active:scale-95 ${
-                                activeTab === tab
-                                    ? 'bg-purple-600 text-white shadow-sm'
-                                    : 'border border-purple-100 bg-white text-gray-500 hover:bg-purple-50'
-                            }`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
-
-                <div className="relative min-h-[400px]">
+                <div className="relative min-h-[500px] duration-700 animate-in fade-in slide-in-from-bottom-4">
                     <GridOrders
                         orders={filteredOrders}
                         loadingOrderId={loadingOrderId}
@@ -312,6 +330,20 @@ export default function Index({
                     )
                 }
             />
+
+            <style>{`
+                @keyframes ring {
+                    0% { transform: rotate(0); }
+                    10% { transform: rotate(15deg); }
+                    20% { transform: rotate(-15deg); }
+                    30% { transform: rotate(10deg); }
+                    40% { transform: rotate(-10deg); }
+                    50% { transform: rotate(5deg); }
+                    60% { transform: rotate(-5deg); }
+                    70% { transform: rotate(0); }
+                    100% { transform: rotate(0); }
+                }
+            `}</style>
         </DashboardLayout>
     );
 }

@@ -22,10 +22,11 @@ class DashboardController extends Controller
         }
 
         $orders = $business->orders()
-            ->whereNotIn('status', OrderStatusEnum::finalStatuses())
+            ->whereNotIn('status',  [OrderStatusEnum::CANCELLED, OrderStatusEnum::REJECTED])
+            ->whereDate('created_at', now())
             ->with(['items', 'user'])
             ->latest()
-            ->limit(25) // evita problemas de rendimiento
+            ->limit(30)  
             ->get();
 
         return inertia('Business/Management/Dashboard', [

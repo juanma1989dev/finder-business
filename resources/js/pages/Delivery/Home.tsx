@@ -1,16 +1,28 @@
 import { Map } from '@/components/leaflet/Map';
 import { useLeafletMap } from '@/components/leaflet/useLeafletMap';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { useGeolocation } from '@/hooks/use-Geolocation';
+import { useNotification } from '@/hooks/use-notification';
 import MainLayout from '@/layouts/main-layout';
 import { DollarSign, Package, PackageSearch } from '@/lib/icons';
 import { OrderStatus, SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Timer, User2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    Battery,
+    ChevronRight,
+    History,
+    Loader2,
+    MapPin,
+    Moon,
+    PackageCheck,
+    Sun,
+    Timer,
+    User2,
+    Wifi,
+    WifiOff,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -31,10 +43,10 @@ interface Props {
 }
 
 /* ----------------------------- Configuration ----------------------------- */
-const AUTO_REJECT_SECONDS = 20_000;
-// const SOUND_NOTIFICATION = '/sounds/notification.mp3';
-// const SOUND_BLOCKED = '/sounds/blocked.mp3';
-// const SOUND_BLOCKED_VOLUME = 0.6;
+const AUTO_REJECT_SECONDS = 30;
+const SOUND_NOTIFICATION = '/sounds/notification.mp3';
+const SOUND_BLOCKED = '/sounds/blocked.mp3';
+const SOUND_BLOCKED_VOLUME = 0.6;
 
 /* ---------------------------- Small utilities ---------------------------- */
 const cls = (...parts: Array<string | false | null | undefined>) =>
@@ -75,12 +87,38 @@ export default function Index({ activeOrder }: Props) {
         0, 0,
     ]);
 
+    const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+    const { playNotification, stop: stopNotification } = useNotification();
+
     const [incomingOrder, setIncomingOrder] = useState<Order | null>(null);
     const [countdown, setCountdown] = useState<number>(AUTO_REJECT_SECONDS);
     const [isAccepting, setIsAccepting] = useState(false);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+    // Track System Status
+    useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        if ('getBattery' in navigator) {
+            (navigator as any).getBattery().then((battery: any) => {
+                setBatteryLevel(Math.floor(battery.level * 100));
+                battery.addEventListener('levelchange', () => {
+                    setBatteryLevel(Math.floor(battery.level * 100));
+                });
+            });
+        }
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
 
     // --- audio refs (initialized once) ---
-    const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
     const blockedAudioRef = useRef<HTMLAudioElement | null>(null);
     const incomingOrderRef = useRef<Order | null>(null);
 
@@ -90,15 +128,17 @@ export default function Index({ activeOrder }: Props) {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        // notificationAudioRef.current = new Audio(SOUND_NOTIFICATION);
-        // blockedAudioRef.current = new Audio(SOUND_BLOCKED);
-        // blockedAudioRef.current.volume = SOUND_BLOCKED_VOLUME;
-        // ensure we don't hold onto audio objects if page unloads
-        return () => {
-            notificationAudioRef.current = null;
-            blockedAudioRef.current = null;
-        };
+        blockedAudioRef.current = new Audio(SOUND_BLOCKED);
     }, []);
+
+    // Sound & Haptic Feedback for New Orders - Handled directly in handler for better browser support
+    /*
+    useEffect(() => {
+        if (incomingOrder) {
+            playNotification({ withSound: true, vibrationType: 'pulse' });
+        }
+    }, [incomingOrder, playNotification]);
+    */
 
     /* -------------------------- helpers / callbacks ------------------------- */
     const getCsrfToken = useCallback(() => {
@@ -111,16 +151,13 @@ export default function Index({ activeOrder }: Props) {
     }, []);
 
     const clearIncomingOrder = useCallback((message?: string) => {
-        notificationAudioRef.current?.pause();
-        if (notificationAudioRef.current) {
-            notificationAudioRef.current.currentTime = 0;
-        }
+        stopNotification();
 
         setIncomingOrder(null);
         setCountdown(AUTO_REJECT_SECONDS);
 
         if (message) toast.info(message);
-    }, []);
+    }, [stopNotification]);
 
     const handleAcceptOrder = useCallback(
         async (orderId: number) => {
@@ -140,12 +177,11 @@ export default function Index({ activeOrder }: Props) {
                     },
                 );
 
-                // toast.success('Pedido aceptado 🚴‍♂️');
-
                 clearIncomingOrder();
 
+                playNotification({ withSound: false, vibrationType: 'short' });
                 router.reload({ only: ['activeOrder'] });
-            } catch (error) {
+            } catch (error: any) {
                 clearIncomingOrder();
 
                 if (axios.isAxiosError<ApiError>(error)) {
@@ -161,21 +197,28 @@ export default function Index({ activeOrder }: Props) {
         [clearIncomingOrder, getCsrfToken, isAccepting],
     );
 
-    const updateStatus = useCallback((url: string, msg: string) => {
-        router.post(
-            url,
-            {},
-            {
-                onSuccess: () => {
-                    router.reload({ only: ['activeOrder'] });
+    const updateStatus = useCallback(
+        (url: string, msg: string) => {
+            if (isUpdatingStatus) return;
+            setIsUpdatingStatus(true);
+            router.post(
+                url,
+                {},
+                {
+                    onSuccess: () => {
+                        playNotification({ withSound: false, vibrationType: 'short' });
+                        router.reload({ only: ['activeOrder'] });
+                    },
+                    onError: (e: any) => toast.error(e?.message ?? 'Error'),
+                    onFinish: () => setIsUpdatingStatus(false),
                 },
-                onError: (e: any) => toast.error(e?.message ?? 'Error'),
-            },
-        );
-    }, []);
+            );
+        },
+        [isUpdatingStatus],
+    );
 
     const playBlockedSound = useCallback(() => {
-        blockedAudioRef.current?.play().catch(() => {});
+        blockedAudioRef.current?.play().catch(() => { });
     }, []);
 
     const toggleAvailability = useCallback(() => {
@@ -197,10 +240,9 @@ export default function Index({ activeOrder }: Props) {
     useEffect(() => {
         let timer: number | undefined;
         if (incomingOrder) {
-            // if an incoming order exists, ensure countdown resets
             setCountdown(AUTO_REJECT_SECONDS);
             timer = window.setInterval(() => {
-                setCountdown((prev) => {
+                setCountdown((prev: number) => {
                     if (prev <= 1) {
                         clearIncomingOrder('Pedido rechazado por tiempo');
                         return AUTO_REJECT_SECONDS;
@@ -241,7 +283,7 @@ export default function Index({ activeOrder }: Props) {
 
                 setIncomingOrder(newIncoming);
                 setCountdown(AUTO_REJECT_SECONDS);
-                notificationAudioRef.current?.play().catch(() => {});
+                playNotification({ withSound: true, vibrationType: 'pulse' });
             }
         };
 
@@ -260,226 +302,325 @@ export default function Index({ activeOrder }: Props) {
 
     return (
         <MainLayout>
-            <div className="min-h-screen space-y-0 bg-purple-50/50 p-2">
-                {(incomingOrder || hasActiveOrder) && (
-                    <div className="fixed inset-x-0 bottom-0 z-50 animate-in slide-in-from-bottom">
-                        <Card className="rounded-t-2xl border-0 bg-white shadow-2xl">
-                            <CardContent className="space-y-4 p-4">
-                                {/* ================= INCOMING ORDER ================= */}
-                                {incomingOrder && (
-                                    <div className="space-y-3">
-                                        {/* Header */}
-                                        <div className="flex items-start justify-between">
-                                            <div className="space-y-1">
-                                                <p className="text-[11px] font-bold tracking-widest text-purple-600 uppercase">
-                                                    Nuevo pedido disponible
-                                                </p>
-                                                <p className="text-base font-semibold text-gray-900">
-                                                    {incomingOrder.store_name ??
-                                                        'Nuevo comercio'}
-                                                </p>
+            <div className="flex min-h-screen flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-50 via-white to-purple-50/30">
+                {/* --- Elegant Header & Performance --- */}
+                <div className="sticky top-0 z-40 px-4 pt-4 pb-2">
+                    <div className="overflow-hidden rounded-2xl border border-white/40 bg-white/70 shadow-xl shadow-purple-900/5 backdrop-blur-xl">
+                        <div className="p-4">
+                            <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg ring-2 shadow-purple-200 ring-white">
+                                            <User2 className="h-6 w-6 text-white" />
+                                        </div>
+                                        <div
+                                            className={cls(
+                                                'absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white shadow-sm',
+                                                deliveryAvailable
+                                                    ? 'bg-emerald-500'
+                                                    : 'bg-gray-300',
+                                            )}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-sm font-black tracking-tight text-gray-800">
+                                            Hola, {auth.user.name}
+                                        </h2>
+                                        <div className="mt-0.5 flex items-center gap-2">
+                                            <div className="flex items-center gap-1 rounded-md border border-white/50 bg-white/50 px-1.5 py-0.5 shadow-sm">
+                                                {isOnline ? (
+                                                    <Wifi className="h-2.5 w-2.5 text-emerald-500" />
+                                                ) : (
+                                                    <WifiOff className="h-2.5 w-2.5 text-rose-500" />
+                                                )}
+                                                <span
+                                                    className={cls(
+                                                        'text-[8px] font-bold uppercase',
+                                                        isOnline
+                                                            ? 'text-emerald-600'
+                                                            : 'text-rose-600',
+                                                    )}
+                                                >
+                                                    {isOnline
+                                                        ? 'Online'
+                                                        : 'Offline'}
+                                                </span>
                                             </div>
+                                            {batteryLevel !== null && (
+                                                <div className="flex items-center gap-1 rounded-md border border-white/50 bg-white/50 px-1.5 py-0.5 shadow-sm">
+                                                    <Battery
+                                                        className={cls(
+                                                            'h-2.5 w-2.5',
+                                                            batteryLevel < 20
+                                                                ? 'text-rose-500'
+                                                                : 'text-indigo-500',
+                                                        )}
+                                                    />
+                                                    <span className="text-[8px] font-bold text-gray-500">
+                                                        {batteryLevel}%
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={toggleAvailability}
+                                    className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-4 py-2 text-[10px] font-black tracking-wider uppercase transition-all duration-300 active:scale-95 ${deliveryAvailable
+                                        ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                        } ${hasActiveOrder && 'cursor-not-allowed opacity-50'}`}
+                                >
+                                    {deliveryAvailable ? (
+                                        <>
+                                            En línea <Sun className="h-3 w-3" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            Fuera de turno{' '}
+                                            <Moon className="h-3 w-3" />
+                                        </>
+                                    )}
+                                </button>
+                            </div>
 
-                                            <div className="space-y-1 text-right">
-                                                <p className="text-xs font-medium text-gray-400">
-                                                    #{incomingOrder?.id}
-                                                </p>
+                            {/* <div className="grid grid-cols-1">
+                                <div className="rounded-xl border border-indigo-100/50 bg-indigo-50/50 p-3">
+                                    <div className="mb-1 flex items-center gap-2">
+                                        <TrendingUp className="h-3 w-3 text-indigo-600" />
+                                        <span className="text-[9px] font-bold tracking-tighter text-gray-400 uppercase">
+                                            ***Entregas de Hoy
+                                        </span>
+                                    </div>
+                                    <p className="text-sm font-black text-indigo-900">
+                                        0
+                                    </p>
+                                </div>
+                            </div> */}
+                        </div>
+                    </div>
+                </div>
 
-                                                <div className="flex items-center justify-end gap-1 text-xs font-bold text-red-600">
-                                                    <Timer className="h-3 w-3" />
-                                                    {countdown}s
+                <div className="flex-1 px-4 pb-32">
+                    <div className="relative mt-2">
+                        {deliveryAvailable ? (
+                            <Card className="relative h-[60vh] overflow-hidden rounded-3xl border-0 bg-white p-0 shadow-2xl ring-1 ring-purple-100/50">
+                                <Map center={deliveryLocation}>
+                                    <FollowDelivery
+                                        position={deliveryLocation}
+                                    />
+                                </Map>
+                                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/20 to-transparent" />
+                            </Card>
+                        ) : (
+                            <div className="flex h-[60vh] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-purple-200 bg-white/50 duration-700 animate-in fade-in">
+                                <div className="relative mb-6">
+                                    <div className="absolute inset-0 animate-ping rounded-full bg-purple-100 opacity-75"></div>
+                                    <div className="relative rounded-2xl bg-white p-6 shadow-xl shadow-purple-900/5">
+                                        <PackageSearch className="h-12 w-12 text-purple-200" />
+                                    </div>
+                                </div>
+                                <h2 className="text-base font-extrabold tracking-tight text-gray-800 uppercase">
+                                    Estás desconectado
+                                </h2>
+                                <p className="mt-2 max-w-[200px] text-center text-[10px] leading-relaxed tracking-widest text-gray-400 uppercase">
+                                    Activa tu disponibilidad para empezar a
+                                    recibir pedidos
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <AnimatePresence>
+                    {(incomingOrder || hasActiveOrder) && (
+                        <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            className="fixed inset-x-0 bottom-0 z-[1000] px-4 pb-2"
+                        >
+                            <Card className="overflow-hidden border-0 bg-white/95 shadow-2xl ring-1 shadow-purple-900/20 ring-white backdrop-blur-xl">
+                                <CardContent className="p-0">
+                                    {incomingOrder && (
+                                        <div className="p-4">
+                                            <div className="mb-4 flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-12 w-12 animate-pulse items-center justify-center rounded-2xl bg-purple-600 shadow-xl shadow-purple-200">
+                                                        <Package className="h-6 w-6 text-white" />
+                                                    </div>
+                                                    <div>
+                                                        <span className="mb-1 inline-flex rounded-full bg-purple-100 px-2.5 py-0.5 text-[9px] font-black tracking-widest text-purple-600 uppercase">
+                                                            Nuevo Pedido
+                                                        </span>
+                                                        <h3 className="text-lg leading-none font-black text-gray-900">
+                                                            {
+                                                                incomingOrder.store_name
+                                                            }
+                                                        </h3>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="flex items-center justify-end gap-1.5 text-xs font-black text-red-500">
+                                                        <Timer className="animate-spin-slow h-4 w-4" />
+                                                        {countdown}s
+                                                    </div>
+                                                    <p className="mt-1 text-[10px] font-bold tracking-tighter text-gray-400">
+                                                        EXPIRA PRONTO
+                                                    </p>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {/* Meta info */}
-                                        <div className="flex items-center justify-between text-sm">
-                                            <p className="text-gray-500">
-                                                Distancia: —
-                                            </p>
-
-                                            <div className="flex items-center gap-1 font-bold text-green-600">
-                                                <DollarSign className="h-4 w-4" />
-                                                {incomingOrder.delivery_fee}
-                                            </div>
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="flex gap-2 pt-2">
-                                            <Button
-                                                variant="ghost"
-                                                className="flex-1 border border-red-200 text-red-600 hover:bg-red-50"
-                                                onClick={() =>
-                                                    clearIncomingOrder(
-                                                        'Pedido rechazado',
-                                                    )
-                                                }
-                                                disabled={isAccepting}
-                                            >
-                                                Rechazar
-                                            </Button>
-
-                                            <Button
-                                                className="flex-1 bg-purple-600 hover:bg-purple-700"
-                                                onClick={() =>
-                                                    handleAcceptOrder(
-                                                        incomingOrder?.id ?? 0,
-                                                    )
-                                                }
-                                                disabled={isAccepting}
-                                            >
-                                                {isAccepting
-                                                    ? 'Aceptando...'
-                                                    : 'Aceptar'}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {hasActiveOrder && (
-                                    <div className="space-y-3 border-t pt-4">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <Package className="h-4 w-4 text-purple-600" />
-                                                <p className="text-sm font-semibold text-gray-900">
-                                                    Pedido en curso
-                                                </p>
+                                            <div className="mb-4 grid grid-cols-2 gap-4">
+                                                <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50/50 p-3">
+                                                    <MapPin className="h-4 w-4 text-gray-400" />
+                                                    <p className="text-xs font-bold text-gray-600">
+                                                        — km
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-3 rounded-2xl border border-green-100 bg-green-50/50 p-3 text-green-700">
+                                                    <DollarSign className="h-4 w-4" />
+                                                    <p className="text-xs font-black">
+                                                        {
+                                                            incomingOrder.delivery_fee
+                                                        }
+                                                    </p>
+                                                </div>
                                             </div>
 
-                                            <span className="text-xs font-medium text-gray-400">
-                                                #{activeOrder.id}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            {activeOrder.status ===
-                                                OrderStatus.DELIVERY_ASSIGNED && (
-                                                <Button
-                                                    className="flex-1 bg-green-600 hover:bg-green-700"
+                                            <div className="flex gap-3">
+                                                <button
+                                                    className="flex-1 rounded-2xl border border-red-200 py-4 text-xs font-black tracking-widest text-red-500 uppercase transition-all hover:bg-red-50 active:scale-95 disabled:opacity-50"
                                                     onClick={() =>
-                                                        updateStatus(
-                                                            `/delivery/orders/${activeOrder.id}/on-the-way`,
-                                                            'En camino 🚴‍♂️',
+                                                        clearIncomingOrder(
+                                                            'Pedido rechazado',
                                                         )
                                                     }
+                                                    disabled={isAccepting}
                                                 >
-                                                    Iniciar ruta
-                                                </Button>
-                                            )}
-
-                                            {activeOrder.status ===
-                                                OrderStatus.PICKED_UP && (
-                                                <>
-                                                    {/* <Button
-                                                        variant="outline"
-                                                        className="flex-1"
-                                                    >
-                                                        Llegué
-                                                    </Button> */}
-
-                                                    <Button
-                                                        className="flex-1 bg-blue-600 hover:bg-blue-700"
-                                                        onClick={() =>
-                                                            updateStatus(
-                                                                `/delivery/orders/${activeOrder.id}/delivered`,
-                                                                'Entregado 📦',
-                                                            )
-                                                        }
-                                                    >
-                                                        Entregar
-                                                    </Button>
-                                                </>
-                                            )}
+                                                    Declinar
+                                                </button>
+                                                <button
+                                                    className="flex-[2] rounded-2xl bg-purple-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-purple-200 transition-all hover:bg-purple-700 active:scale-95 disabled:opacity-50"
+                                                    onClick={() =>
+                                                        handleAcceptOrder(
+                                                            incomingOrder?.id ??
+                                                            0,
+                                                        )
+                                                    }
+                                                    disabled={isAccepting}
+                                                >
+                                                    {isAccepting ? (
+                                                        <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        'Aceptar Pedido'
+                                                    )}
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-                )}
-
-                {/* --- Profile & availability --- */}
-                <Card
-                    className={cls(
-                        'overflow-hidden border-purple-200 py-1',
-                        !deliveryAvailable && 'bg-gray-200',
-                    )}
-                >
-                    <CardContent className="flex items-center justify-between p-1">
-                        <div className="flex items-center gap-3">
-                            <div className="relative">
-                                <User2 className="h-8 w-8 text-purple-700" />
-                                <div
-                                    className={cls(
-                                        'absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white',
-                                        deliveryAvailable
-                                            ? 'bg-green-500'
-                                            : 'bg-gray-400',
                                     )}
-                                />
-                            </div>
-                            <div>
-                                <p className="text-sm leading-tight font-semibold text-purple-900">
-                                    {user.name}
-                                </p>
-                                <p className="text-[10px] font-semibold text-gray-500 uppercase">
-                                    Repartidor
-                                </p>
-                            </div>
-                        </div>
 
-                        <div
-                            className={cls(
-                                'flex items-center gap-2 rounded-lg border border-purple-100 bg-purple-50 px-2 py-1.5',
-                                hasActiveOrder && 'opacity-50',
-                            )}
-                        >
-                            <Label
-                                htmlFor="disponibilidad"
-                                className="text-[10px] font-bold text-purple-800 uppercase"
-                            >
-                                {deliveryAvailable
-                                    ? 'En línea'
-                                    : 'Desconectado'}
-                            </Label>
+                                    {hasActiveOrder && (
+                                        <div className="p-2">
+                                            <div className="mb-4 flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                                                        <History className="h-5 w-5" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-black tracking-widest text-indigo-600 uppercase">
+                                                            En Curso
+                                                        </p>
+                                                        <p className="text-sm font-black text-gray-900">
+                                                            Orden #
+                                                            {activeOrder.id}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="h-2 w-24 overflow-hidden rounded-full bg-gray-100">
+                                                    <div
+                                                        className="h-full bg-indigo-500 transition-all duration-1000"
+                                                        style={{
+                                                            width:
+                                                                activeOrder.status ===
+                                                                    OrderStatus.PICKED_UP
+                                                                    ? '100%'
+                                                                    : '50%',
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
 
-                            <div
-                                onClick={() => toggleAvailability()}
-                                role="button"
-                            >
-                                <Switch
-                                    id="disponibilidad"
-                                    checked={deliveryAvailable}
-                                    disabled={hasActiveOrder}
-                                    onCheckedChange={() => toggleAvailability()}
-                                    className="data-[state=checked]:bg-purple-600"
-                                />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                                            <div className="flex gap-3">
+                                                {activeOrder.status ===
+                                                    OrderStatus.DELIVERY_ASSIGNED && (
+                                                        <button
+                                                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-green-200 transition-all hover:bg-green-700 active:scale-95 disabled:opacity-50"
+                                                            onClick={() =>
+                                                                updateStatus(
+                                                                    `/delivery/orders/${activeOrder.id}/on-the-way`,
+                                                                    'En camino 🚴‍♂️',
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                isUpdatingStatus
+                                                            }
+                                                        >
+                                                            {isUpdatingStatus ? (
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                            ) : (
+                                                                <>
+                                                                    Recoger Pedido
+                                                                    <ChevronRight className="h-4 w-4" />
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    )}
 
-                {/* --- Map or disconnected state --- */}
-                {deliveryAvailable ? (
-                    <Card className="relative h-80 overflow-hidden border-purple-200 bg-white p-0 shadow-sm">
-                        <Map center={deliveryLocation}>
-                            <FollowDelivery position={deliveryLocation} />
-                        </Map>
-                    </Card>
-                ) : (
-                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-100 bg-purple-50/30 py-12">
-                        <div className="mb-4 rounded-lg bg-white p-4 shadow-sm">
-                            <PackageSearch className="h-10 w-10 text-gray-300" />
-                        </div>
-                        <h2 className="text-sm font-semibold text-gray-700 uppercase">
-                            No puedes recibir pedidos
-                        </h2>
-                        <p className="mt-1 text-[10px] tracking-widest text-gray-500 uppercase">
-                            Activa tu disponibilidad
-                        </p>
-                    </div>
-                )}
+                                                {activeOrder.status ===
+                                                    OrderStatus.PICKED_UP && (
+                                                        <button
+                                                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50"
+                                                            onClick={() =>
+                                                                updateStatus(
+                                                                    `/delivery/orders/${activeOrder.id}/delivered`,
+                                                                    'Entregado 📦',
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                isUpdatingStatus
+                                                            }
+                                                        >
+                                                            {isUpdatingStatus ? (
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                            ) : (
+                                                                <>
+                                                                    Confirmar
+                                                                    Entrega
+                                                                    <PackageCheck className="h-4 w-4" />
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
+
+            <style>{`
+                .animate-spin-slow {
+                    animation: spin 3s linear infinite;
+                }
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </MainLayout>
     );
 }

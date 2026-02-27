@@ -77,18 +77,11 @@ async function registerFCMToken(currentToken: string | null) {
 }
 
 function initFCMListeners(currentToken: string | null) {
-    // const messaging = getMessaging();
-
     document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
             await registerFCMToken(currentToken);
         }
     });
-
-    // Mensajes en foreground
-    // onMessage(messaging, (payload) => {
-    //     console.log("Mensaje foreground:", payload);
-    // });
 }
 
 export { initFCMListeners, onMessage, registerFCMToken };

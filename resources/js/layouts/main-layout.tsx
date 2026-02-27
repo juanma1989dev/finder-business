@@ -1,6 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { memo, ReactNode, useEffect, useRef, useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 import Header from '@/components/app/Header';
 import MobileSidebar from '@/components/app/MobileSidebar';
@@ -49,10 +49,6 @@ export default function MainLayout({
     showFloatShoppingCart = true,
 }: MainLayoutProps) {
     const [isCartOpen, setIsCartOpen] = useState(false);
-    // const [previousStatus, setPreviousStatus] = useState<OrderStatus | null>(
-    //     null,
-    // );
-
     const [activeOrder, setActiveOrder] = useState<Order | null>(null);
     const [isLoadingActiveOrder, setIsLoadingActiveOrder] = useState(true);
 
@@ -69,16 +65,16 @@ export default function MainLayout({
                 new CustomEvent('firebase-message', { detail: payload }),
             );
 
-            toast.success(
-                <div>
-                    <p className="font-bold">
-                        {payload.notification?.title ?? 'Actualización'}
-                    </p>
-                    <p className="text-[10px]">
-                        {payload.notification?.body ?? ''}
-                    </p>
-                </div>,
-            );
+            // toast.success(
+            //     <div>
+            //         <p className="font-bold">
+            //             {payload.notification?.title ?? 'Actualización'}
+            //         </p>
+            //         <p className="text-[10px]">
+            //             {payload.notification?.body ?? ''}
+            //         </p>
+            //     </div>,
+            // );
             fetchActiveOrder();
         });
 
@@ -164,186 +160,219 @@ export default function MainLayout({
 
 const STORAGE_KEY = 'active-order-expanded';
 
-const ActiveOrderBar = memo(({ order, onClose }: { order: Order; onClose?: () => void }) => {
-    const [isVisible, setIsVisible] = useState(true);
-    const [expanded, setExpanded] = useState<boolean>(() => {
-        // ✅ Si monta directo con DELIVERED, siempre abrir sin importar localStorage
-        if (order.status === OrderStatus.DELIVERED) return true;
+const ActiveOrderBar = memo(
+    ({ order, onClose }: { order: Order; onClose?: () => void }) => {
+        const [isVisible, setIsVisible] = useState(true);
+        const [expanded, setExpanded] = useState<boolean>(() => {
+            // ✅ Si monta directo con DELIVERED, siempre abrir sin importar localStorage
+            if (order.status === OrderStatus.DELIVERED) return true;
 
-        if (typeof window === 'undefined') return true;
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved === null) return true;
-        return saved === 'true';
-    });
+            if (typeof window === 'undefined') return true;
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved === null) return true;
+            return saved === 'true';
+        });
 
-    // ✅ previousStatusRef arranca en null para distinguir "primer mount" de "cambio real"
-    const previousStatusRef = useRef<OrderStatus | null>(null);
+        // ✅ previousStatusRef arranca en null para distinguir "primer mount" de "cambio real"
+        const previousStatusRef = useRef<OrderStatus | null>(null);
 
-    const visualStatus = normalizeStatus(order.status);
-    const CURRENT_STEP = STEPS.findIndex((s) => s.key === visualStatus);
+        const visualStatus = normalizeStatus(order.status);
+        const CURRENT_STEP = STEPS.findIndex((s) => s.key === visualStatus);
 
-    useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, String(expanded));
-    }, [expanded]);
+        useEffect(() => {
+            localStorage.setItem(STORAGE_KEY, String(expanded));
+        }, [expanded]);
 
-    useEffect(() => {
-        const isNowDelivered = order.status === OrderStatus.DELIVERED;
+        useEffect(() => {
+            const isNowDelivered = order.status === OrderStatus.DELIVERED;
 
-        if (isNowDelivered) {
-            setExpanded(true); // Siempre expandir al entregar
+            if (isNowDelivered) {
+                setExpanded(true); // Siempre expandir al entregar
 
-            // Countdown de 6s para cerrar
-            const timer = setTimeout(() => {
-                setIsVisible(false);
-                // Notificar al padre para que limpie el estado después de la animación de salida
-                setTimeout(() => {
-                    onClose?.();
-                }, 500); // Esperar a que termine la animación de Framer Motion
-            }, 6000);
+                // Countdown de 6s para cerrar
+                const timer = setTimeout(() => {
+                    setIsVisible(false);
+                    // Notificar al padre para que limpie el estado después de la animación de salida
+                    setTimeout(() => {
+                        onClose?.();
+                    }, 500); // Esperar a que termine la animación de Framer Motion
+                }, 6000);
 
-            return () => clearTimeout(timer);
-        }
+                return () => clearTimeout(timer);
+            }
 
-        previousStatusRef.current = order.status;
-    }, [order.status, onClose]);
+            previousStatusRef.current = order.status;
+        }, [order.status, onClose]);
 
-    useEffect(() => {
-        // Resetear visibilidad si el pedido cambia a uno no entregado (por si acaso)
-        if (order.status !== OrderStatus.DELIVERED) {
-            setIsVisible(true);
-        }
-    }, [order.id]);
+        useEffect(() => {
+            // Resetear visibilidad si el pedido cambia a uno no entregado (por si acaso)
+            if (order.status !== OrderStatus.DELIVERED) {
+                setIsVisible(true);
+            }
+        }, [order.id]);
 
-    const totalQuantity = (order.items ?? []).reduce(
-        (sum, item) => sum + (item.quantity ?? 0),
-        0,
-    );
+        const totalQuantity = (order.items ?? []).reduce(
+            (sum, item) => sum + (item.quantity ?? 0),
+            0,
+        );
 
-    return (
-        <AnimatePresence>
-            {isVisible && (
-                <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center p-2 sm:p-4">
-                    <motion.div
-                        layout
-                        initial={{ y: 100, opacity: 0, scale: 0.95 }}
-                        animate={{ y: 0, opacity: 1, scale: 1 }}
-                        exit={{ y: 120, opacity: 0, transition: { duration: 0.2 } }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                        className="pointer-events-auto relative w-full max-w-md overflow-hidden rounded-3xl border border-white/40 bg-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all hover:bg-white/90"
-                    >
-                        {/* Botón Cerrar (X) */}
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsVisible(false);
-                                setTimeout(() => onClose?.(), 300);
+        return (
+            <AnimatePresence>
+                {isVisible && (
+                    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center p-2 sm:p-4">
+                        <motion.div
+                            layout
+                            initial={{ y: 100, opacity: 0, scale: 0.95 }}
+                            animate={{ y: 0, opacity: 1, scale: 1 }}
+                            exit={{
+                                y: 120,
+                                opacity: 0,
+                                transition: { duration: 0.2 },
                             }}
-                            className="absolute top-3 right-3 z-20 rounded-full p-1.5 text-purple-400 hover:bg-purple-100 hover:text-purple-600 transition-colors"
-                        >
-                            <X size={16} />
-                        </button>
-
-                        <div
-                            className="cursor-pointer px-5 py-4 select-none"
-                            onClick={() => {
-                                setExpanded((prev) => !prev);
+                            transition={{
+                                type: 'spring',
+                                stiffness: 400,
+                                damping: 30,
                             }}
+                            className="pointer-events-auto relative w-full max-w-md overflow-hidden rounded-3xl border border-white/40 bg-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all hover:bg-white/90"
                         >
-                            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-purple-200/50" />
+                            {/* Botón Cerrar (X) */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsVisible(false);
+                                    setTimeout(() => onClose?.(), 300);
+                                }}
+                                className="absolute top-3 right-3 z-20 rounded-full p-1.5 text-purple-400 transition-colors hover:bg-purple-100 hover:text-purple-600"
+                            >
+                                <X size={16} />
+                            </button>
 
-                            <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 pb-1.5">
-                                        <span className="flex items-center gap-1.5 rounded-full bg-purple-100 px-2 py-0.5 text-[9px] font-bold tracking-widest text-purple-600 uppercase">
-                                            {order.status === OrderStatus.DELIVERED ? 'Completado' : 'Pedido en vivo'}
-                                            {order.status !== OrderStatus.DELIVERED && (
-                                                <Circle className="h-1.5 w-1.5 animate-pulse fill-purple-600 text-purple-600" />
-                                            )}
-                                        </span>
-                                        {!expanded && totalQuantity > 0 && (
-                                            <span className="text-[10px] font-medium text-slate-500">
-                                                • {totalQuantity} {totalQuantity === 1 ? 'producto' : 'productos'}
+                            <div
+                                className="cursor-pointer px-5 py-4 select-none"
+                                onClick={() => {
+                                    setExpanded((prev) => !prev);
+                                }}
+                            >
+                                <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-purple-200/50" />
+
+                                <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 pb-1.5">
+                                            <span className="flex items-center gap-1.5 rounded-full bg-purple-100 px-2 py-0.5 text-[9px] font-bold tracking-widest text-purple-600 uppercase">
+                                                {order.status ===
+                                                OrderStatus.DELIVERED
+                                                    ? 'Completado'
+                                                    : 'Pedido en vivo'}
+                                                {order.status !==
+                                                    OrderStatus.DELIVERED && (
+                                                    <Circle className="h-1.5 w-1.5 animate-pulse fill-purple-600 text-purple-600" />
+                                                )}
                                             </span>
+                                            {!expanded && totalQuantity > 0 && (
+                                                <span className="text-[10px] font-medium text-slate-500">
+                                                    • {totalQuantity}{' '}
+                                                    {totalQuantity === 1
+                                                        ? 'producto'
+                                                        : 'productos'}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-base font-extrabold text-slate-900">
+                                            ORDEN #{order.id}
+                                        </p>
+                                        <p className="text-xs font-semibold text-purple-600">
+                                            {STEPS[CURRENT_STEP]?.label ?? ''}
+                                        </p>
+
+                                        {order.status ===
+                                            OrderStatus.DELIVERED && (
+                                            <motion.p
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                className="mt-1 flex items-center gap-1.5 text-xs font-bold text-green-600"
+                                            >
+                                                <CheckCircle size={14} />{' '}
+                                                ¡Entregado con éxito!
+                                            </motion.p>
                                         )}
                                     </div>
-                                    <p className="text-base font-extrabold text-slate-900">
-                                        ORDEN #{order.id}
-                                    </p>
-                                    <p className="text-xs font-semibold text-purple-600">
-                                        {STEPS[CURRENT_STEP]?.label ?? ''}
-                                    </p>
-
-                                    {order.status === OrderStatus.DELIVERED && (
-                                        <motion.p
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            className="mt-1 flex items-center gap-1.5 text-xs font-bold text-green-600"
-                                        >
-                                            <CheckCircle size={14} /> ¡Entregado con éxito!
-                                        </motion.p>
-                                    )}
+                                    <motion.div
+                                        animate={{ rotate: expanded ? 180 : 0 }}
+                                        className="mr-6 flex h-8 w-8 items-center justify-center rounded-full bg-purple-50 text-purple-500"
+                                    >
+                                        <ChevronDown size={20} />
+                                    </motion.div>
                                 </div>
-                                <motion.div
-                                    animate={{ rotate: expanded ? 180 : 0 }}
-                                    className="mr-6 flex h-8 w-8 items-center justify-center rounded-full bg-purple-50 text-purple-500"
-                                >
-                                    <ChevronDown size={20} />
-                                </motion.div>
                             </div>
-                        </div>
 
-                        <AnimatePresence initial={false}>
-                            {expanded && (
-                                <motion.div
-                                    key="content"
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                                >
-                                    <div className="max-h-[50vh] overflow-y-auto border-t border-slate-100 bg-slate-50/30 px-5 py-4">
-                                        <OrderDetail
-                                            order={{
-                                                ...order,
-                                                status: normalizeStatus(order.status),
-                                            }}
-                                            expanded={expanded}
-                                        />
-                                    </div>
-
-                                    {order.status === OrderStatus.DELIVERED && (
-                                        <div className="border-t border-slate-100 bg-white p-4">
-                                            <button
-                                                onClick={() => {
-                                                    window.location.href = `/orders/${order.id}`;
+                            <AnimatePresence initial={false}>
+                                {expanded && (
+                                    <motion.div
+                                        key="content"
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{
+                                            duration: 0.3,
+                                            ease: [0.4, 0, 0.2, 1],
+                                        }}
+                                    >
+                                        <div className="max-h-[50vh] overflow-y-auto border-t border-slate-100 bg-slate-50/30 px-5 py-4">
+                                            <OrderDetail
+                                                order={{
+                                                    ...order,
+                                                    status: normalizeStatus(
+                                                        order.status,
+                                                    ),
                                                 }}
-                                                className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-purple-200 transition-all hover:scale-[1.02] hover:shadow-purple-300 active:scale-[0.98]"
-                                            >
-                                                <span>Ver detalle completo</span>
-                                                <ChevronDown size={18} className="-rotate-90 group-hover:translate-x-1 transition-transform" />
-                                            </button>
+                                                expanded={expanded}
+                                            />
                                         </div>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
 
-                        {/* Barra de progreso de cierre automático (solo para entregados) */}
-                        {order.status === OrderStatus.DELIVERED && isVisible && (
-                            <motion.div
-                                initial={{ width: '100%' }}
-                                animate={{ width: '0%' }}
-                                transition={{ duration: 6, ease: 'linear' }}
-                                className="h-1 bg-green-500/50"
-                            />
-                        )}
-                    </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
-    );
-});
+                                        {order.status ===
+                                            OrderStatus.DELIVERED && (
+                                            <div className="border-t border-slate-100 bg-white p-4">
+                                                <button
+                                                    onClick={() => {
+                                                        window.location.href = `/orders/${order.id}`;
+                                                    }}
+                                                    className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-purple-200 transition-all hover:scale-[1.02] hover:shadow-purple-300 active:scale-[0.98]"
+                                                >
+                                                    <span>
+                                                        Ver detalle completo
+                                                    </span>
+                                                    <ChevronDown
+                                                        size={18}
+                                                        className="-rotate-90 transition-transform group-hover:translate-x-1"
+                                                    />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
+                            {/* Barra de progreso de cierre automático (solo para entregados) */}
+                            {order.status === OrderStatus.DELIVERED &&
+                                isVisible && (
+                                    <motion.div
+                                        initial={{ width: '100%' }}
+                                        animate={{ width: '0%' }}
+                                        transition={{
+                                            duration: 6,
+                                            ease: 'linear',
+                                        }}
+                                        className="h-1 bg-green-500/50"
+                                    />
+                                )}
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        );
+    },
+);
 
 const OrderDetail = memo(
     ({ order, expanded }: { order: Order; expanded: boolean }) => (
@@ -454,10 +483,11 @@ const OrderTimeline = memo(
                                         <CheckCircle className="h-5 w-5 text-green-600" />
                                     ) : (
                                         <div
-                                            className={`${isCurrent
-                                                ? 'text-purple-600'
-                                                : 'text-gray-300'
-                                                }`}
+                                            className={`${
+                                                isCurrent
+                                                    ? 'text-purple-600'
+                                                    : 'text-gray-300'
+                                            }`}
                                         >
                                             {STEP_ICONS[step.key]}
                                         </div>
@@ -465,12 +495,13 @@ const OrderTimeline = memo(
                                 </div>
 
                                 <span
-                                    className={`mt-2 text-center text-[11px] leading-tight font-semibold ${isCurrent
-                                        ? 'text-purple-800'
-                                        : isCompleted
-                                            ? 'text-gray-700'
-                                            : 'text-gray-300'
-                                        }`}
+                                    className={`mt-2 text-center text-[11px] leading-tight font-semibold ${
+                                        isCurrent
+                                            ? 'text-purple-800'
+                                            : isCompleted
+                                              ? 'text-gray-700'
+                                              : 'text-gray-300'
+                                    }`}
                                 >
                                     {step.label}
                                 </span>

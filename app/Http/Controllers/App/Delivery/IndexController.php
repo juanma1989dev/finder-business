@@ -14,6 +14,7 @@ class IndexController extends Controller
         $user = Auth::user();
 
         $activeOrder = Order::query()
+            ->with(['business', 'user'])
             ->where('delivery_id', $user->id)
             ->whereIn('status', [
                 OrderStatusEnum::PICKED_UP->value,

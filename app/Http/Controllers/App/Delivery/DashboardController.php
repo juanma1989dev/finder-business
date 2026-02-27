@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App\Delivery;
 
+use App\Domains\Orders\Enums\OrderStatusEnum;
 use App\Domains\Orders\Models\Order;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
@@ -16,7 +17,7 @@ class DashboardController extends Controller
             : now()->startOfDay();
 
         $orders = Order::with('user')
-            ->whereNotIn('status', ['confirmed', 'on_the_way', 'rejected'])
+            ->whereNotIn('status', [OrderStatusEnum::CANCELLED, OrderStatusEnum::REJECTED ])
             ->whereBetween('created_at', [
                 $date->copy()->startOfDay(),
                 $date->copy()->endOfDay(),
