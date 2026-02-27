@@ -19,6 +19,7 @@ import {
     PackageCheck,
     Sun,
     Timer,
+    TrendingUp,
     User2,
     Wifi,
     WifiOff,
@@ -38,8 +39,9 @@ interface ApiError {
     message: string;
 }
 
-interface Props {
+interface HomeProps {
     activeOrder: any;
+    ordersDelivered: number;
 }
 
 /* ----------------------------- Configuration ----------------------------- */
@@ -59,7 +61,7 @@ function FollowDelivery({ position }: { position: [number, number] }) {
     return null;
 }
 
-export default function Index({ activeOrder }: Props) {
+export default function Index({ activeOrder, ordersDelivered }: HomeProps) {
     const { auth } = usePage<SharedData>().props;
     const { user } = auth;
     const { latitude, longitude } = useGeolocation();
@@ -391,19 +393,19 @@ export default function Index({ activeOrder }: Props) {
                                 </button>
                             </div>
 
-                            {/* <div className="grid grid-cols-1">
+                            <div className="grid grid-cols-1">
                                 <div className="rounded-xl border border-indigo-100/50 bg-indigo-50/50 p-3">
                                     <div className="mb-1 flex items-center gap-2">
                                         <TrendingUp className="h-3 w-3 text-indigo-600" />
                                         <span className="text-[9px] font-bold tracking-tighter text-gray-400 uppercase">
-                                            ***Entregas de Hoy
+                                            Entregas de Hoy
                                         </span>
                                     </div>
                                     <p className="text-sm font-black text-indigo-900">
-                                        0
+                                        {ordersDelivered}
                                     </p>
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>

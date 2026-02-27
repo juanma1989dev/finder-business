@@ -22,9 +22,18 @@ class IndexController extends Controller
             ])
             ->latest()
             ->first();
+        
+        $ordersDelivered = Order::query()
+            ->where('delivery_id', $user->id)
+            ->whereIn('status', [
+                OrderStatusEnum::DELIVERED->value
+            ])
+            ->whereDate('updated_at', now()->toDateString())
+            ->count();
 
         return inertia('Delivery/Home', [
             'activeOrder' => $activeOrder,
+            'ordersDelivered' => $ordersDelivered,
         ]);
     }
 }
